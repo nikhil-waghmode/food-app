@@ -5,13 +5,19 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
+import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
-public class Reviews {
+
+
+@Entity
+@Table(name="reviews")
+public class Review {
     @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,12 +30,12 @@ public class Reviews {
     private LocalDate date;
     private Long userId;
 
-    public Reviews() {
+    public Review() {
         super();
         // TODO Auto-generated constructor stub
     }
 
-    public Reviews(Long id, Float rating, String feedback, LocalDate date, Long userId) {
+    public Review(Long id, Float rating, String feedback, LocalDate date, Long userId) {
         super();
         this.id = id;
         this.rating = rating;

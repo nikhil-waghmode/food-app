@@ -12,9 +12,11 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
 
 @Entity
+@Table(name="restaurants")
 public class Restaurant {
 
 	@Id
@@ -32,7 +34,7 @@ public class Restaurant {
 	
 	@OneToMany(mappedBy="restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
 	@JsonManagedReference
-	private List<Reviews> reviews = new ArrayList<Reviews>();
+	private List<Review> review = new ArrayList<Review>();
 
 	public Restaurant() {
 		super();
@@ -55,7 +57,7 @@ public class Restaurant {
 	
 
 	public Restaurant(Long id, String name, String location, String contact, Long ownerId, String restaurantImg,
-			List<FoodItem> foodItem, List<Reviews> reviews) {
+			List<FoodItem> foodItem, List<Review> review) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -64,7 +66,7 @@ public class Restaurant {
 		this.ownerId = ownerId;
 		this.restaurantImg = restaurantImg;
 		this.foodItem = foodItem;
-		this.reviews = reviews;
+		this.review = review;
 	}
 
 	public Long getId() {
@@ -123,12 +125,12 @@ public class Restaurant {
 		this.foodItem = foodItem;
 	}
 
-	public List<Reviews> getReviews() {
-		return reviews;
+	public List<Review> getReview() {
+		return review;
 	}
 
-	public void setReviews(List<Reviews> reviews) {
-		this.reviews = reviews;
+	public void setReview(List<Review> review) {
+		this.review = review;
 	}
 
 	@Override
