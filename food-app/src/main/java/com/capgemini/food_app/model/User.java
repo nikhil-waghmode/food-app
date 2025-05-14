@@ -1,7 +1,5 @@
 package com.capgemini.food_app.model;
 
-import java.util.Objects;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -113,29 +111,10 @@ public class User {
 		this.userImg = userImg;
 	}
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(email, id, location, name, password, phone, userImg, userType);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		User other = (User) obj;
-		return Objects.equals(email, other.email) && Objects.equals(id, other.id)
-				&& Objects.equals(location, other.location) && Objects.equals(name, other.name)
-				&& Objects.equals(password, other.password) && Objects.equals(phone, other.phone)
-				&& Objects.equals(userImg, other.userImg) && Objects.equals(userType, other.userType);
-	}
 
 	@Override
 	public String toString() {
-		return "User [id=" + id + ", name=" + name + ", email=" + email + ", password=" + password + ", phone=" + phone
+		return "User [id=" + id + ", name=" + name + ", email=" + email + ", phone=" + phone
 				+ ", userType=" + userType + ", location=" + location + ", userImg=" + userImg + "]";
 	}
 }

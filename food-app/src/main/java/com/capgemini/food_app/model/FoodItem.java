@@ -110,11 +110,11 @@ public class FoodItem {
 		this.price = price;
 	}
 
-	public String getitemImg() {
+	public String getItemImg() {
 		return itemImg;
 	}
 
-	public void setitemImg(String itemImg) {
+	public void setItemImg(String itemImg) {
 		this.itemImg = itemImg;
 	}
 
