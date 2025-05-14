@@ -21,11 +21,21 @@ public class Review {
     @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
     @ManyToOne
     @JsonBackReference
     @JoinColumn(name="restaurant_id")
-    private List<Restaurant>restaurant;
-    private Float rating;
+    private Restaurant restaurant;
+    
+    public Restaurant getRestaurant() {
+		return restaurant;
+	}
+
+	public void setRestaurant(Restaurant restaurant) {
+		this.restaurant = restaurant;
+	}
+
+	private Float rating;
     private String feedback;
     private LocalDate date;
     private Long userId;

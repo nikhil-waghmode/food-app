@@ -10,11 +10,11 @@ import com.capgemini.food_app.model.User;
 import com.capgemini.food_app.repository.UserRepository;
 
 @Service
-public class UserServiceImp implements UserService{
+public class UserServiceImpl implements UserService{
 	UserRepository userRepository;
 
 	@Autowired
-	public UserServiceImp(UserRepository userRepository) {
+	public UserServiceImpl(UserRepository userRepository) {
 		this.userRepository = userRepository;
 	}
 
