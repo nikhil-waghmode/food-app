@@ -39,18 +39,6 @@ public class Restaurant {
 		// TODO Auto-generated constructor stub
 	}
 
-	public Restaurant(Long id, String name, String location, String contact, Long ownerId, String restaurantImg,
-			List<FoodItem> foodItem, List<Reviews> reviews) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.location = location;
-		this.contact = contact;
-		this.ownerId = ownerId;
-		this.restaurantImg = restaurantImg;
-		this.foodItem = foodItem;
-		this.reviews = reviews;
-	}
 
 	public Restaurant(Long id, String name, String location, String contact, Long ownerId, String restaurantImg,
 			List<FoodItem> foodItem) {
