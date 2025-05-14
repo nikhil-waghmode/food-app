@@ -23,7 +23,7 @@ public class OrderController {
     	this.orderService = orderService;
     }
 
-    
+     
     @PostMapping
 	ResponseEntity<Order> createOrder(@RequestBody Order order) {
 		return ResponseEntity.status(HttpStatus.CREATED).location(URI.create("/api/orders/" + order.getId()))

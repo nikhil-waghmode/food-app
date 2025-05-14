@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -42,7 +41,7 @@ public class OrderServiceImpl implements OrderService {
         order.setTotalAmount(updatedOrder.getTotalAmount());
         return orderRepository.save(order);
     }
-    
+     
     @Override
 	public Order patchOrder(Long id, Order newOrder) {
 		Order oldOrder = orderRepository.findById(id)
