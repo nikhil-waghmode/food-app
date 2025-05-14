@@ -1,6 +1,5 @@
 package com.capgemini.food_app.model;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +12,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 
-
 @Entity
 public class Restaurant {
 
@@ -25,31 +23,22 @@ public class Restaurant {
 	private String contact;
 	private Long ownerId;
 	private String restaurantImg;
-	
-	@OneToMany(mappedBy="restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
+
+	@OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
 	@JsonManagedReference
 	private List<FoodItem> foodItem = new ArrayList<FoodItem>();
-	
-	@OneToMany(mappedBy="restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
+
+	@OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
 	@JsonManagedReference
 	private List<Reviews> reviews = new ArrayList<Reviews>();
+	
+//	@OneToMany(mappedBy = "restaurant")
+//	private List<FoodOrder> foodOrders;
+
 
 	public Restaurant() {
 		super();
 		// TODO Auto-generated constructor stub
-	}
-
-	public Restaurant(Long id, String name, String location, String contact, Long ownerId, String restaurantImg,
-			List<FoodItem> foodItem, List<Reviews> reviews) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.location = location;
-		this.contact = contact;
-		this.ownerId = ownerId;
-		this.restaurantImg = restaurantImg;
-		this.foodItem = foodItem;
-		this.reviews = reviews;
 	}
 
 	public Restaurant(Long id, String name, String location, String contact, Long ownerId, String restaurantImg,
@@ -63,8 +52,6 @@ public class Restaurant {
 		this.restaurantImg = restaurantImg;
 		this.foodItem = foodItem;
 	}
-	
-	
 
 	public Restaurant(Long id, String name, String location, String contact, Long ownerId, String restaurantImg,
 			List<FoodItem> foodItem, List<Reviews> reviews) {
@@ -103,11 +90,11 @@ public class Restaurant {
 		this.location = location;
 	}
 
-	public String getcontact() {
+	public String getContact() {
 		return contact;
 	}
 
-	public void setcontact(String contact) {
+	public void setContact(String contact) {
 		this.contact = contact;
 	}
 
@@ -145,10 +132,8 @@ public class Restaurant {
 
 	@Override
 	public String toString() {
-		return "Restaurant [id=" + id + ", name=" + name + ", location=" + location + ", contact=" + contact + ", ownerId="
-				+ ownerId + ", restaurantImg=" + restaurantImg + "]";
+		return "Restaurant [id=" + id + ", name=" + name + ", location=" + location + ", contact=" + contact
+				+ ", ownerId=" + ownerId + ", restaurantImg=" + restaurantImg + "]";
 	}
-	
-	
 
 }
