@@ -1,4 +1,4 @@
-package com.capgemini.food_app.entity;
+package com.capgemini.food_app.model;
 
 
 import java.util.ArrayList;
@@ -13,10 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 
-/**
- * "name": "Tasty Bites", "location": "Downtown", "contact": "9876543210",
- * "ownerID": "u1a9b", "id": "r2k9d"
- */
+
 @Entity
 public class Restaurant {
 

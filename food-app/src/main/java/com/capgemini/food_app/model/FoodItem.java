@@ -1,4 +1,4 @@
-package com.capgemini.food_app.entity;
+package com.capgemini.food_app.model;
 
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -25,7 +25,7 @@ public class FoodItem {
 	
 	@ManyToOne
 	@JsonBackReference
-	@JoinColumn(name = "restaurant")
+	@JoinColumn(name = "restaurant_id")
 	private Restaurant restaurant;
 
 	public FoodItem() {
