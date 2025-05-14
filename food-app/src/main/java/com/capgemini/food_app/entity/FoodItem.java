@@ -1,0 +1,129 @@
+package com.capgemini.food_app.entity;
+
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+
+
+@Entity
+public class FoodItem {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	private String name;
+	private String category;
+	private Integer price;
+	private String foodImage;
+	private String cuisine;
+	
+	@ManyToOne
+	@JsonBackReference
+	@JoinColumn(name = "restaurant")
+	private Restaurant restaurant;
+
+	public FoodItem() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	public FoodItem(Long id, String name, String category, Integer price, String foodImage) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.category = category;
+		this.price = price;
+		this.foodImage = foodImage;
+	}
+
+	public FoodItem(Long id, String name, String category, Integer price, String foodImage, String cuisine) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.category = category;
+		this.price = price;
+		this.foodImage = foodImage;
+		this.cuisine = cuisine;
+	}
+
+	public FoodItem(Long id, String name, String category, Integer price, String foodImage, Restaurant restaurant) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.category = category;
+		this.price = price;
+		this.foodImage = foodImage;
+		this.restaurant = restaurant;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getCategory() {
+		return category;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
+	}
+
+	public Integer getPrice() {
+		return price;
+	}
+
+	public void setPrice(Integer price) {
+		this.price = price;
+	}
+
+	public String getFoodImage() {
+		return foodImage;
+	}
+
+	public void setFoodImage(String foodImage) {
+		this.foodImage = foodImage;
+	}
+
+	public String getCuisine() {
+		return cuisine;
+	}
+
+	public void setCuisine(String cuisine) {
+		this.cuisine = cuisine;
+	}
+
+	public Restaurant getRestaurant() {
+		return restaurant;
+	}
+
+	public void setRestaurant(Restaurant restaurant) {
+		this.restaurant = restaurant;
+	}
+
+	@Override
+	public String toString() {
+		return "FoodItem [id=" + id + ", name=" + name + ", category=" + category + ", price=" + price + ", foodImage="
+				+ foodImage + "]";
+	}
+	
+	
+
+}
