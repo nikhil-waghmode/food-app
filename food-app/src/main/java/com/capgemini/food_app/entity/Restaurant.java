@@ -14,7 +14,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 
 /**
- * "name": "Tasty Bites", "location": "Downtown", "phone": "9876543210",
+ * "name": "Tasty Bites", "location": "Downtown", "contact": "9876543210",
  * "ownerID": "u1a9b", "id": "r2k9d"
  */
 @Entity
@@ -25,9 +25,9 @@ public class Restaurant {
 	private Long id;
 	private String name;
 	private String location;
-	private String phone;
+	private String contact;
 	private Long ownerId;
-	private String resImage;
+	private String restaurantImg;
 	
 	@OneToMany(mappedBy="restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
 	@JsonManagedReference
@@ -42,29 +42,44 @@ public class Restaurant {
 		// TODO Auto-generated constructor stub
 	}
 
-	public Restaurant(Long id, String name, String location, String phone, Long ownerId, String resImage,
+	public Restaurant(Long id, String name, String location, String contact, Long ownerId, String restaurantImg,
 			List<FoodItem> foodItem, List<Reviews> reviews) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.location = location;
-		this.phone = phone;
+		this.contact = contact;
 		this.ownerId = ownerId;
-		this.resImage = resImage;
+		this.restaurantImg = restaurantImg;
 		this.foodItem = foodItem;
 		this.reviews = reviews;
 	}
 
-	public Restaurant(Long id, String name, String location, String phone, Long ownerId, String resImage,
+	public Restaurant(Long id, String name, String location, String contact, Long ownerId, String restaurantImg,
 			List<FoodItem> foodItem) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.location = location;
-		this.phone = phone;
+		this.contact = contact;
 		this.ownerId = ownerId;
-		this.resImage = resImage;
+		this.restaurantImg = restaurantImg;
 		this.foodItem = foodItem;
+	}
+	
+	
+
+	public Restaurant(Long id, String name, String location, String contact, Long ownerId, String restaurantImg,
+			List<FoodItem> foodItem, List<Reviews> reviews) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.location = location;
+		this.contact = contact;
+		this.ownerId = ownerId;
+		this.restaurantImg = restaurantImg;
+		this.foodItem = foodItem;
+		this.reviews = reviews;
 	}
 
 	public Long getId() {
@@ -91,12 +106,12 @@ public class Restaurant {
 		this.location = location;
 	}
 
-	public String getPhone() {
-		return phone;
+	public String getcontact() {
+		return contact;
 	}
 
-	public void setPhone(String phone) {
-		this.phone = phone;
+	public void setcontact(String contact) {
+		this.contact = contact;
 	}
 
 	public Long getOwnerId() {
@@ -107,12 +122,12 @@ public class Restaurant {
 		this.ownerId = ownerId;
 	}
 
-	public String getResImage() {
-		return resImage;
+	public String getrestaurantImg() {
+		return restaurantImg;
 	}
 
-	public void setResImage(String resImage) {
-		this.resImage = resImage;
+	public void setrestaurantImg(String restaurantImg) {
+		this.restaurantImg = restaurantImg;
 	}
 
 	public List<FoodItem> getFoodItem() {
@@ -133,8 +148,8 @@ public class Restaurant {
 
 	@Override
 	public String toString() {
-		return "Restaurant [id=" + id + ", name=" + name + ", location=" + location + ", phone=" + phone + ", ownerId="
-				+ ownerId + ", resImage=" + resImage + "]";
+		return "Restaurant [id=" + id + ", name=" + name + ", location=" + location + ", contact=" + contact + ", ownerId="
+				+ ownerId + ", restaurantImg=" + restaurantImg + "]";
 	}
 	
 	

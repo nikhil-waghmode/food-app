@@ -20,7 +20,7 @@ public class FoodItem {
 	private String name;
 	private String category;
 	private Integer price;
-	private String foodImage;
+	private String itemImg;
 	private String cuisine;
 	
 	@ManyToOne
@@ -33,32 +33,46 @@ public class FoodItem {
 		// TODO Auto-generated constructor stub
 	}
 
-	public FoodItem(Long id, String name, String category, Integer price, String foodImage) {
+	public FoodItem(Long id, String name, String category, Integer price, String itemImg) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.category = category;
 		this.price = price;
-		this.foodImage = foodImage;
+		this.itemImg = itemImg;
 	}
 
-	public FoodItem(Long id, String name, String category, Integer price, String foodImage, String cuisine) {
+	public FoodItem(Long id, String name, String category, Integer price, String itemImg, String cuisine) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.category = category;
 		this.price = price;
-		this.foodImage = foodImage;
+		this.itemImg = itemImg;
 		this.cuisine = cuisine;
 	}
 
-	public FoodItem(Long id, String name, String category, Integer price, String foodImage, Restaurant restaurant) {
+	public FoodItem(Long id, String name, String category, Integer price, String itemImg, Restaurant restaurant) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.category = category;
 		this.price = price;
-		this.foodImage = foodImage;
+		this.itemImg = itemImg;
+		this.restaurant = restaurant;
+	}
+	
+	
+
+	public FoodItem(Long id, String name, String category, Integer price, String itemImg, String cuisine,
+			Restaurant restaurant) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.category = category;
+		this.price = price;
+		this.itemImg = itemImg;
+		this.cuisine = cuisine;
 		this.restaurant = restaurant;
 	}
 
@@ -94,12 +108,12 @@ public class FoodItem {
 		this.price = price;
 	}
 
-	public String getFoodImage() {
-		return foodImage;
+	public String getitemImg() {
+		return itemImg;
 	}
 
-	public void setFoodImage(String foodImage) {
-		this.foodImage = foodImage;
+	public void setitemImg(String itemImg) {
+		this.itemImg = itemImg;
 	}
 
 	public String getCuisine() {
@@ -120,8 +134,8 @@ public class FoodItem {
 
 	@Override
 	public String toString() {
-		return "FoodItem [id=" + id + ", name=" + name + ", category=" + category + ", price=" + price + ", foodImage="
-				+ foodImage + "]";
+		return "FoodItem [id=" + id + ", name=" + name + ", category=" + category + ", price=" + price + ", itemImg="
+				+ itemImg + "]";
 	}
 	
 	
