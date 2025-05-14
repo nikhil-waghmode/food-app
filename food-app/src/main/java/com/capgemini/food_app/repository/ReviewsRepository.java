@@ -10,5 +10,5 @@ public interface ReviewsRepository extends JpaRepository<Reviews, Long> {
 	
 	List<Reviews> findByRestaurantId(Long restaurantId);
 	List<Reviews> findByUserId(Long userId);
-
+ 
 }

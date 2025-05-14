@@ -49,5 +49,5 @@ public class ReviewsController {
 	@GetMapping("/users/{userId}/reviews")
 	public List<Reviews> getReviewsByUser(@PathVariable Long userId) {
 		return reviewService.getReviewsByUser(userId);
-	}
+	} 
 }

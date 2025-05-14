@@ -24,7 +24,15 @@ public class Reviews {
     private LocalDate date;
     private Long userId;
 
-    public Reviews() {
+    public List<Restaurant> getRestaurant() {
+		return restaurant;
+	}
+
+	public void setRestaurant(List<Restaurant> restaurant) {
+		this.restaurant = restaurant;
+	}
+
+	public Reviews() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -37,8 +45,19 @@ public class Reviews {
         this.date = date;
         this.userId = userId;
     }
+    
 
-    public Long getId() {
+    public Reviews(Long id, List<Restaurant> restaurant, Float rating, String feedback, LocalDate date, Long userId) {
+		super();
+		this.id = id;
+		this.restaurant = restaurant;
+		this.rating = rating;
+		this.feedback = feedback;
+		this.date = date;
+		this.userId = userId;
+	}
+
+	public Long getId() {
         return id;
     }
 

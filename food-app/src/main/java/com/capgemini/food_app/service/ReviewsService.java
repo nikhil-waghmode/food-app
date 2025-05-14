@@ -18,4 +18,4 @@ public interface ReviewsService {
 	List<Reviews> getReviewsByRestaurant(Long restaurantId);
 
 	List<Reviews> getReviewsByUser(Long userId);
-}
+} 

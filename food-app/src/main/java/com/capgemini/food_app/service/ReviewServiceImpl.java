@@ -41,7 +41,7 @@ public class ReviewServiceImpl implements ReviewsService {
 	@Override
 	public void deleteReview(Long id) {
 		reviewRepository.deleteById(id);
-	}
+	} 
 
 	@Override
 	public List<Reviews> getReviewsByRestaurant(Long restaurantId) {

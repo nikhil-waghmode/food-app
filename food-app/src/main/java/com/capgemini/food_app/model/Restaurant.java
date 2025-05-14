@@ -91,14 +91,6 @@ public class Restaurant {
 		this.location = location;
 	}
 
-	public String getcontact() {
-		return contact;
-	}
-
-	public void setcontact(String contact) {
-		this.contact = contact;
-	}
-
 	public Long getOwnerId() {
 		return ownerId;
 	}
@@ -107,13 +99,26 @@ public class Restaurant {
 		this.ownerId = ownerId;
 	}
 
-	public String getrestaurantImg() {
+
+	public String getContact() {
+		return contact;
+	}
+
+
+	public void setContact(String contact) {
+		this.contact = contact;
+	}
+
+
+	public String getRestaurantImg() {
 		return restaurantImg;
 	}
 
-	public void setrestaurantImg(String restaurantImg) {
+
+	public void setRestaurantImg(String restaurantImg) {
 		this.restaurantImg = restaurantImg;
 	}
+
 
 	public List<FoodItem> getFoodItem() {
 		return foodItem;
