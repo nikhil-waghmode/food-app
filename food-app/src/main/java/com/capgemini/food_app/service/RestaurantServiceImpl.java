@@ -1,5 +1,6 @@
 package com.capgemini.food_app.service;
 
+import com.capgemini.food_app.exception.OwnerAlreadyHasRestaurantException;
 import com.capgemini.food_app.model.Restaurant;
 import com.capgemini.food_app.repository.RestaurantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class RestaurantServiceImpl implements RestaurantService {
@@ -61,7 +63,13 @@ public class RestaurantServiceImpl implements RestaurantService {
 
     @Override
     public Restaurant createRestaurant(String name, String location, String contact,
-                                      Long ownerId, MultipartFile resImage) throws IOException {
+                                       Long ownerId, MultipartFile resImage) throws IOException {
+        List<Restaurant> existingRestaurants = getRestaurantsByOwner(ownerId);
+
+        if (!existingRestaurants.isEmpty()) {
+            throw new OwnerAlreadyHasRestaurantException("User already owns a restaurant");
+        }
+
         String filename = storeImage(resImage);
 
         Restaurant restaurant = new Restaurant();
@@ -73,6 +81,7 @@ public class RestaurantServiceImpl implements RestaurantService {
 
         return restaurantRepository.save(restaurant);
     }
+
 
     @Override
     public Restaurant updateRestaurant(Long id, String name, String location, String contact,
