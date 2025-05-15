@@ -1,4 +1,5 @@
 package com.capgemini.food_app;
+
 import com.capgemini.food_app.controller.ReviewController;
 import com.capgemini.food_app.model.Review;
 import com.capgemini.food_app.service.ReviewService;
@@ -15,8 +16,9 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
+
 public class ReviewControllerTest {
-	@Mock
+    @Mock
     private ReviewService reviewService;
 
     @InjectMocks
@@ -29,7 +31,7 @@ public class ReviewControllerTest {
 
     @Test
     void testCreateReview() {
-        Review input = new Review(null, 5F, "Great!", LocalDate.now(), 1L );
+        Review input = new Review(null, 5F, "Great!", LocalDate.now(), 1L);
         Review saved = new Review(1L, 5F, "Great!", LocalDate.now(), 1L);
 
         when(reviewService.createReview(input)).thenReturn(saved);
@@ -84,7 +86,7 @@ public class ReviewControllerTest {
 
         ResponseEntity<Void> response = reviewController.deleteReview(1L);
 
-//        assertThat(response.getStatusCodeValue()).isEqualTo(204);
+        // assertThat(response.getStatusCodeValue()).isEqualTo(204);
         verify(reviewService, times(1)).deleteReview(1L);
     }
 

@@ -1,11 +1,8 @@
 package com.capgemini.food_app.controller;
 
-import com.capgemini.food_app.exception.OrderItemNotFoundException;
 import com.capgemini.food_app.model.OrderItem;
 import com.capgemini.food_app.service.OrderItemService;
-
-import jakarta.validation.Valid;
-
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,8 +11,10 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.List;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/orderitems")
+@Slf4j
 public class OrderItemController {
 
 	private final OrderItemService service;
@@ -27,38 +26,66 @@ public class OrderItemController {
 
 	@GetMapping
 	public ResponseEntity<List<OrderItem>> getAllOrderItems() {
-		return ResponseEntity.status(HttpStatus.OK).body(service.getAllOrderItems());
+		log.info("Fetching all order items");
+		List<OrderItem> items = service.getAllOrderItems();
+		log.debug("Total order items fetched: {}", items.size());
+		return ResponseEntity.status(HttpStatus.OK).body(items);
 	}
 
 	@GetMapping("/{id}")
 	public ResponseEntity<OrderItem> getOrderItemById(@PathVariable Long id) {
-		return ResponseEntity.status(HttpStatus.OK).body(service.getOrderItemById(id));
+		log.info("Fetching order item with ID: {}", id);
+		try {
+			OrderItem item = service.getOrderItemById(id);
+			log.debug("Fetched order item: {}", item);
+			return ResponseEntity.ok(item);
+		} catch (RuntimeException e) {
+			log.warn("Order item with ID {} not found", id);
+			return ResponseEntity.notFound().build();
+		}
 	}
 
 	@PostMapping
-	public ResponseEntity<OrderItem> addOrderItem(@Valid @RequestBody OrderItem orderItem) {
+	public ResponseEntity<OrderItem> addOrderItem(@RequestBody OrderItem orderItem) {
+		log.info("Adding new order item: {}", orderItem);
 		OrderItem createdItem = service.createOrderItem(orderItem);
-		return ResponseEntity.status(HttpStatus.CREATED).location(URI.create("/api/orderitems/" + createdItem.getId()))
+		log.debug("Created order item: {}", createdItem);
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.location(URI.create("/api/orderitems/" + createdItem.getId()))
 				.body(createdItem);
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<OrderItem> updateOrderItem(@PathVariable Long id, @Valid @RequestBody OrderItem orderItem) {
+	public ResponseEntity<OrderItem> updateOrderItem(@PathVariable Long id, @RequestBody OrderItem orderItem) {
+		log.info("Updating order item with ID: {}", id);
 		try {
-			return ResponseEntity.ok(service.updateOrderItem(id, orderItem));
+			OrderItem updated = service.updateOrderItem(id, orderItem);
+			log.debug("Updated order item: {}", updated);
+			return ResponseEntity.ok(updated);
 		} catch (RuntimeException e) {
-			throw new OrderItemNotFoundException("Cannot update. OrderItem not found with ID: " + id);
+			log.error("Error updating order item with ID {}: {}", id, e.getMessage());
+			return ResponseEntity.notFound().build();
 		}
 	}
 
 	@PatchMapping("/{id}")
-	public ResponseEntity<OrderItem> patchOrderItem(@PathVariable Long id, @Valid @RequestBody OrderItem orderItem) {
-		return ResponseEntity.status(HttpStatus.OK).body(service.patchOrderItem(id, orderItem));
+	public ResponseEntity<OrderItem> patchOrderItem(@PathVariable Long id, @RequestBody OrderItem orderItem) {
+		log.trace("Patching order item with ID: {}", id);
+		OrderItem patched = service.patchOrderItem(id, orderItem);
+		log.debug("Patched order item: {}", patched);
+		return ResponseEntity.ok(patched);
 	}
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> deleteOrderItem(@PathVariable Long id) {
-		service.deleteOrderItem(id);
-		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+		log.warn("Deleting order item with ID: {}", id);
+		try {
+			service.deleteOrderItem(id);
+			log.info("Deleted order item with ID: {}", id);
+			return ResponseEntity.noContent().build();
+		} catch (RuntimeException e) {
+			log.error("Error deleting order item with ID {}: {}", id, e.getMessage());
+			return ResponseEntity.notFound().build();
+		}
 	}
 }
