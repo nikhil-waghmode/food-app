@@ -1,6 +1,6 @@
 package com.capgemini.food_app;
-import com.capgemini.food_app.controller.ReviewController;
 import com.capgemini.food_app.model.Review;
+import com.capgemini.food_app.rest.ReviewController;
 import com.capgemini.food_app.service.ReviewService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

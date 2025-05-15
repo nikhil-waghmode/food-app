@@ -1,4 +1,4 @@
-package com.capgemini.food_app.controller;
+package com.capgemini.food_app.rest;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;

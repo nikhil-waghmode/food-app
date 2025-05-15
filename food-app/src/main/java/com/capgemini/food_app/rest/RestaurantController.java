@@ -1,4 +1,4 @@
-package com.capgemini.food_app.controller;
+package com.capgemini.food_app.rest;
 
 import com.capgemini.food_app.model.Restaurant;
 import com.capgemini.food_app.service.RestaurantService;
@@ -39,8 +39,10 @@ public class RestaurantController {
     }
 
     @GetMapping("/owner/{ownerId}")
-    public ResponseEntity<List<Restaurant>> getRestaurantsByOwner(@PathVariable Long ownerId) {
-        return ResponseEntity.ok(restaurantService.getRestaurantsByOwner(ownerId));
+    public ResponseEntity<Restaurant> getRestaurantsByOwner(@PathVariable Long ownerId) {
+//        return ResponseEntity.ok(restaurantService.getRestaurantsByOwner(ownerId));
+        return ResponseEntity.status(200).body(restaurantService.getRestaurantByOwner(ownerId));
+
     }
 
     @GetMapping("/count")

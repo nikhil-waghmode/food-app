@@ -1,7 +1,7 @@
 package com.capgemini.food_app;
 
-import com.capgemini.food_app.controller.FoodItemController;
 import com.capgemini.food_app.model.FoodItem;
+import com.capgemini.food_app.rest.FoodItemController;
 import com.capgemini.food_app.service.FoodItemService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Restaurant Reports</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+    <style>
+        /* Container for charts */
+        .container {
+            max-width: 1200px;
+        }
+    
+        /* Row adjustments */
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+    
+        .col-md-6 {
+            flex: 1 1 45%; /* Allows for two charts per row */
+            max-width: 48%; /* Adjust max width to allow some gap between charts */
+        }
+    
+        .chart-container {
+            width: 100%;
+            margin-bottom: 20px; /* Space between charts */
+        }
+    
+        /* Card styling */
+        .card {
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+    
+        .card-header {
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-align: center;
+            padding: 10px;
+        }
+    
+        .card-body {
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    
+        canvas {
+            max-width: 100% !important; /* Ensure charts don't overflow */
+            height: auto !important; /* Ensure charts scale appropriately */
+        }
+    
+        /* Responsive Design */
+        @media (max-width: 767px) {
+            .col-md-6 {
+                flex: 1 1 100%; 
+                max-width: 100%;
+            }
+    
+            .container {
+                margin-left: 10px;
+                margin-right: 10px;
+            }
+        }
+    
+       
+        #ordersPerWeekChart,
+        #revenuePerWeekChart,
+        #revenuePerMonthChart {
+            max-height: 180px !important; 
+        }
+    
+        #salesPerRestaurantChart,
+        #ownerLocationChart,
+        #revenueByCategoryChart {
+            max-height: 250px !important;
+        }
+    
+        .mt-4 {
+            margin-top: 20px !important;
+        }
+    </style>
+    
+</head>
+
+<body class="container my-5">
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">Revenue per Restaurant</div>
+                <div class="card-body">
+                    <canvas id="salesPerRestaurantChart"></canvas>
+                </div>
+            </div>
+        </div>
+    
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">Restaurant Locations</div>
+                <div class="card-body">
+                    <canvas id="ownerLocationChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card text-center">
+                <div class="card-header">Orders Per Week</div>
+                <div class="card-body">
+                    <canvas id="ordersPerWeekChart" height="150"></canvas>
+                </div>
+            </div>
+        </div>
+    
+        <div class="col-md-6">
+            <div class="card text-center">
+                <div class="card-header">Revenue by Category</div>
+                <div class="card-body">
+                    <canvas id="revenueByCategoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card text-center">
+                <div class="card-header">Revenue Per Week</div>
+                <div class="card-body">
+                    <canvas id="revenuePerWeekChart" height="150"></canvas>
+                </div>
+            </div>
+        </div>
+    
+        <div class="col-md-6">
+            <div class="card text-center">
+                <div class="card-header">Revenue per Month</div>
+                <div class="card-body">
+                    <canvas id="revenuePerMonthChart" height="150"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        apiUrl = "http://localhost:8080/api";
+
+        currentAdminId = localStorage.getItem("currentAdminId");
+
+
+        async function renderSalesPerRestaurantChart() {
+            try {
+                currentAdminRes = await fetch(`${apiUrl}/users/${currentAdminId}`);
+                currentAdminData = await currentAdminRes.json();
+
+                const restaurantsRes = await fetch(`${apiUrl}/restaurants`);
+                const ordersRes = await fetch(`${apiUrl}/orders`);
+
+                const restaurants = await restaurantsRes.json();
+                const orders = await ordersRes.json();
+
+                const revenueMap = {};
+
+                orders.forEach(order => {
+                    if (!revenueMap[order.restaurantID]) {
+                        revenueMap[order.restaurantID] = 0;
+                    }
+                    revenueMap[order.restaurantID] += order.totalAmount;
+                });
+
+                const labels = [];
+                const revenues = [];
+
+                restaurants.forEach(restaurant => {
+                    labels.push(restaurant.name);
+                    revenues.push(revenueMap[restaurant.id]);
+                });
+
+                new Chart(document.getElementById("salesPerRestaurantChart"), {
+                    type: "bar",
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: "Revenue (₹)",
+                            data: revenues,
+                            backgroundColor: "#4bc0c0"
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error("Failed to render chart:", error);
+            }
+        }
+
+        async function renderOwnerLocationChart() {
+            restaurantsRes = await fetch(`${apiUrl}/restaurants`);
+            restaurants = await restaurantsRes.json();
+
+            locationMap = {};
+
+            restaurants.forEach(restaurant => {
+                if (!locationMap[restaurant.location]) {
+                    locationMap[restaurant.location] = 0;
+                }
+                locationMap[restaurant.location]++;
+            });
+
+            locations = Object.keys(locationMap);
+            counts = Object.values(locationMap);
+
+            new Chart(document.getElementById("ownerLocationChart"), {
+                type: "pie",
+                data: {
+                    labels: locations,
+                    datasets: [{
+                        data: counts,
+                        backgroundColor: ['#36A2EB', '#FF6384', '#FFCE56', '#4BC0C0', '#9966FF']
+                    }]
+                },
+                options: {
+                    responsive: true
+                }
+            });
+        }
+        renderSalesPerRestaurantChart();
+        renderOwnerLocationChart();
+
+        async function renderOrdersPerWeekChart() {
+
+        ordersPerWeekRes = await fetch(`${apiUrl}/orders/restaurant/charts/orders-per-week`);
+        ordersPerWeekData = await ordersPerWeekRes.json();
+
+        weeks = ordersPerWeekData.map(item => item[0]);
+        orders = ordersPerWeekData.map(item => item[1]);
+        new Chart(document.getElementById('ordersPerWeekChart'), {
+            type: 'line',
+            data: {
+                labels: weeks,
+                datasets: [{
+                    label: 'Orders',
+                    data: orders,
+                    fill: false,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        precision: 0
+                    }
+                }
+            }
+        });
+    }
+    renderOrdersPerWeekChart();
+
+
+    async function renderRevenueByCategoryChart() {
+
+
+        revenueCategoryRes = await fetch(`${apiUrl}/orders/restaurant/charts/revenue-by-category`);
+        revenueCategoryData = await revenueCategoryRes.json();
+
+        categories = revenueCategoryData.map(item => item[0]);
+        revenues = revenueCategoryData.map(item => item[1]);
+
+
+        new Chart(document.getElementById('revenueByCategoryChart'), {
+            type: 'pie',
+            data: {
+                labels: categories,
+                datasets: [{
+                    label: 'Revenue by Category',
+                    data: revenues,
+                    backgroundColor: [
+                        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+            }
+        });
+    }
+    renderRevenueByCategoryChart();
+
+    async function renderRevenuePerWeekChart() {
+
+
+        revenuePerWeekRes = await fetch(`${apiUrl}/orders/restaurant/charts/revenue-per-week`);
+        revenuePerWeekData = await revenuePerWeekRes.json();
+
+        weeks = revenuePerWeekData.map(item => item[0]);
+        revenues = revenuePerWeekData.map(item => item[1]);
+
+        new Chart(document.getElementById('revenuePerWeekChart'), {
+            type: 'line',
+            data: {
+                labels: weeks,
+                datasets: [{
+                    label: 'Revenue',
+                    data: revenues,
+                    fill: false,
+                    borderColor: '#28a745',
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+    renderRevenuePerWeekChart();
+
+    async function renderRevenuePerMonthChart() {
+
+
+
+        revenuePerMonthRes = await fetch(`${apiUrl}/orders/restaurant/charts/revenue-per-month`);
+        revenuePerMonthData = await revenuePerMonthRes.json();
+
+        months = revenuePerMonthData.map(item => item[0]);
+        revenues = revenuePerMonthData.map(item => item[1]);
+
+        new Chart(document.getElementById('revenuePerMonthChart'), {
+            type: 'bar',
+            data: {
+                labels: months,
+                datasets: [{
+                    label: 'Revenue per Month (₹)',
+                    data: revenues,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+    renderRevenuePerMonthChart();
+
+
+    </script>
+</body>
+
+</html>

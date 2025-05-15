@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register New User</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #f8f9fa;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+    }
+
+    .card-header {
+      font-size: 1.5rem;
+      text-align: center;
+    }
+
+    .form-text {
+      font-size: 0.9rem;
+    }
+
+    .form-footer {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .form-footer button {
+      text-decoration: none;
+      color: #007bff;
+      border: none;
+      background: none;
+      padding: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <div class="card-header">
+      <h3>User Registration Form</h3>
+    </div>
+    <form id="userRegForm" novalidate>
+      <div class="mb-3">
+        <label class="form-label">Name</label>
+        <input type="text" id="nameInput" class="form-control" />
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input type="email" id="emailInput" class="form-control" />
+        <div class="invalid-feedback" id="emailError">Email not valid or Already Exists.</div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Password</label>
+        <input type="password" id="passwordInput" class="form-control" />
+        <div class="invalid-feedback">Password must be at least 8 characters with a uppercase, lowercase, and special
+          character.</div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Phone Number</label>
+        <input type="number" id="phoneInput" class="form-control" />
+        <div class="invalid-feedback">Enter a 10-digit number starting with 7, 8, or 9.</div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Location</label>
+        <input type="text" id="locationInput" class="form-control" />
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">User Type</label><br />
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="usertype" id="customer" value="CUSTOMER" checked />
+          <label class="form-check-label" for="customer">Customer</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="usertype" id="owner" value="OWNER" />
+          <label class="form-check-label" for="owner">Restaurant Owner</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="usertype" id="admin" value="ADMIN" />
+          <label class="form-check-label" for="admin">Admin</label>
+        </div>
+        <div class="form-text text-danger d-none" id="userTypeError">Please select a user type.</div>
+      </div>
+      <div id="restaurantFields" class="d-none">
+        <div class="mb-3">
+          <label class="form-label">Restaurant Name</label>
+          <input type="text" id="restaurantName" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Restaurant Location</label>
+          <input type="text" id="restaurantLocation" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Restaurant Phone</label>
+          <input type="text" id="restaurantPhone" class="form-control" />
+          <div class="invalid-feedback">Enter a valid 10-digit phone starting with 7, 8, or 9.</div>
+        </div>
+      </div>
+      <button type="submit" id="submitBtn" class="btn btn-success w-100">Register User</button>
+    </form>
+
+    <div class="form-footer">
+      <p>Already registered? <a href="./login.html">Login here</a></p>
+    </div>
+  </div>
+
+  <script>
+    apiUrl = "http://localhost:8080/api";
+
+    nameInput = document.getElementById("nameInput");
+    passwordInput = document.getElementById("passwordInput");
+    emailInput = document.getElementById("emailInput");
+    phoneInput = document.getElementById("phoneInput");
+    locationInput = document.getElementById("locationInput");
+    userRegForm = document.getElementById("userRegForm");
+
+    restaurantNameInput = document.getElementById("restaurantName");
+    restaurantLocationInput = document.getElementById("restaurantLocation");
+    restaurantPhoneInput = document.getElementById("restaurantPhone");
+
+    const userTypeRadios = document.querySelectorAll('input[name="usertype"]');
+    const restaurantFields = document.getElementById("restaurantFields");
+
+    userTypeRadios.forEach(radio => {
+      radio.addEventListener("change", () => {
+        if (document.getElementById("owner").checked) {
+          restaurantFields.classList.remove("d-none");
+        } else {
+          restaurantFields.classList.add("d-none");
+        }
+      });
+    });
+
+
+
+    async function addUser() {
+      const newUser = {
+        name: nameInput.value.trim(),
+        email: emailInput.value.trim(),
+        password: passwordInput.value.trim(),
+        phone: phoneInput.value.trim(),
+        userType: document.querySelector('input[name="usertype"]:checked').value,
+        location: locationInput.value.trim(),
+      };
+
+      try {
+        const response = await fetch(`${apiUrl}/users`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(newUser),
+        });
+
+        if (!response.ok) throw new Error("User creation failed.");
+
+        const createdUser = await response.json();
+        const userId = createdUser.id;
+
+        // If Restaurant Owner, create associated restaurant
+        if (newUser.userType === "Restaurant Owner") {
+
+          const newRestaurant = {
+            name: restaurantNameInput.value.trim(),
+            location: restaurantLocationInput.value.trim(),
+            phone: restaurantPhoneInput.value.trim(),
+            ownerID: userId
+          };
+
+          const restRes = await fetch(`${apiUrl}/restaurants`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(newRestaurant),
+          });
+
+          if (!restRes.ok) throw new Error("Restaurant creation failed.");
+        }
+
+        alert("User Registration Successful! 🎉");
+        window.location.href = "./login.html";
+
+      } catch (err) {
+        console.error("Error:", err);
+        alert("Something went wrong during registration.");
+      }
+    }
+
+
+    function validatePhone() {
+      const phoneRegex = /^[789]\d{9}$/;
+      if (phoneRegex.test(phoneInput.value.trim())) {
+        phoneInput.classList.add("is-valid");
+        phoneInput.classList.remove("is-invalid");
+        return true;
+      } else {
+        phoneInput.classList.add("is-invalid");
+        phoneInput.classList.remove("is-valid");
+        return false;
+      }
+    }
+
+    function validatePassword() {
+      const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$/;
+      if (passRegex.test(passwordInput.value)) {
+        passwordInput.classList.add("is-valid");
+        passwordInput.classList.remove("is-invalid");
+        return true;
+      } else {
+        passwordInput.classList.add("is-invalid");
+        passwordInput.classList.remove("is-valid");
+        return false;
+      }
+    }
+
+    function validateEmail() {
+      const emailValue = emailInput.value.trim();
+
+      // Check if email is valid (non-empty and proper format)
+      const emailRegex = /^[a-z0-9]+@[a-z0-9]+\.[a-z]{2,}$/;
+      if (!emailValue || !emailRegex.test(emailValue)) {
+        emailInput.classList.add("is-invalid");
+        emailInput.classList.remove("is-valid");
+        document.getElementById("emailError").style.display = "block";
+        document.getElementById("emailError").textContent = !emailValue
+          ? "Email cannot be empty."
+          : "Please enter a valid email address.";
+        return false;
+      } else {
+        emailInput.classList.add("is-valid");
+        emailInput.classList.remove("is-invalid");
+        document.getElementById("emailError").style.display = "none";
+        return true;
+      }
+    }
+
+
+    async function checkEmailExits() {
+      const email = emailInput.value.trim();
+      if (validateEmail()) {
+        try {
+          const existsRes = await fetch(`${apiUrl}/users/exists/${email}`);
+          const existsText = await existsRes.text();
+          if (existsText === "true") {
+            emailInput.classList.add("is-invalid");
+            emailInput.classList.remove("is-valid");
+            document.getElementById("emailError").style.display = "block";
+            return false;
+          } else {
+            emailInput.classList.add("is-valid");
+            emailInput.classList.remove("is-invalid");
+            document.getElementById("emailError").style.display = "none";
+            return true;
+          }
+        } catch (error) {
+          console.error("Error checking email existence:", error);
+        }
+      }
+    }
+
+    function validateRestaurantPhone() {
+      const phoneRegex = /^[789]\d{9}$/;
+      if (phoneRegex.test(restaurantPhoneInput.value.trim())) {
+        restaurantPhoneInput.classList.add("is-valid");
+        restaurantPhoneInput.classList.remove("is-invalid");
+        return true;
+      } else {
+        restaurantPhoneInput.classList.add("is-invalid");
+        restaurantPhoneInput.classList.remove("is-valid");
+        return false;
+      }
+    }
+
+
+    userRegForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const nameValid = nameInput.value.trim() !== "";
+      const locationValid = locationInput.value.trim() !== "";
+      const emailValid = await checkEmailExits();
+      const phoneValid = validatePhone();
+      const passwordValid = validatePassword();
+
+      restaurantValid = true;
+      const userType = document.querySelector('input[name="usertype"]:checked').value;
+
+      if (userType === "Restaurant Owner") {
+        const nameCheck = restaurantNameInput.value.trim() !== "";
+        const locationCheck = restaurantLocationInput.value.trim() !== "";
+        const phoneCheck = validateRestaurantPhone();
+        restaurantValid = nameCheck && locationCheck && phoneCheck;
+      }
+
+      if (nameValid && locationValid && emailValid && phoneValid && passwordValid && restaurantValid) {
+        addUser();
+      } else {
+        alert("Please fill in all required fields correctly.");
+      }
+    });
+
+
+    restaurantPhoneInput.addEventListener("blur", validateRestaurantPhone);
+    phoneInput.addEventListener("blur", validatePhone);
+    passwordInput.addEventListener("blur", validatePassword);
+    emailInput.addEventListener("blur", checkEmailExits);
+  </script>
+</body>
+
+</html>

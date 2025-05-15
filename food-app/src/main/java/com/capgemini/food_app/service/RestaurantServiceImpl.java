@@ -47,8 +47,8 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
-    public List<Restaurant> getRestaurantsByOwner(Long ownerId) {
-        return restaurantRepository.findAllByOwnerId(ownerId);
+    public Restaurant getRestaurantByOwner(Long ownerId) {
+        return restaurantRepository.findByOwnerId(ownerId);
     }
 
     @Override
@@ -64,9 +64,9 @@ public class RestaurantServiceImpl implements RestaurantService {
     @Override
     public Restaurant createRestaurant(String name, String location, String contact,
                                        Long ownerId, MultipartFile resImage) throws IOException {
-        List<Restaurant> existingRestaurants = getRestaurantsByOwner(ownerId);
+        Restaurant existingRestaurant = getRestaurantByOwner(ownerId);
 
-        if (!existingRestaurants.isEmpty()) {
+        if (existingRestaurant!= null) {
             throw new OwnerAlreadyHasRestaurantException("User already owns a restaurant");
         }
 

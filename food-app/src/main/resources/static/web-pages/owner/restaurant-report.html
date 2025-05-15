@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Restaurant Reports</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+    <style>
+    .stats-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: space-between;
+    }
+
+    .stats-card {
+      flex: 1 1 calc(25% - 1rem);
+      min-width: 200px;
+      background-color: #ffffff;
+      border: 1px solid #dee2e6;
+      border-radius: 0.75rem;
+      padding: 1rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+        .chart-container {
+            flex: 1 1 48%;
+            min-width: 300px;
+        }
+
+        .chart-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+
+        #revenueByCategoryChart {
+            max-height: 250px !important;
+            max-width: 250px;
+            margin: 0 auto;
+        }
+
+        .card-header {
+            font-size: 1.1rem;
+            font-weight: 600;
+            background-color: #f1f1f1;
+            color: #333;
+        }
+    </style>
+</head>
+
+<body class="container my-5">
+
+    <div class="stats-row mb-4">
+        <div class="stats-card">
+          <h5>Best Selling Item</h5>
+          <h3 id="bestSellingItem"></h3>
+        </div>
+        <div class="stats-card">
+          <h5>Least Selling Item</h5>
+          <h3 id="leastSellingItem"></h3>
+        </div>
+    </div>
+
+
+    <div class="chart-section">
+        <div class="chart-container">
+            <div class="card text-center">
+                <div class="card-header">Orders Per Week</div>
+                <div class="card-body">
+                    <canvas id="ordersPerWeekChart" height="150"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div class="card text-center">
+                <div class="card-header">Revenue by Category</div>
+                <div class="card-body">
+                    <canvas id="revenueByCategoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="chart-container">
+            <div class="card text-center">
+                <div class="card-header">Revenue Per Week</div>
+                <div class="card-body">
+                    <canvas id="revenuePerWeekChart" height="150"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div class="card text-center">
+                <div class="card-header">Revenue per Month</div>
+                <div class="card-body">
+                    <canvas id="revenuePerMonthChart" height="150"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    apiUrl = "http://localhost:8080/api"
+    currentOwnerId = localStorage.getItem("currentOwnerId");
+
+
+    async function renderOrdersPerWeekChart() {
+        currentRestaurantRes = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
+      currentRestaurant = await currentRestaurantRes.json();
+      currentRestaurantId = currentRestaurant.id;
+
+        ordersPerWeekRes = await fetch(`${apiUrl}/orders/restaurant/charts/orders-per-week/${currentRestaurantId}`);
+        ordersPerWeekData = await ordersPerWeekRes.json();
+
+        weeks = ordersPerWeekData.map(item => item[0]);
+        orders = ordersPerWeekData.map(item => item[1]);
+        new Chart(document.getElementById('ordersPerWeekChart'), {
+            type: 'line',
+            data: {
+                labels: weeks,
+                datasets: [{
+                    label: 'Orders',
+                    data: orders,
+                    fill: false,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        precision: 0
+                    }
+                }
+            }
+        });
+    }
+    renderOrdersPerWeekChart();
+
+
+    async function renderRevenueByCategoryChart() {
+        currentRestaurantRes = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
+      currentRestaurant = await currentRestaurantRes.json();
+      currentRestaurantId = currentRestaurant.id;
+
+        revenueCategoryRes = await fetch(`${apiUrl}/orders/restaurant/charts/revenue-by-category/${currentRestaurantId}`);
+        revenueCategoryData = await revenueCategoryRes.json();
+
+        categories = revenueCategoryData.map(item => item[0]);
+        revenues = revenueCategoryData.map(item => item[1]);
+
+
+        new Chart(document.getElementById('revenueByCategoryChart'), {
+            type: 'pie',
+            data: {
+                labels: categories,
+                datasets: [{
+                    label: 'Revenue by Category',
+                    data: revenues,
+                    backgroundColor: [
+                        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+            }
+        });
+    }
+    renderRevenueByCategoryChart();
+
+    async function renderRevenuePerWeekChart() {
+        currentRestaurantRes = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
+      currentRestaurant = await currentRestaurantRes.json();
+      currentRestaurantId = currentRestaurant.id;
+
+        revenuePerWeekRes = await fetch(`${apiUrl}/orders/restaurant/charts/revenue-per-week/${currentRestaurantId}`);
+        revenuePerWeekData = await revenuePerWeekRes.json();
+
+        weeks = revenuePerWeekData.map(item => item[0]);
+        revenues = revenuePerWeekData.map(item => item[1]);
+
+        new Chart(document.getElementById('revenuePerWeekChart'), {
+            type: 'line',
+            data: {
+                labels: weeks,
+                datasets: [{
+                    label: 'Revenue',
+                    data: revenues,
+                    fill: false,
+                    borderColor: '#28a745',
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+    renderRevenuePerWeekChart();
+
+    async function renderRevenuePerMonthChart() {
+
+        currentRestaurantRes = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
+      currentRestaurant = await currentRestaurantRes.json();
+      currentRestaurantId = currentRestaurant.id;
+
+        revenuePerMonthRes = await fetch(`${apiUrl}/orders/restaurant/charts/revenue-per-month/${currentRestaurantId}`);
+        revenuePerMonthData = await revenuePerMonthRes.json();
+
+        months = revenuePerMonthData.map(item => item[0]);
+        revenues = revenuePerMonthData.map(item => item[1]);
+
+        new Chart(document.getElementById('revenuePerMonthChart'), {
+            type: 'bar',
+            data: {
+                labels: months,
+                datasets: [{
+                    label: 'Revenue per Month (₹)',
+                    data: revenues,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+    renderRevenuePerMonthChart();
+
+    async function renderBestAndLeastSellingItem(){
+
+        currentRestaurantRes = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
+      currentRestaurant = await currentRestaurantRes.json();
+      currentRestaurantId = currentRestaurant.id;
+
+
+        bestItemRes = await fetch(`${apiUrl}/fooditems/best/${currentRestaurantId}`);
+        bestItem = await bestItemRes.json();
+        leastItemRes= await fetch(`${apiUrl}/fooditems/least/${currentRestaurantId}`);
+        leastItem = await leastItemRes.json();
+        document.getElementById("bestSellingItem").innerHTML=`${bestItem[0][1]}`;
+        document.getElementById("leastSellingItem").innerHTML=`${leastItem[0][1]}`;
+
+    }
+    renderBestAndLeastSellingItem();
+</script>
+
+</html>

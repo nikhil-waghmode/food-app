@@ -1,7 +1,7 @@
 package com.capgemini.food_app;
 
-import com.capgemini.food_app.controller.UserController;
 import com.capgemini.food_app.model.User;
+import com.capgemini.food_app.rest.UserController;
 import com.capgemini.food_app.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 

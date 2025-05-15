@@ -1,4 +1,4 @@
-package com.capgemini.food_app.controller;
+package com.capgemini.food_app.rest;
 
 import com.capgemini.food_app.exception.OrderItemNotFoundException;
 import com.capgemini.food_app.model.OrderItem;

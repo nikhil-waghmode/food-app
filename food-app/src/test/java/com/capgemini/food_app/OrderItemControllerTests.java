@@ -6,9 +6,9 @@ import static org.mockito.Mockito.*;
 import java.util.Arrays;
 import java.util.List;
 
-import com.capgemini.food_app.controller.OrderItemController;
 import com.capgemini.food_app.exception.OrderItemNotFoundException;
 import com.capgemini.food_app.model.OrderItem;
+import com.capgemini.food_app.rest.OrderItemController;
 import com.capgemini.food_app.service.OrderItemService;
 
 import org.junit.jupiter.api.BeforeEach;

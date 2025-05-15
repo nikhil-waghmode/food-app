@@ -9,7 +9,7 @@ import java.util.List;
 public interface RestaurantService {
     List<Restaurant> getAllRestaurants();
     Restaurant getRestaurantById(Long id);
-    List<Restaurant> getRestaurantsByOwner(Long ownerId);
+    Restaurant getRestaurantByOwner(Long ownerId);
     Long getTotalRestaurantsCount();
     //List<Object[]> restaurantsBySorted();
     Restaurant createRestaurant(String name, String location, String contact, 

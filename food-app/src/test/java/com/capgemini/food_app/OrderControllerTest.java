@@ -16,9 +16,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import com.capgemini.food_app.controller.OrderController;
 import com.capgemini.food_app.exception.OrderNotFoundException;
 import com.capgemini.food_app.model.Order;
+import com.capgemini.food_app.rest.OrderController;
 import com.capgemini.food_app.service.OrderService;
 
 class OrderControllerTest {
