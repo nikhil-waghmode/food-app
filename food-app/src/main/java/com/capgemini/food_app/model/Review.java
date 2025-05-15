@@ -1,7 +1,6 @@
 package com.capgemini.food_app.model;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
@@ -12,13 +11,19 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Size;
 
 
 
 @Entity
 @Table(name="reviews")
 public class Review {
-    @Id
+   @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
@@ -26,18 +31,21 @@ public class Review {
     @JsonBackReference
     @JoinColumn(name="restaurant_id")
     private Restaurant restaurant;
-    
-    public Restaurant getRestaurant() {
-		return restaurant;
-	}
-
-	public void setRestaurant(Restaurant restaurant) {
-		this.restaurant = restaurant;
-	}
-
+	
+	@NotNull(message = "Rating must not be null")
+    @DecimalMin(value = "0.0", message = "Rating must be at least 0.0")
+    @DecimalMax(value = "5.0", message = "Rating must be at most 5.0")
 	private Float rating;
+	
+    @NotBlank(message = "Feedback must not be blank")
+    @Size(max = 500, message = "Feedback must be less than 500 characters")
     private String feedback;
+    
+    @NotNull(message = "Date must not be null")
+    @PastOrPresent(message = "Date cannot be in the future")
     private LocalDate date;
+    
+    @NotNull(message = "User ID must not be null")
     private Long userId;
 
     public Review() {
@@ -93,6 +101,14 @@ public class Review {
     public void setUserId(Long userId) {
         this.userId = userId;
     }
+    
+    public Restaurant getRestaurant() {
+		return restaurant;
+	}
+
+	public void setRestaurant(Restaurant restaurant) {
+		this.restaurant = restaurant;
+	}
 
     @Override
     public String toString() {
