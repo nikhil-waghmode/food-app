@@ -2,6 +2,9 @@ package com.capgemini.food_app.controller;
 
 import com.capgemini.food_app.model.Order;
 import com.capgemini.food_app.service.OrderService;
+
+import jakarta.validation.Valid;
+
 import java.net.URI;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,17 +26,18 @@ public class OrderController {
     	this.orderService = orderService;
     }
 
-    
+
     @PostMapping
-	public ResponseEntity<Order> createOrder(@RequestBody Order order) {
-		return ResponseEntity.status(HttpStatus.CREATED).location(URI.create("/api/orders/" + order.getId()))
-				.body(orderService.createOrder(order));
-	}
+    public ResponseEntity<Order> createOrder(@Valid @RequestBody Order order) {
+        Order createdOrder = orderService.createOrder(order);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .location(URI.create("/api/orders/" + createdOrder.getId()))
+                .body(createdOrder);
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<Order> getOrderById(@PathVariable Long id) {
     	return ResponseEntity.status(HttpStatus.OK).body(orderService.getOrderById(id));
-    	
     }
 
     @GetMapping
@@ -42,7 +46,7 @@ public class OrderController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Order> updateOrder(@PathVariable Long id, @RequestBody Order order) {
+    public ResponseEntity<Order> updateOrder(@PathVariable Long id, @Valid @RequestBody Order order) {
         try {
             Order updated = orderService.updateOrder(id, order);
             return ResponseEntity.ok(updated);
@@ -50,10 +54,11 @@ public class OrderController {
             return ResponseEntity.notFound().build();
         }
     }
+
     @PatchMapping("/{id}")
-	public ResponseEntity<Order> patchOrder(@PathVariable Long id, @RequestBody Order order) {
-		return ResponseEntity.status(HttpStatus.OK).body(orderService.patchOrder(id, order));
-	}
+    public ResponseEntity<Order> patchOrder(@PathVariable Long id, @Valid @RequestBody Order order) {
+        return ResponseEntity.status(HttpStatus.OK).body(orderService.patchOrder(id, order));
+    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteOrder(@PathVariable Long id) {
