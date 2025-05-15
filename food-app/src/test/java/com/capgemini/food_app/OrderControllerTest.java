@@ -131,7 +131,7 @@ class OrderControllerTest {
     void testGetOrderById_Exception() {
         when(orderService.getOrderById(1L)).thenThrow(new OrderNotFoundException("Order not found"));
 
-        assertThrows(RuntimeException.class, () -> orderController.getOrderById(1L));
+        assertThrows(OrderNotFoundException.class, () -> orderController.getOrderById(1L));
         verify(orderService).getOrderById(1L);
     }
     
@@ -140,7 +140,7 @@ class OrderControllerTest {
     void testPatchOrder_Exception() {
         when(orderService.patchOrder(eq(1L), any(Order.class))).thenThrow(new OrderNotFoundException("Patch failed"));
 
-        assertThrows(RuntimeException.class, () -> orderController.patchOrder(1L, sampleOrder));
+        assertThrows(OrderNotFoundException.class, () -> orderController.patchOrder(1L, sampleOrder));
         verify(orderService).patchOrder(1L, sampleOrder);
     }
 

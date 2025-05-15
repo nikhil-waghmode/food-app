@@ -34,6 +34,11 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public boolean orderExists(Long orderId) {
+        return orderRepository.existsById(orderId);
+    }
+    
+    @Override
     public Order updateOrder(Long id, Order updatedOrder) {
         Order order =  orderRepository.findById(id).orElseThrow(() -> new OrderNotFoundException("Order not found with id " + id));
         order.setUserId(updatedOrder.getUserId());

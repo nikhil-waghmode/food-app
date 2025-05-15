@@ -15,5 +15,7 @@ public interface OrderService {
 
 	Order patchOrder(Long id, Order order);
 
+	boolean orderExists(Long orderId);
+
 	void deleteOrder(Long id);
 }
