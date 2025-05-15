@@ -3,6 +3,9 @@ package com.capgemini.food_app.controller;
 
 import com.capgemini.food_app.model.FoodItem;
 import com.capgemini.food_app.service.FoodItemService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,17 +33,17 @@ public class FoodItemController {
     }
 
     @PostMapping
-    public FoodItem createFoodItem(@RequestBody FoodItem foodItem) {
+    public FoodItem createFoodItem(@Valid @RequestBody FoodItem foodItem) {
         return foodItemService.createFoodItem(foodItem);
     }
 
     @PutMapping("/{id}")
-    public FoodItem updateFoodItem(@PathVariable Long id, @RequestBody FoodItem foodItem) {
+    public FoodItem updateFoodItem(@PathVariable Long id, @Valid @RequestBody FoodItem foodItem) {
         return foodItemService.updateFoodItem(id, foodItem);
     }
 
     @PatchMapping("/{id}")
-    public FoodItem patchFoodItem(@PathVariable Long id, @RequestBody FoodItem foodItem) {
+    public FoodItem patchFoodItem(@PathVariable Long id, @Valid @RequestBody FoodItem foodItem) {
         return foodItemService.patchFoodItem(id, foodItem);
     }
 
