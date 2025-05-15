@@ -25,7 +25,7 @@ public class OrderController {
 
     
     @PostMapping
-	ResponseEntity<Order> createOrder(@RequestBody Order order) {
+	public ResponseEntity<Order> createOrder(@RequestBody Order order) {
 		return ResponseEntity.status(HttpStatus.CREATED).location(URI.create("/api/orders/" + order.getId()))
 				.body(orderService.createOrder(order));
 	}
@@ -51,7 +51,7 @@ public class OrderController {
         }
     }
     @PatchMapping("/{id}")
-	ResponseEntity<Order> patchOrder(@PathVariable Long id, @RequestBody Order order) {
+	public ResponseEntity<Order> patchOrder(@PathVariable Long id, @RequestBody Order order) {
 		return ResponseEntity.status(HttpStatus.OK).body(orderService.patchOrder(id, order));
 	}
 
