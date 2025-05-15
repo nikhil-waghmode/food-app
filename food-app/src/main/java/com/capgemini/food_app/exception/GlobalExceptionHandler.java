@@ -101,4 +101,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
 		errorDetails.put("details", ex.getMessage());
 		return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+	
+	
 }
