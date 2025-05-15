@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.capgemini.food_app.exception.EmailAlreadyExistsException;
 import com.capgemini.food_app.model.User;
 import com.capgemini.food_app.repository.UserRepository;
 
@@ -20,6 +21,9 @@ public class UserServiceImpl implements UserService{
 
 	@Override
 	public User createUser(User user) {
+		if(userRepository.existsByEmail(user.getEmail())) {
+			throw new EmailAlreadyExistsException("Email already exists");
+		}
 		return userRepository.save(user);
 	}
 
@@ -35,6 +39,9 @@ public class UserServiceImpl implements UserService{
 			present.setUserType(updated.getUserType());
 			present.setLocation(updated.getLocation());
 			present.setUserImg(updated.getUserImg());
+			if(userRepository.existsByEmail(updated.getEmail())) {
+				throw new EmailAlreadyExistsException("Email already exists");
+			}
 			return userRepository.save(present);
 		}
 		return null;
@@ -80,6 +87,10 @@ public class UserServiceImpl implements UserService{
 				present.setLocation(patch.getLocation());
 			if(patch.getUserImg()!=null)
 				present.setUserImg(patch.getUserImg());
+			
+			if(userRepository.existsByEmail(patch.getEmail())) {
+				throw new EmailAlreadyExistsException("Email already exists");
+			}
 			
 			return userRepository.save(present);
 		}
