@@ -14,136 +14,122 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name="restaurants")
+@Table(name = "restaurants")
 public class Restaurant {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-	private String name;
-	private String location;
-	private String contact;
-	private Long ownerId;
-	private String restaurantImg;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String name;
+    private String location;
+    private String contact;
+    private Long ownerId;
+    private String restaurantImg;
 
-	@OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
-	@JsonManagedReference
-	private List<FoodItem> foodItem = new ArrayList<FoodItem>();
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<FoodItem> foodItem = new ArrayList<FoodItem>();
 
-	@OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
-	@JsonManagedReference
-<<<<<<< HEAD
-	private List<Review> review = new ArrayList<Review>();
-=======
-	private List<Reviews> reviews = new ArrayList<Reviews>();
-	
-//	@OneToMany(mappedBy = "restaurant")
-//	private List<FoodOrder> foodOrders;
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Review> review = new ArrayList<Review>();
 
->>>>>>> d6713b2f77127967c15ee0cbf0c053c482dd5fc6
+    public Restaurant() {
+        super();
+    }
 
-	public Restaurant() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
+    public Restaurant(Long id, String name, String location, String contact, Long ownerId, String restaurantImg,
+                      List<FoodItem> foodItem) {
+        super();
+        this.id = id;
+        this.name = name;
+        this.location = location;
+        this.contact = contact;
+        this.ownerId = ownerId;
+        this.restaurantImg = restaurantImg;
+        this.foodItem = foodItem;
+    }
 
-<<<<<<< HEAD
+    public Restaurant(Long id, String name, String location, String contact, Long ownerId, String restaurantImg,
+                      List<FoodItem> foodItem, List<Review> review) {
+        super();
+        this.id = id;
+        this.name = name;
+        this.location = location;
+        this.contact = contact;
+        this.ownerId = ownerId;
+        this.restaurantImg = restaurantImg;
+        this.foodItem = foodItem;
+        this.review = review;
+    }
 
-=======
->>>>>>> d6713b2f77127967c15ee0cbf0c053c482dd5fc6
-	public Restaurant(Long id, String name, String location, String contact, Long ownerId, String restaurantImg,
-			List<FoodItem> foodItem) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.location = location;
-		this.contact = contact;
-		this.ownerId = ownerId;
-		this.restaurantImg = restaurantImg;
-		this.foodItem = foodItem;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public Restaurant(Long id, String name, String location, String contact, Long ownerId, String restaurantImg,
-			List<FoodItem> foodItem, List<Review> review) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.location = location;
-		this.contact = contact;
-		this.ownerId = ownerId;
-		this.restaurantImg = restaurantImg;
-		this.foodItem = foodItem;
-		this.review = review;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public Long getId() {
-		return id;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getLocation() {
+        return location;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setLocation(String location) {
+        this.location = location;
+    }
 
-	public String getLocation() {
-		return location;
-	}
+    public String getContact() {
+        return contact;
+    }
 
-	public void setLocation(String location) {
-		this.location = location;
-	}
+    public void setContact(String contact) {
+        this.contact = contact;
+    }
 
-	public String getContact() {
-		return contact;
-	}
+    public Long getOwnerId() {
+        return ownerId;
+    }
 
-	public void setContact(String contact) {
-		this.contact = contact;
-	}
+    public void setOwnerId(Long ownerId) {
+        this.ownerId = ownerId;
+    }
 
-	public Long getOwnerId() {
-		return ownerId;
-	}
+    public String getRestaurantImg() {
+        return restaurantImg;
+    }
 
-	public void setOwnerId(Long ownerId) {
-		this.ownerId = ownerId;
-	}
+    public void setRestaurantImg(String restaurantImg) {
+        this.restaurantImg = restaurantImg;
+    }
 
-	public String getRestaurantImg() {
-		return restaurantImg;
-	}
+    public List<FoodItem> getFoodItem() {
+        return foodItem;
+    }
 
-	public void setRestaurantImg(String restaurantImg) {
-		this.restaurantImg = restaurantImg;
-	}
+    public void setFoodItem(List<FoodItem> foodItem) {
+        this.foodItem = foodItem;
+    }
 
-	public List<FoodItem> getFoodItem() {
-		return foodItem;
-	}
+    public List<Review> getReview() {
+        return review;
+    }
 
-	public void setFoodItem(List<FoodItem> foodItem) {
-		this.foodItem = foodItem;
-	}
+    public void setReview(List<Review> review) {
+        this.review = review;
+    }
 
-	public List<Review> getReview() {
-		return review;
-	}
-
-	public void setReview(List<Review> review) {
-		this.review = review;
-	}
-
-	@Override
-	public String toString() {
-		return "Restaurant [id=" + id + ", name=" + name + ", location=" + location + ", contact=" + contact
-				+ ", ownerId=" + ownerId + ", restaurantImg=" + restaurantImg + "]";
-	}
-
+    @Override
+    public String toString() {
+        return "Restaurant [id=" + id + ", name=" + name + ", location=" + location + ", contact=" + contact
+                + ", ownerId=" + ownerId + ", restaurantImg=" + restaurantImg + "]";
+    }
 }

@@ -20,8 +20,5 @@ public interface RestaurantService {
                               Long ownerId, MultipartFile resImage) throws IOException;
     void deleteRestaurant(Long id);
 //    List<Object[]> getCustomerDetailsByRestaurantID(Long restaurantID);
-<<<<<<< HEAD
+
 }
-=======
-}
->>>>>>> d6713b2f77127967c15ee0cbf0c053c482dd5fc6
