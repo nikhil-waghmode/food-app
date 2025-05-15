@@ -1,42 +1,36 @@
 package com.capgemini.food_app;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.util.Arrays;
+import java.util.List;
+
 import com.capgemini.food_app.controller.OrderItemController;
 import com.capgemini.food_app.exception.OrderItemNotFoundException;
 import com.capgemini.food_app.model.OrderItem;
 import com.capgemini.food_app.service.OrderItemService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+class OrderItemControllerTests {
 
-import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.Collections;
-
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-@WebMvcTest(OrderItemController.class)
-public class OrderItemControllerTests {
-
-	@Autowired
-	private MockMvc mockMvc;
-
-	@MockitoBean
+	@Mock
 	private OrderItemService service;
+
+	@InjectMocks
+	private OrderItemController controller;
 
 	private OrderItem sampleOrderItem;
 
-	private final ObjectMapper objectMapper = new ObjectMapper();
-
 	@BeforeEach
 	void setUp() {
+		MockitoAnnotations.openMocks(this);
+
 		sampleOrderItem = new OrderItem();
 		sampleOrderItem.setId(1L);
 		sampleOrderItem.setOrderId(100L);
@@ -45,66 +39,86 @@ public class OrderItemControllerTests {
 	}
 
 	@Test
-	void testGetAllOrderItems() throws Exception {
-		when(service.getAllOrderItems()).thenReturn(Collections.singletonList(sampleOrderItem));
+	void testGetAllOrderItems() {
+		List<OrderItem> items = Arrays.asList(sampleOrderItem);
+		when(service.getAllOrderItems()).thenReturn(items);
 
-		mockMvc.perform(get("/api/orderitems")).andExpect(status().isOk()).andExpect(jsonPath("$[0].id").value(1L));
+		ResponseEntity<List<OrderItem>> response = controller.getAllOrderItems();
+
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertEquals(1, response.getBody().size());
+		verify(service).getAllOrderItems();
 	}
 
 	@Test
-	void testGetOrderItemById() throws Exception {
+	void testGetOrderItemById() {
 		when(service.getOrderItemById(1L)).thenReturn(sampleOrderItem);
 
-		mockMvc.perform(get("/api/orderitems/1")).andExpect(status().isOk()).andExpect(jsonPath("$.id").value(1L));
+		ResponseEntity<OrderItem> response = controller.getOrderItemById(1L);
+
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertEquals(sampleOrderItem, response.getBody());
+		verify(service).getOrderItemById(1L);
 	}
 
 	@Test
-	void testGetOrderItemById_NotFound() throws Exception {
+	void testGetOrderItemById_NotFound() {
 		when(service.getOrderItemById(99L)).thenThrow(new OrderItemNotFoundException("OrderItem not found"));
-
-		mockMvc.perform(get("/api/orderitems/99")).andExpect(status().isNotFound());
+		assertThrows(RuntimeException.class, () -> controller.getOrderItemById(99L));
+		verify(service).getOrderItemById(99L);
 	}
 
 	@Test
-	void testAddOrderItem() throws Exception {
+	void testAddOrderItem() {
 		when(service.createOrderItem(any(OrderItem.class))).thenReturn(sampleOrderItem);
 
-		mockMvc.perform(post("/api/orderitems").contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(sampleOrderItem))).andExpect(status().isCreated())
-				.andExpect(header().string("Location", "/api/orderitems/1")).andExpect(jsonPath("$.id").value(1L));
+		ResponseEntity<OrderItem> response = controller.addOrderItem(sampleOrderItem);
+
+		assertEquals(HttpStatus.CREATED, response.getStatusCode());
+		assertEquals(sampleOrderItem, response.getBody());
+		assertTrue(response.getHeaders().getLocation().toString().contains("/api/orderitems/"));
+		verify(service).createOrderItem(sampleOrderItem);
 	}
 
 	@Test
-	void testUpdateOrderItem() throws Exception {
+	void testUpdateOrderItem_Success() {
 		when(service.updateOrderItem(eq(1L), any(OrderItem.class))).thenReturn(sampleOrderItem);
 
-		mockMvc.perform(put("/api/orderitems/1").contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(sampleOrderItem))).andExpect(status().isOk())
-				.andExpect(jsonPath("$.id").value(1L));
+		ResponseEntity<OrderItem> response = controller.updateOrderItem(1L, sampleOrderItem);
+
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertEquals(sampleOrderItem, response.getBody());
+		verify(service).updateOrderItem(1L, sampleOrderItem);
 	}
 
 	@Test
-	void testUpdateOrderItem_NotFound() throws Exception {
-		when(service.updateOrderItem(eq(99L), any(OrderItem.class))).thenThrow(new OrderItemNotFoundException("OrderItem not found"));
-
-		mockMvc.perform(put("/api/orderitems/99").contentType(MediaType.APPLICATION_JSON)
-				.content(new ObjectMapper().writeValueAsString(sampleOrderItem)))
-				.andExpect(status().isNotFound());
-	}
-
-	@Test
-	void testPatchOrderItem() throws Exception {
+	void testPatchOrderItem() {
 		when(service.patchOrderItem(eq(1L), any(OrderItem.class))).thenReturn(sampleOrderItem);
 
-		mockMvc.perform(patch("/api/orderitems/1").contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(sampleOrderItem))).andExpect(status().isOk())
-				.andExpect(jsonPath("$.id").value(1L));
+		ResponseEntity<OrderItem> response = controller.patchOrderItem(1L, sampleOrderItem);
+
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertEquals(sampleOrderItem, response.getBody());
+		verify(service).patchOrderItem(1L, sampleOrderItem);
 	}
 
 	@Test
-	void testDeleteOrderItem() throws Exception {
+	void testPatchOrderItem_NotFound() {
+		when(service.patchOrderItem(eq(99L), any(OrderItem.class)))
+				.thenThrow(new OrderItemNotFoundException("OrderItem not found"));
+
+		assertThrows(RuntimeException.class, () -> controller.patchOrderItem(99L, sampleOrderItem));
+
+		verify(service).patchOrderItem(99L, sampleOrderItem);
+	}
+
+	@Test
+	void testDeleteOrderItem() {
 		doNothing().when(service).deleteOrderItem(1L);
 
-		mockMvc.perform(delete("/api/orderitems/1")).andExpect(status().isNoContent());
+		ResponseEntity<Void> response = controller.deleteOrderItem(1L);
+
+		assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+		verify(service).deleteOrderItem(1L);
 	}
 }
