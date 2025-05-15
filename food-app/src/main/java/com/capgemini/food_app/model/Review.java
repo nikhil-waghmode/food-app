@@ -13,11 +13,16 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+<<<<<<< HEAD:food-app/src/main/java/com/capgemini/food_app/model/Review.java
 
 
 @Entity
 @Table(name="reviews")
 public class Review {
+=======
+@Entity
+public class Reviews {
+>>>>>>> d6713b2f77127967c15ee0cbf0c053c482dd5fc6:food-app/src/main/java/com/capgemini/food_app/model/Reviews.java
     @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,6 +31,7 @@ public class Review {
     @JsonBackReference
     @JoinColumn(name="restaurant_id")
     private Restaurant restaurant;
+<<<<<<< HEAD:food-app/src/main/java/com/capgemini/food_app/model/Review.java
     
     public Restaurant getRestaurant() {
 		return restaurant;
@@ -36,6 +42,9 @@ public class Review {
 	}
 
 	private Float rating;
+=======
+    private Float rating;
+>>>>>>> d6713b2f77127967c15ee0cbf0c053c482dd5fc6:food-app/src/main/java/com/capgemini/food_app/model/Reviews.java
     private String feedback;
     private LocalDate date;
     private Long userId;

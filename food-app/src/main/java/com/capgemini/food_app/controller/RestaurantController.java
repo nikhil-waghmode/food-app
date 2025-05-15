@@ -110,4 +110,8 @@ public class RestaurantController {
                 .contentType(MediaType.parseMediaType(contentType))
                 .body(resource);
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> d6713b2f77127967c15ee0cbf0c053c482dd5fc6

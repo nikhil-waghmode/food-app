@@ -1,6 +1,5 @@
 package com.capgemini.food_app.model;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +13,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
-
 @Entity
 @Table(name="restaurants")
 public class Restaurant {
@@ -27,21 +25,32 @@ public class Restaurant {
 	private String contact;
 	private Long ownerId;
 	private String restaurantImg;
-	
-	@OneToMany(mappedBy="restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
+
+	@OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
 	@JsonManagedReference
 	private List<FoodItem> foodItem = new ArrayList<FoodItem>();
-	
-	@OneToMany(mappedBy="restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
+
+	@OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
 	@JsonManagedReference
+<<<<<<< HEAD
 	private List<Review> review = new ArrayList<Review>();
+=======
+	private List<Reviews> reviews = new ArrayList<Reviews>();
+	
+//	@OneToMany(mappedBy = "restaurant")
+//	private List<FoodOrder> foodOrders;
+
+>>>>>>> d6713b2f77127967c15ee0cbf0c053c482dd5fc6
 
 	public Restaurant() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> d6713b2f77127967c15ee0cbf0c053c482dd5fc6
 	public Restaurant(Long id, String name, String location, String contact, Long ownerId, String restaurantImg,
 			List<FoodItem> foodItem) {
 		super();
@@ -53,8 +62,6 @@ public class Restaurant {
 		this.restaurantImg = restaurantImg;
 		this.foodItem = foodItem;
 	}
-	
-	
 
 	public Restaurant(Long id, String name, String location, String contact, Long ownerId, String restaurantImg,
 			List<FoodItem> foodItem, List<Review> review) {
@@ -135,10 +142,8 @@ public class Restaurant {
 
 	@Override
 	public String toString() {
-		return "Restaurant [id=" + id + ", name=" + name + ", location=" + location + ", contact=" + contact + ", ownerId="
-				+ ownerId + ", restaurantImg=" + restaurantImg + "]";
+		return "Restaurant [id=" + id + ", name=" + name + ", location=" + location + ", contact=" + contact
+				+ ", ownerId=" + ownerId + ", restaurantImg=" + restaurantImg + "]";
 	}
-	
-	
 
 }

@@ -14,9 +14,12 @@ import java.util.List;
 public class RestaurantServiceImpl implements RestaurantService {
 
     private final RestaurantRepository restaurantRepository;
+<<<<<<< HEAD
     
     
     
+=======
+>>>>>>> d6713b2f77127967c15ee0cbf0c053c482dd5fc6
     private final Path rootLocation = Paths.get("uploads/restaurants");
 
     @Autowired
@@ -69,7 +72,11 @@ public class RestaurantServiceImpl implements RestaurantService {
         restaurant.setLocation(location);
         restaurant.setContact(contact);
         restaurant.setOwnerId(ownerId);
+<<<<<<< HEAD
         restaurant.setRestaurantImg(filename);
+=======
+        restaurant.setrestaurantImg(filename);
+>>>>>>> d6713b2f77127967c15ee0cbf0c053c482dd5fc6
 
         return restaurantRepository.save(restaurant);
     }
@@ -99,7 +106,11 @@ public class RestaurantServiceImpl implements RestaurantService {
     @Override
     public void deleteRestaurant(Long id) {
         Restaurant restaurant = getRestaurantById(id);
+<<<<<<< HEAD
         deleteImage(restaurant.getRestaurantImg());
+=======
+        deleteImage(restaurant.getrestaurantImg());
+>>>>>>> d6713b2f77127967c15ee0cbf0c053c482dd5fc6
         restaurantRepository.deleteById(id);
     }
 
@@ -118,9 +129,15 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     private void updateImage(Restaurant restaurant, MultipartFile newImage) throws IOException {
+<<<<<<< HEAD
         deleteImage(restaurant.getRestaurantImg());
         String newFilename = storeImage(newImage);
         restaurant.setRestaurantImg(newFilename);
+=======
+        deleteImage(restaurant.getrestaurantImg());
+        String newFilename = storeImage(newImage);
+        restaurant.setrestaurantImg(newFilename);
+>>>>>>> d6713b2f77127967c15ee0cbf0c053c482dd5fc6
     }
 
     private void deleteImage(String filename) {
@@ -133,4 +150,8 @@ public class RestaurantServiceImpl implements RestaurantService {
             throw new RuntimeException("Failed to delete image file: " + filename, e);
         }
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> d6713b2f77127967c15ee0cbf0c053c482dd5fc6

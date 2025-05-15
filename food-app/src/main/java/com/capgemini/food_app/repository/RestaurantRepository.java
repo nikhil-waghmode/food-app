@@ -2,6 +2,10 @@ package com.capgemini.food_app.repository;
 
 import com.capgemini.food_app.model.Restaurant;
 import org.springframework.data.jpa.repository.JpaRepository;
+<<<<<<< HEAD
+=======
+import org.springframework.data.jpa.repository.Query;
+>>>>>>> d6713b2f77127967c15ee0cbf0c053c482dd5fc6
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,4 +21,8 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
 //    @Query("SELECT c.name, c.email, o.orderDate FROM FoodOrder o " +
 //           "JOIN o.customer c WHERE o.restaurant.id = ?1")
 //    List<Object[]> findCustomerDetailsByRestaurant(Long restaurantId);
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> d6713b2f77127967c15ee0cbf0c053c482dd5fc6
