@@ -9,13 +9,15 @@ public interface ReviewService {
 
 	List<Review> getAllReview();
 
-	Review getReviewById(Long id);
-
 	Review updateReview(Long id, Review updatedReview);
 
 	void deleteReview(Long id);
+	
+	Review patchReview(Long id, Review review);
 
 	List<Review> getReviewByRestaurant(Long restaurantId);
 
 	List<Review> getReviewByUser(Long userId);
+	
+	public Review getReviewById(Long id);
 }
