@@ -6,7 +6,9 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.capgemini.food_app.exception.UserNotFoundException;
 import com.capgemini.food_app.exception.EmailAlreadyExistsException;
+
 import com.capgemini.food_app.model.User;
 import com.capgemini.food_app.repository.UserRepository;
 
@@ -29,9 +31,9 @@ public class UserServiceImpl implements UserService{
 
 	@Override
 	public User updateUser(Long id, User updated) {
-		Optional<User> optional=userRepository.findById(id);
-		if(optional.isPresent()) {
-			User present=optional.get();
+		User present=userRepository.findById(id).orElseThrow(() ->
+		new UserNotFoundException("User with ID " + id + " not found."));
+
 			present.setName(updated.getName());
 			present.setEmail(updated.getEmail());
 			present.setPassword(updated.getPassword());
@@ -43,8 +45,7 @@ public class UserServiceImpl implements UserService{
 				throw new EmailAlreadyExistsException("Email already exists");
 			}
 			return userRepository.save(present);
-		}
-		return null;
+
 	}
 
 	@Override
@@ -69,9 +70,9 @@ public class UserServiceImpl implements UserService{
 	@Override
 	public User patchUser(Long id, User patch) {
 		// TODO Auto-generated method stub
-		Optional<User> optional=userRepository.findById(id);
-		if(optional.isPresent()) {
-			User present=optional.get();
+		User present=userRepository.findById(id).orElseThrow(() ->
+		new UserNotFoundException("User with ID " + id + " not found."));
+
 			
 			if(patch.getName()!=null)
 				present.setName(patch.getName());
@@ -93,8 +94,7 @@ public class UserServiceImpl implements UserService{
 			}
 			
 			return userRepository.save(present);
-		}
-		return null;
+
 	}
 	
 }
