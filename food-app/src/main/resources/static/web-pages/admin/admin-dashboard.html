@@ -68,8 +68,8 @@
           <thead>
             <tr>
               <th>Order ID</th>
-              <th>Restaurant Name</th>
-              <th>Customer</th>
+              <th>Restaurant ID</th>
+              <!-- <th>Customer</th> -->
               <th>Order Date</th>
               <th>Total Amount</th>
             </tr>
@@ -119,7 +119,7 @@
             <p id="leastSelling"></p>
           </div>
         </div>
-        <div class="mb-4">
+        <!-- <div class="mb-4">
             <h4 class="fw-bold mb-3">Top Restaurants</h4>
             <table class="table table-bordered">
               <thead>
@@ -130,10 +130,10 @@
                 </tr>
               </thead>
               <tbody id="topRestaurantsTable">
-                <!-- Orders will be populated here -->
+               
               </tbody>
             </table>
-          </div>
+          </div> -->
 
 
     <script>
@@ -141,59 +141,41 @@
         welcomeMessage = document.getElementById("welcomeMessage");
         currentAdminId = localStorage.getItem("currentAdminId");
 
-
-        totalOrders = document.getElementById("totalOrders");
-        totalRestaurants = document.getElementById("totalRestaurants");
-        totalFoodItems = document.getElementById("totalFoodItems")
-        totalUsers = document.getElementById("totalUsers");
-        totalCustomers = document.getElementById("totalCustomers");
-        totalOwners = document.getElementById("totalOwners");
-        bestSellingInput = document.getElementById("bestSelling");
-        leastSellingInput = document.getElementById("leastSelling");
-
         async function fetchAllData() {
-            const[restaurantsResponse, usersResponse, ordersResponse, foodItemsResponse, bestSellingResponse, leastSellingResponse] = await Promise.all([
-            await fetch(`${apiUrl}/restaurants`),
-            await fetch(`${apiUrl}/users`),
-            await fetch(`${apiUrl}/orders`),
-            await fetch(`${apiUrl}/fooditems`),
-            await fetch(`${apiUrl}/fooditems/best`),
-            await fetch(`${apiUrl}/fooditems/least`),
-
-            ]);
-
-            const [restaurants, users, orders, foodItems, bestSelling, leastSelling] = await Promise.all([
-            restaurantsResponse.json(),
-            usersResponse.json(),
-            ordersResponse.json(),
-            foodItemsResponse.json(),
-            bestSellingResponse.json(),
-            leastSellingResponse.json()
+            const response = await fetch("http://localhost:8080/api/dashboard")
             
-            ]);
-            renderQuickStats(restaurants,users, orders, foodItems, bestSelling, leastSelling)
+             if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+
+          const dashBoardData = await response.json();
+
+
+            const {recentOrders, totalRestaurants, totalFoodItems, totalOrders, totalCustomers, totalOwners,totalUsers,bestSelling,leastSelling} = dashBoardData;
+            // console.log(dashBoardData);
+            renderQuickStats( recentOrders, totalRestaurants, totalFoodItems, totalOrders, totalCustomers, totalOwners, totalUsers, bestSelling, leastSelling);
+            renderRecentOrders(recentOrders);
         }
 
-        fetchAllData()
+        
 
-        async function renderQuickStats(restaurants,users, orders,foodItems, bestSelling, leastSelling) {
+        fetchAllData();
+
+        async function renderQuickStats(recentOrders, totalRestaurants, totalFoodItems, totalOrders, totalCustomers, totalOwners,totalUsers,bestSelling,leastSelling) {
+        // console.log(users);
             try {
                 currentAdminRes = await fetch(`${apiUrl}/users/${currentAdminId}`);
                 currentAdminData = await currentAdminRes.json();
-
+                console.log("total food items "+totalFoodItems)
                 welcomeMessage.innerHTML = `Welcome, ${currentAdminData.name} 👩🏻‍💼`;
-
-                customerUsers = users.filter(user => user.userType === "customer");
-                // console.log("Total Customers:", customerUsers.length);
-                ownerUsers = users.filter(user => user.userType === "owner");
-                totalRestaurants.innerHTML = `${restaurants.length}`
-                totalOrders.innerHTML = `${orders.length}`
-                totalFoodItems.innerHTML = `${foodItems.length}`
-                totalUsers.innerHTML = `${users.length}`
-                totalCustomers.innerHTML = `${customerUsers.length}`;
-                totalOwners.innerHTML = `${ownerUsers.length}`;
-                bestSellingInput.innerHTML = `${bestSelling[0][1]} - ${bestSelling[0][3]}`;
-                leastSellingInput.innerHTML = `${leastSelling[0][1]} - ${leastSelling[0][3]}`;
+                document.getElementById("totalRestaurants").innerHTML = `${totalRestaurants}`;
+                document.getElementById("totalOrders").innerText = totalOrders;
+                document.getElementById("totalFoodItems").innerHTML = `${totalFoodItems}`;
+                document.getElementById("totalUsers").innerHTML = `${totalUsers}`
+                document.getElementById("totalCustomers").innerHTML = `${totalCustomers}`;
+                document.getElementById("totalOwners").innerHTML = `${totalOwners}`;
+                document.getElementById("bestSelling").innerHTML = `${bestSelling}`;
+                document.getElementById("leastSelling").innerHTML = `${leastSelling}`;
 
         } catch (error) {
                 console.error("Failed to render quick stats :", error);
@@ -201,30 +183,25 @@
         }
 
 
-        async function renderRecentOrders() {
+        function renderRecentOrders(recentOrdersData) {
 
-      const recentOrdersRes = await fetch(`${apiUrl}/orders/recents`);
-      const recentOrdersData = await recentOrdersRes.json(); 
-// console.log(recentOrdersData)
-      const tableBody = document.getElementById("recentOrdersTable");
-      tableBody.innerHTML = "";
-      recentOrdersData.forEach(order => {
-        tableBody.innerHTML += `
-      <tr>
-        <td>${order.orderID}</td>
-        <td>${order.restaurantID}</td>
-        <td>${order.customerName}</td>
-        <td>${order.orderDate}</td>
-        <td>₹${order.totalAmount}</td>
-      </tr>
-    `;
-      });
+          const tableBody = document.getElementById("recentOrdersTable");
+          tableBody.innerHTML = "";
+          recentOrdersData.forEach(order => {
+            tableBody.innerHTML += `
+          <tr>
+            <td>${order.id}</td>
+            <td>${order.restaurantId}</td>
+            <td>${order.date}</td>
+            <td>₹${order.totalAmount}</td>
+          </tr>
+        `;
+          });
     }
-    renderRecentOrders();
 
     
 
-    async function renderTopRestaurants() {
+  /*  async function renderTopRestaurants() {
 
  topRestaurantsRes = await fetch(`${apiUrl}/restaurants/sorted-by-orders`);
  topRestaurantsData = await topRestaurantsRes.json(); 
@@ -242,6 +219,8 @@ topRestaurantsData.forEach(restaurant => {
 });
 }
 renderTopRestaurants();
+*/
+
 
         // restaurantIds = {}
         // function restaurantsRanking() {
