@@ -17,5 +17,8 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
 //    @Query("SELECT c.name, c.email, o.orderDate FROM FoodOrder o " +
 //           "JOIN o.customer c WHERE o.restaurant.id = ?1")
 //    List<Object[]> findCustomerDetailsByRestaurant(Long restaurantId);
-    
+
+
 }
+
+

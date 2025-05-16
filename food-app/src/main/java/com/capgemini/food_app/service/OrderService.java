@@ -18,4 +18,6 @@ public interface OrderService {
 	boolean orderExists(Long orderId);
 
 	void deleteOrder(Long id);
+	List<Order> getOrdersByRestaurantId(Long restaurantId);
+
 }

@@ -16,9 +16,6 @@ import java.util.Optional;
 public class RestaurantServiceImpl implements RestaurantService {
 
     private final RestaurantRepository restaurantRepository;
-    
-    
-    
     private final Path rootLocation = Paths.get("uploads/restaurants");
 
     @Autowired
@@ -132,7 +129,7 @@ public class RestaurantServiceImpl implements RestaurantService {
         restaurant.setRestaurantImg(newFilename);
     }
 
-    private void deleteImage(String filename) {
+    public void deleteImage(String filename) {
         if (filename == null) return;
 
         try {
