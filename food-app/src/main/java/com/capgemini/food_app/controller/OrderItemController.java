@@ -37,7 +37,7 @@ public class OrderItemController {
 		log.info("Fetching order item with ID: {}", id);
 		try {
 			OrderItem item = service.getOrderItemById(id);
-			log.debug("Fetched order item: {}", item);
+			log.info("Fetched order item: {}", item);
 			return ResponseEntity.ok(item);
 		} catch (RuntimeException e) {
 			log.warn("Order item with ID {} not found", id);
@@ -49,7 +49,7 @@ public class OrderItemController {
 	public ResponseEntity<OrderItem> addOrderItem(@RequestBody OrderItem orderItem) {
 		log.info("Adding new order item: {}", orderItem);
 		OrderItem createdItem = service.createOrderItem(orderItem);
-		log.debug("Created order item: {}", createdItem);
+		log.info("Created order item: {}", createdItem);
 		return ResponseEntity.status(HttpStatus.CREATED)
 				.location(URI.create("/api/orderitems/" + createdItem.getId()))
 				.body(createdItem);
@@ -60,7 +60,7 @@ public class OrderItemController {
 		log.info("Updating order item with ID: {}", id);
 		try {
 			OrderItem updated = service.updateOrderItem(id, orderItem);
-			log.debug("Updated order item: {}", updated);
+			log.info("Updated order item: {}", updated);
 			return ResponseEntity.ok(updated);
 		} catch (RuntimeException e) {
 			log.error("Error updating order item with ID {}: {}", id, e.getMessage());
@@ -72,7 +72,7 @@ public class OrderItemController {
 	public ResponseEntity<OrderItem> patchOrderItem(@PathVariable Long id, @RequestBody OrderItem orderItem) {
 		log.trace("Patching order item with ID: {}", id);
 		OrderItem patched = service.patchOrderItem(id, orderItem);
-		log.debug("Patched order item: {}", patched);
+		log.info("Patched order item: {}", patched);
 		return ResponseEntity.ok(patched);
 	}
 
@@ -88,4 +88,16 @@ public class OrderItemController {
 			return ResponseEntity.notFound().build();
 		}
 	}
+	
+//	@GetMapping("/best")
+//    public ResponseEntity<Long> getItemIdWithMaxCount() {
+//        Long itemId = service.getItemIdWithMaxCount();
+//        return itemId != null ? ResponseEntity.ok(itemId) : ResponseEntity.noContent().build();
+//    }
+//
+//    @GetMapping("/least")
+//    public ResponseEntity<Long> getItemIdWithMinCount() {
+//        Long itemId = service.getItemIdWithMinCount();
+//        return itemId != null ? ResponseEntity.ok(itemId) : ResponseEntity.noContent().build();
+//    }
 }

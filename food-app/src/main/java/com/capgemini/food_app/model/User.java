@@ -8,39 +8,38 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 @Entity
-@Table(name="users")
+@Table(name = "users")
 public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Long id;
-	
+
 	@NotBlank(message = "Name is mandatory.")
 	String name;
-	
+
 	@Email(message = "Invalid email format.")
 	String email;
-	
+
 	@NotBlank
-	@Size(min=5,message = "Length should minimum 5")
+	@Size(min = 5, message = "Length should minimum 5")
 	String password;
-	
-	@Pattern(regexp = "^\\d{10}$",message = "Invalid phone number.")
+
+	@Pattern(regexp = "^\\d{10}$", message = "Invalid phone number.")
 	String phone;
-	
+
 	@NotBlank(message = "User type is mandatory")
-	@Column(name="user_type")
+	@Column(name = "user_type")
 	String userType;
-	
+
 	String location;
-	
-	@Column(name="user_img")
+
+	@Column(name = "user_img")
 	String userImg;
-	
+
 	public User() {
 	}
 
@@ -120,11 +119,9 @@ public class User {
 		this.userImg = userImg;
 	}
 
-
 	@Override
 	public String toString() {
 		return "User [id=" + id + ", name=" + name + ", email=" + email + ", phone=" + phone
 				+ ", userType=" + userType + ", location=" + location + ", userImg=" + userImg + "]";
 	}
 }
-

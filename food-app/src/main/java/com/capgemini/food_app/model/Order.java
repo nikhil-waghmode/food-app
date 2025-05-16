@@ -1,8 +1,6 @@
 package com.capgemini.food_app.model;
 
 import java.time.LocalDate;
-import jakarta.annotation.Generated;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,7 +14,7 @@ import jakarta.validation.constraints.PastOrPresent;
 @Entity
 @Table(name = "orders")
 public class Order {
- 
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -25,11 +23,11 @@ public class Order {
 	private Long userId;
 	@NotNull(message = "Restaurant ID must not be null")
 	private Long restaurantId;
-	
+
 	@NotNull(message = "Order date must not be null")
-    @PastOrPresent(message = "Order date cannot be in the future")
+	@PastOrPresent(message = "Order date cannot be in the future")
 	private LocalDate date;
-	
+
 	@NotNull(message = "Total amount must not be null")
 	@DecimalMin(value = "0.0", inclusive = true, message = "Total amount must be zero or greater")
 	private Double totalAmount;

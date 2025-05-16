@@ -20,5 +20,12 @@ public interface FoodItemService {
 
 	List<FoodItem> getFoodItemsForRestaurant(Long restaurantID);
 
+	// public List<Object[]> getBottom1FoodItemForAdmin();
+	//
+	// public List<Object[]> getTop1FoodItemForAdmin();
+
+	FoodItem getMostOrderedFoodItem();
+
+	FoodItem getLeastOrderedFoodItem();
 
 }

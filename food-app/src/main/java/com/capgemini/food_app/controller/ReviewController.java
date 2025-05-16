@@ -25,7 +25,7 @@ public class ReviewController {
 		log.info("Creating new review for restaurantId: {} by userId: {}",
 				review.getRestaurant().getId(), review.getUserId());
 		Review created = reviewService.createReview(review);
-		log.debug("Created review: {}", created);
+		log.info("Created review: {}", created);
 		return ResponseEntity.status(201).body(created);
 	}
 
@@ -33,7 +33,7 @@ public class ReviewController {
 	public ResponseEntity<List<Review>> getAllReview() {
 		log.info("Fetching all reviews");
 		List<Review> reviews = reviewService.getAllReview();
-		log.debug("Total reviews fetched: {}", reviews.size());
+		log.info("Total reviews fetched: {}", reviews.size());
 		return ResponseEntity.ok(reviews);
 	}
 
@@ -56,7 +56,7 @@ public class ReviewController {
 			log.warn("Review with ID {} not found for update", id);
 			return ResponseEntity.notFound().build();
 		}
-		log.debug("Updated review: {}", updated);
+		log.info("Updated review: {}", updated);
 		return ResponseEntity.ok(updated);
 	}
 
@@ -72,7 +72,7 @@ public class ReviewController {
 	public ResponseEntity<List<Review>> getReviewByRestaurant(@PathVariable Long restaurantId) {
 		log.info("Fetching reviews for restaurant ID: {}", restaurantId);
 		List<Review> reviews = reviewService.getReviewByRestaurant(restaurantId);
-		log.debug("Found {} reviews for restaurant ID {}", reviews.size(), restaurantId);
+		log.info("Found {} reviews for restaurant ID {}", reviews.size(), restaurantId);
 		return ResponseEntity.ok(reviews);
 	}
 
@@ -80,7 +80,15 @@ public class ReviewController {
 	public ResponseEntity<List<Review>> getReviewByUser(@PathVariable Long userId) {
 		log.info("Fetching reviews by user ID: {}", userId);
 		List<Review> reviews = reviewService.getReviewByUser(userId);
-		log.debug("Found {} reviews by user ID {}", reviews.size(), userId);
+		log.info("Found {} reviews by user ID {}", reviews.size(), userId);
 		return ResponseEntity.ok(reviews);
+	}
+
+	@PatchMapping("/reviews/{id}")
+	public ResponseEntity<Review> patchReview(@PathVariable Long id, @RequestBody Review review) {
+		log.info("Patching review with ID: {}", id);
+		Review patched = reviewService.patchReview(id, review);
+		log.info("Patched review: {}", patched);
+		return ResponseEntity.ok(patched);
 	}
 }

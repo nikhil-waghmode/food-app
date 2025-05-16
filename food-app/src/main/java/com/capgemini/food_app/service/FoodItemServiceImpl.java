@@ -81,4 +81,14 @@ public class FoodItemServiceImpl implements FoodItemService {
 		return foodItemRepo.save(existing);
 	}
 
+	// @Override
+	// public List<Object[]> getTop1FoodItemForAdmin() {
+	// return foodItemRepo.getTop1FoodItemForAdmin();
+	// }
+	//
+	// @Override
+	// public List<Object[]> getBottom1FoodItemForAdmin() {
+	// return foodItemRepo.getBottom1FoodItemForAdmin();
+	// }
+
 }

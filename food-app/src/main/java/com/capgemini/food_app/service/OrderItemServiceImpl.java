@@ -56,4 +56,16 @@ public class OrderItemServiceImpl implements OrderItemService {
 	public void deleteOrderItem(Long id) {
 		orderItemRepository.deleteById(id);
 	}
+	
+//	@Override
+//	public Long getItemIdWithMaxCount() {
+//        List<Long> itemIds = orderItemRepository.findAllItemIdsOrderedByCountDesc();
+//        return itemIds.isEmpty() ? null : itemIds.get(0);
+//    }
+//
+//	@Override
+//    public Long getItemIdWithMinCount() {
+//        List<Long> itemIds = orderItemRepository.findAllItemIdsOrderedByCountAsc();
+//        return itemIds.isEmpty() ? null : itemIds.get(0);
+//    }
 }

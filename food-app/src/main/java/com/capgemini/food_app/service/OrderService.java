@@ -2,9 +2,10 @@ package com.capgemini.food_app.service;
 
 import com.capgemini.food_app.model.Order;
 import java.util.List;
+
 //edited
 public interface OrderService {
- 
+
 	Order createOrder(Order order);
 
 	Order getOrderById(Long id);
@@ -18,4 +19,6 @@ public interface OrderService {
 	boolean orderExists(Long orderId);
 
 	void deleteOrder(Long id);
+
+	List<Order> getTop3OrdersByDateDesc();
 }

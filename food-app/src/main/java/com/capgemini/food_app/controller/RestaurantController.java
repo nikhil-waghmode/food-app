@@ -34,28 +34,22 @@ public class RestaurantController {
     public ResponseEntity<List<Restaurant>> getAllRestaurants() {
         log.info("Fetching all restaurants");
         List<Restaurant> restaurants = restaurantService.getAllRestaurants();
-        log.debug("Total restaurants fetched: {}", restaurants.size());
+        log.info("Total restaurants fetched: {}", restaurants.size());
         return ResponseEntity.ok(restaurants);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Restaurant> getRestaurantById(@PathVariable Long id) {
         log.info("Fetching restaurant with ID: {}", id);
-        try {
-            Restaurant restaurant = restaurantService.getRestaurantById(id);
-            log.debug("Restaurant details: {}", restaurant);
-            return ResponseEntity.ok(restaurant);
-        } catch (RuntimeException e) {
-            log.warn("Restaurant with ID {} not found", id);
-            return ResponseEntity.notFound().build();
-        }
+        Restaurant restaurant = restaurantService.getRestaurantById(id); // throws if not found
+        return ResponseEntity.ok(restaurant);
     }
 
     @GetMapping("/owner/{ownerId}")
     public ResponseEntity<List<Restaurant>> getRestaurantsByOwner(@PathVariable Long ownerId) {
         log.info("Fetching restaurants for owner ID: {}", ownerId);
         List<Restaurant> restaurants = restaurantService.getRestaurantsByOwner(ownerId);
-        log.debug("Found {} restaurants for owner ID: {}", restaurants.size(), ownerId);
+        log.info("Found {} restaurants for owner ID: {}", restaurants.size(), ownerId);
         return ResponseEntity.ok(restaurants);
     }
 
@@ -63,7 +57,7 @@ public class RestaurantController {
     public ResponseEntity<Long> getRestaurantCount() {
         log.info("Fetching total restaurant count");
         long count = restaurantService.getTotalRestaurantsCount();
-        log.debug("Total restaurants count: {}", count);
+        log.info("Total restaurants count: {}", count);
         return ResponseEntity.ok(count);
     }
 
@@ -76,7 +70,7 @@ public class RestaurantController {
             @RequestParam(value = "resImage", required = false) MultipartFile resImage) throws IOException {
         log.info("Creating new restaurant: {}", name);
         Restaurant created = restaurantService.createRestaurant(name, location, contact, ownerId, resImage);
-        log.debug("Created restaurant: {}", created);
+        log.info("Created restaurant: {}", created);
         return ResponseEntity.created(URI.create("/api/restaurants/" + created.getId())).body(created);
     }
 
@@ -91,7 +85,7 @@ public class RestaurantController {
         log.info("Updating restaurant with ID: {}", id);
         try {
             Restaurant updated = restaurantService.updateRestaurant(id, name, location, contact, ownerId, resImage);
-            log.debug("Updated restaurant: {}", updated);
+            log.info("Updated restaurant: {}", updated);
             return ResponseEntity.ok(updated);
         } catch (RuntimeException e) {
             log.error("Error updating restaurant ID {}: {}", id, e.getMessage());
@@ -109,21 +103,15 @@ public class RestaurantController {
             @RequestParam(value = "resImage", required = false) MultipartFile resImage) throws IOException {
         log.info("Patching restaurant with ID: {}", id);
         Restaurant patched = restaurantService.patchRestaurant(id, name, location, contact, ownerId, resImage);
-        log.debug("Patched restaurant: {}", patched);
+        log.info("Patched restaurant: {}", patched);
         return ResponseEntity.ok(patched);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRestaurant(@PathVariable Long id) {
         log.warn("Deleting restaurant with ID: {}", id);
-        try {
-            restaurantService.deleteRestaurant(id);
-            log.info("Deleted restaurant with ID: {}", id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            log.error("Error deleting restaurant ID {}: {}", id, e.getMessage());
-            return ResponseEntity.notFound().build();
-        }
+        restaurantService.deleteRestaurant(id); // throws if not found
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/image/{filename:.+}")
@@ -142,9 +130,25 @@ public class RestaurantController {
             contentType = "application/octet-stream";
         }
 
-        log.debug("Serving image '{}' with content type '{}'", filename, contentType);
+        log.info("Serving image '{}' with content type '{}'", filename, contentType);
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(contentType))
                 .body(resource);
     }
+
+    // @GetMapping("/top-review")
+    // public ResponseEntity<List<Object[]>> getTopReview() {
+    // log.info("Fetching top review for restaurants");
+    // List<Object[]> result = restaurantService.findTop1ByOrderByRatingDesc();
+    // log.info("Top review result: {}", result);
+    // return ResponseEntity.ok(result);
+    // }
+
+    // @GetMapping("/least-review")
+    // public ResponseEntity<List<Object[]>> getLeastReview() {
+    // log.info("Fetching least review for restaurants");
+    // List<Object[]> result = restaurantService.findTop1ByOrderByRatingAsc();
+    // log.info("Least review result: {}", result);
+    // return ResponseEntity.ok(result);
+    // }
 }

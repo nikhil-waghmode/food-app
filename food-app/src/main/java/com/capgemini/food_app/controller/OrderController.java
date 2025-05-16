@@ -27,7 +27,7 @@ public class OrderController {
     public ResponseEntity<Order> createOrder(@RequestBody Order order) {
         log.info("Creating new order for customer ID: {}", order.getUserId());
         Order createdOrder = orderService.createOrder(order);
-        log.debug("Created order: {}", createdOrder);
+        log.info("Created order: {}", createdOrder);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .location(URI.create("/api/orders/" + createdOrder.getId()))
                 .body(createdOrder);
@@ -38,7 +38,7 @@ public class OrderController {
         log.info("Fetching order with ID: {}", id);
         try {
             Order order = orderService.getOrderById(id);
-            log.debug("Fetched order: {}", order);
+            log.info("Fetched order: {}", order);
             return ResponseEntity.ok(order);
         } catch (RuntimeException e) {
             log.warn("Order with ID {} not found", id);
@@ -50,7 +50,13 @@ public class OrderController {
     public ResponseEntity<List<Order>> getAllOrders() {
         log.info("Fetching all orders");
         List<Order> orders = orderService.getAllOrders();
-        log.debug("Fetched {} orders", orders.size());
+        log.info("Fetched {} orders", orders.size());
+        return ResponseEntity.ok(orders);
+    }
+
+    @GetMapping("/recents")
+    public ResponseEntity<List<Order>> getRecentOrders() {
+        List<Order> orders = orderService.getTop3OrdersByDateDesc();
         return ResponseEntity.ok(orders);
     }
 
@@ -59,7 +65,7 @@ public class OrderController {
         log.info("Updating order with ID: {}", id);
         try {
             Order updated = orderService.updateOrder(id, order);
-            log.debug("Updated order: {}", updated);
+            log.info("Updated order: {}", updated);
             return ResponseEntity.ok(updated);
         } catch (RuntimeException e) {
             log.error("Failed to update order with ID {}: {}", id, e.getMessage());
@@ -71,7 +77,7 @@ public class OrderController {
     public ResponseEntity<Order> patchOrder(@PathVariable Long id, @RequestBody Order order) {
         log.trace("Patching order with ID: {}", id);
         Order patched = orderService.patchOrder(id, order);
-        log.debug("Patched order: {}", patched);
+        log.info("Patched order: {}", patched);
         return ResponseEntity.ok(patched);
     }
 

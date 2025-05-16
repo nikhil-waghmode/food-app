@@ -17,7 +17,7 @@ import org.mockito.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-class OrderItemControllerTests {
+public class OrderItemControllerTests {
 
 	@Mock
 	private OrderItemService service;
@@ -64,7 +64,11 @@ class OrderItemControllerTests {
 	@Test
 	void testGetOrderItemById_NotFound() {
 		when(service.getOrderItemById(99L)).thenThrow(new OrderItemNotFoundException("OrderItem not found"));
-		assertThrows(RuntimeException.class, () -> controller.getOrderItemById(99L));
+
+		ResponseEntity<OrderItem> response = controller.getOrderItemById(99L);
+
+		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+		assertNull(response.getBody());
 		verify(service).getOrderItemById(99L);
 	}
 

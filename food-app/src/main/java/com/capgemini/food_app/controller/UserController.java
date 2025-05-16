@@ -26,7 +26,7 @@ public class UserController {
 	public ResponseEntity<List<User>> getAllUsers() {
 		log.info("Fetching all users");
 		List<User> users = userService.getAllUsers();
-		log.debug("Number of users found: {}", users.size());
+		log.info("Number of users found: {}", users.size());
 		return ResponseEntity.ok(users);
 	}
 
@@ -34,7 +34,7 @@ public class UserController {
 	public ResponseEntity<User> createUser(@RequestBody User user) {
 		log.info("Creating new user with email: {}", user.getEmail());
 		User saved = userService.createUser(user);
-		log.debug("Created user: {}", saved);
+		log.info("Created user: {}", saved);
 		return ResponseEntity.status(HttpStatus.CREATED).body(saved);
 	}
 
@@ -70,7 +70,7 @@ public class UserController {
 			log.warn("User with ID {} not found for update", id);
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
-		log.debug("Updated user: {}", updated);
+		log.info("Updated user: {}", updated);
 		return ResponseEntity.ok(updated);
 	}
 
@@ -82,7 +82,7 @@ public class UserController {
 			log.warn("User with ID {} not found for patch", id);
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
-		log.debug("Patched user: {}", user);
+		log.info("Patched user: {}", user);
 		return ResponseEntity.ok(user);
 	}
 }

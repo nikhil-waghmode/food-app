@@ -1,19 +1,15 @@
 package com.capgemini.food_app.service;
 
 import java.util.List;
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.capgemini.food_app.exception.UserNotFoundException;
 import com.capgemini.food_app.exception.EmailAlreadyExistsException;
-
 import com.capgemini.food_app.model.User;
 import com.capgemini.food_app.repository.UserRepository;
 
 @Service
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
 	UserRepository userRepository;
 
 	@Autowired
@@ -23,7 +19,7 @@ public class UserServiceImpl implements UserService{
 
 	@Override
 	public User createUser(User user) {
-		if(userRepository.existsByEmail(user.getEmail())) {
+		if (userRepository.existsByEmail(user.getEmail())) {
 			throw new EmailAlreadyExistsException("Email already exists");
 		}
 		return userRepository.save(user);
@@ -31,26 +27,26 @@ public class UserServiceImpl implements UserService{
 
 	@Override
 	public User updateUser(Long id, User updated) {
-		User present=userRepository.findById(id).orElseThrow(() ->
-		new UserNotFoundException("User with ID " + id + " not found."));
+		User present = userRepository.findById(id)
+				.orElseThrow(() -> new UserNotFoundException("User with ID " + id + " not found."));
 
-			present.setName(updated.getName());
-			present.setEmail(updated.getEmail());
-			present.setPassword(updated.getPassword());
-			present.setPhone(updated.getPhone());
-			present.setUserType(updated.getUserType());
-			present.setLocation(updated.getLocation());
-			present.setUserImg(updated.getUserImg());
-			if(userRepository.existsByEmail(updated.getEmail())) {
-				throw new EmailAlreadyExistsException("Email already exists");
-			}
-			return userRepository.save(present);
+		present.setName(updated.getName());
+		present.setEmail(updated.getEmail());
+		present.setPassword(updated.getPassword());
+		present.setPhone(updated.getPhone());
+		present.setUserType(updated.getUserType());
+		present.setLocation(updated.getLocation());
+		present.setUserImg(updated.getUserImg());
+		if (userRepository.existsByEmail(updated.getEmail())) {
+			throw new EmailAlreadyExistsException("Email already exists");
+		}
+		return userRepository.save(present);
 
 	}
 
 	@Override
 	public boolean deleteUser(Long id) {
-		if(userRepository.existsById(id)) {
+		if (userRepository.existsById(id)) {
 			userRepository.deleteById(id);
 			return true;
 		}
@@ -66,35 +62,34 @@ public class UserServiceImpl implements UserService{
 	public User getUserById(Long id) {
 		return userRepository.findById(id).orElse(null);
 	}
-	
+
 	@Override
 	public User patchUser(Long id, User patch) {
 		// TODO Auto-generated method stub
-		User present=userRepository.findById(id).orElseThrow(() ->
-		new UserNotFoundException("User with ID " + id + " not found."));
+		User present = userRepository.findById(id)
+				.orElseThrow(() -> new UserNotFoundException("User with ID " + id + " not found."));
 
-			
-			if(patch.getName()!=null)
-				present.setName(patch.getName());
-			if(patch.getEmail()!=null)
-				present.setEmail(patch.getEmail());
-			if(patch.getPassword()!=null)
-				present.setPassword(patch.getPassword());
-			if(patch.getPhone()!=null)
-				present.setPhone(patch.getPhone());
-			if(patch.getUserType()!=null)
-				present.setUserType(patch.getUserType());
-			if(patch.getLocation()!=null)
-				present.setLocation(patch.getLocation());
-			if(patch.getUserImg()!=null)
-				present.setUserImg(patch.getUserImg());
-			
-			if(userRepository.existsByEmail(patch.getEmail())) {
-				throw new EmailAlreadyExistsException("Email already exists");
-			}
-			
-			return userRepository.save(present);
+		if (patch.getName() != null)
+			present.setName(patch.getName());
+		if (patch.getEmail() != null)
+			present.setEmail(patch.getEmail());
+		if (patch.getPassword() != null)
+			present.setPassword(patch.getPassword());
+		if (patch.getPhone() != null)
+			present.setPhone(patch.getPhone());
+		if (patch.getUserType() != null)
+			present.setUserType(patch.getUserType());
+		if (patch.getLocation() != null)
+			present.setLocation(patch.getLocation());
+		if (patch.getUserImg() != null)
+			present.setUserImg(patch.getUserImg());
+
+		if (userRepository.existsByEmail(patch.getEmail())) {
+			throw new EmailAlreadyExistsException("Email already exists");
+		}
+
+		return userRepository.save(present);
 
 	}
-	
+
 }

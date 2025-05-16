@@ -4,6 +4,7 @@ import com.capgemini.food_app.model.FoodItem;
 import com.capgemini.food_app.service.FoodItemService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -52,7 +53,7 @@ public class FoodItemController {
     public FoodItem updateFoodItem(@PathVariable Long id, @RequestBody FoodItem foodItem) {
         log.info("Updating food item with id {}", id);
         FoodItem updated = foodItemService.updateFoodItem(id, foodItem);
-        log.debug("Updated food item: {}", updated);
+        log.info("Updated food item: {}", updated);
         return updated;
     }
 
@@ -60,7 +61,7 @@ public class FoodItemController {
     public FoodItem patchFoodItem(@PathVariable Long id, @RequestBody FoodItem foodItem) {
         log.trace("Patching food item with id {}", id);
         FoodItem patched = foodItemService.patchFoodItem(id, foodItem);
-        log.debug("Patched food item: {}", patched);
+        log.info("Patched food item: {}", patched);
         return patched;
     }
 
@@ -76,13 +77,32 @@ public class FoodItemController {
         }
     }
 
-    // @GetMapping("/restaurant/{restaurantId}")
-    // public List<FoodItem> getFoodItemsByRestaurantId(@PathVariable Long
-    // restaurantId) {
-    // log.info("Fetching food items for restaurant id {}", restaurantId);
-    // List<FoodItem> items =
-    // foodItemService.getFoodItemsForRestaurant(restaurantId);
-    // log.debug("Found {} items for restaurant id {}", items.size(), restaurantId);
-    // return items;
+    // @GetMapping("/best")
+    // public ResponseEntity<List<Object[]>> getBestSellingFoodItem() {
+    // log.info("Fetching best selling food items (limit 3)");
+    // List<Object[]> result = foodItemService.getTop1FoodItemForAdmin();
+    // log.info("Best selling food item result: {}", result);
+    // return ResponseEntity.ok(result);
     // }
+
+    // @GetMapping("/least")
+    // public ResponseEntity<List<Object[]>> getLeastSellingFoodItem() {
+    // log.info("Fetching least selling food items (limit 3)");
+    // List<Object[]> result = foodItemService.getBottom1FoodItemForAdmin();
+    // log.info("Least selling food item result: {}", result);
+    // return ResponseEntity.ok(result);
+    // }
+
+    @GetMapping("/best")
+    public ResponseEntity<FoodItem> getMostOrderedFoodItem() {
+        FoodItem foodItem = foodItemService.getMostOrderedFoodItem();
+        return foodItem != null ? ResponseEntity.ok(foodItem) : ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/least")
+    public ResponseEntity<FoodItem> getLeastOrderedFoodItem() {
+        FoodItem foodItem = foodItemService.getLeastOrderedFoodItem();
+        return foodItem != null ? ResponseEntity.ok(foodItem) : ResponseEntity.noContent().build();
+    }
+
 }

@@ -1,6 +1,5 @@
 package com.capgemini.food_app.model;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,9 +13,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
-
 @Entity
-@Table(name="restaurants")
+@Table(name = "restaurants")
 public class Restaurant {
 
 	@Id
@@ -27,12 +25,12 @@ public class Restaurant {
 	private String contact;
 	private Long ownerId;
 	private String restaurantImg;
-	
-	@OneToMany(mappedBy="restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
+
+	@OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
 	@JsonManagedReference
 	private List<FoodItem> foodItem = new ArrayList<FoodItem>();
-	
-	@OneToMany(mappedBy="restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
+
+	@OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
 	@JsonManagedReference
 	private List<Review> review = new ArrayList<Review>();
 
@@ -40,7 +38,6 @@ public class Restaurant {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-
 
 	public Restaurant(Long id, String name, String location, String contact, Long ownerId, String restaurantImg,
 			List<FoodItem> foodItem) {
@@ -53,8 +50,6 @@ public class Restaurant {
 		this.restaurantImg = restaurantImg;
 		this.foodItem = foodItem;
 	}
-	
-	
 
 	public Restaurant(Long id, String name, String location, String contact, Long ownerId, String restaurantImg,
 			List<FoodItem> foodItem, List<Review> review) {
@@ -135,10 +130,9 @@ public class Restaurant {
 
 	@Override
 	public String toString() {
-		return "Restaurant [id=" + id + ", name=" + name + ", location=" + location + ", contact=" + contact + ", ownerId="
+		return "Restaurant [id=" + id + ", name=" + name + ", location=" + location + ", contact=" + contact
+				+ ", ownerId="
 				+ ownerId + ", restaurantImg=" + restaurantImg + "]";
 	}
-	
-	
 
 }

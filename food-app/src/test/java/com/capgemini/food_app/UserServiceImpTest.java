@@ -2,20 +2,15 @@ package com.capgemini.food_app;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-
 import java.util.*;
-
 import com.capgemini.food_app.model.User;
 import com.capgemini.food_app.repository.UserRepository;
 import com.capgemini.food_app.service.UserServiceImpl;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-class UserServiceImpTest {
+public class UserServiceImpTest {
 
     @Mock
     private UserRepository userRepository;
@@ -76,9 +71,9 @@ class UserServiceImpTest {
     void testUpdateUser_UserNotExists() {
         when(userRepository.findById(2L)).thenReturn(Optional.empty());
 
-        User result = userService.updateUser(2L, user);
-
-        assertNull(result);
+        assertThrows(com.capgemini.food_app.exception.UserNotFoundException.class, () -> {
+            userService.updateUser(2L, user);
+        });
         verify(userRepository, never()).save(any(User.class));
     }
 
@@ -154,9 +149,9 @@ class UserServiceImpTest {
     void testPatchUser_UserNotFound() {
         when(userRepository.findById(2L)).thenReturn(Optional.empty());
 
-        User result = userService.patchUser(2L, new User());
-
-        assertNull(result);
+        assertThrows(com.capgemini.food_app.exception.UserNotFoundException.class, () -> {
+            userService.patchUser(2L, new User());
+        });
         verify(userRepository, never()).save(any(User.class));
     }
 }

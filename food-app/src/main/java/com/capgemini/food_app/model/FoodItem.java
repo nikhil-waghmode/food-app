@@ -1,6 +1,5 @@
 package com.capgemini.food_app.model;
 
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.Entity;
@@ -15,36 +14,34 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-
 @Entity
-@Table(name="food_items")
+@Table(name = "food_items")
 public class FoodItem {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
-	
+
 	@NotBlank(message = "Name is mandatory")
-    @Size(max = 100, message = "Name cannot exceed 100 characters")
-    private String name;
+	@Size(max = 100, message = "Name cannot exceed 100 characters")
+	private String name;
 
-    @NotBlank(message = "Category is mandatory")
-    @Size(max = 50, message = "Category cannot exceed 50 characters")
-    private String category;
+	@NotBlank(message = "Category is mandatory")
+	@Size(max = 50, message = "Category cannot exceed 50 characters")
+	private String category;
 
-    @NotNull(message = "Price is mandatory")
-    @Min(value = 1, message = "Price must be at least 1")
-    private Integer price;
+	@NotNull(message = "Price is mandatory")
+	@Min(value = 1, message = "Price must be at least 1")
+	private Integer price;
 
-    @NotBlank(message = "Item image URL is mandatory")
-    @Size(max = 255, message = "Item image URL cannot exceed 255 characters")
-    private String itemImg;
+	@NotBlank(message = "Item image URL is mandatory")
+	@Size(max = 255, message = "Item image URL cannot exceed 255 characters")
+	private String itemImg;
 
-    @NotBlank(message = "Cuisine is mandatory")
-    @Size(max = 50, message = "Cuisine cannot exceed 50 characters")
-    private String cuisine;
-	
+	@NotBlank(message = "Cuisine is mandatory")
+	@Size(max = 50, message = "Cuisine cannot exceed 50 characters")
+	private String cuisine;
+
 	@ManyToOne
 	@JsonBackReference
 	@JoinColumn(name = "restaurant_id")
@@ -83,8 +80,6 @@ public class FoodItem {
 		this.itemImg = itemImg;
 		this.restaurant = restaurant;
 	}
-	
-	
 
 	public FoodItem(Long id, String name, String category, Integer price, String itemImg, String cuisine,
 			Restaurant restaurant) {
@@ -159,7 +154,5 @@ public class FoodItem {
 		return "FoodItem [id=" + id + ", name=" + name + ", category=" + category + ", price=" + price + ", itemImg="
 				+ itemImg + "]";
 	}
-	
-	
 
 }

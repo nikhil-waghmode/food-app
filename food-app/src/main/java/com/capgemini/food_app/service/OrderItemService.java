@@ -15,4 +15,8 @@ public interface OrderItemService {
 	OrderItem patchOrderItem(Long id, OrderItem partialOrderItem);
 
 	void deleteOrderItem(Long id);
+	
+//	List<Long> getItemIdWithMinCount();
+//	
+//	List<Long> getItemIdWithMaxCount();
 }
