@@ -1,8 +1,12 @@
 package com.capgemini.food_app;
 
-import com.capgemini.food_app.controller.RestaurantController;
+
 import com.capgemini.food_app.exception.RestaurantNotFoundException;
 import com.capgemini.food_app.model.Restaurant;
+
+import com.capgemini.food_app.exception.RestaurantNotFoundException;
+import com.capgemini.food_app.model.Restaurant;
+import com.capgemini.food_app.rest.RestaurantController;
 import com.capgemini.food_app.service.RestaurantService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +24,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.Arrays;
 import java.util.List;
-
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -79,7 +82,9 @@ class RestaurantControllerTest {
 
     @Test
     void testGetRestaurantsByOwner() throws Exception {
-        when(restaurantService.getRestaurantsByOwner(1L)).thenReturn(Arrays.asList(restaurant));
+
+        when(restaurantService.getRestaurantByOwner(1L)).thenReturn(restaurant);
+
         
         mockMvc.perform(MockMvcRequestBuilders.get("/api/restaurants/owner/1"))
                .andExpect(status().isOk())

@@ -1,4 +1,4 @@
-package com.capgemini.food_app.controller;
+package com.capgemini.food_app.rest;
 
 import java.util.List;
 
@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.capgemini.food_app.model.User;
 import com.capgemini.food_app.service.UserService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("api/users")
 public class UserController {
@@ -37,7 +39,7 @@ public class UserController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<User> createUser(@RequestBody User user){
+	public ResponseEntity<User> createUser(@Valid @RequestBody User user){
 		User saved=userService.createUser(user);
 		return ResponseEntity.status(HttpStatus.CREATED).body(saved);
 	}
@@ -59,7 +61,7 @@ public class UserController {
 	}
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User newUser){
+	public ResponseEntity<User> updateUser(@PathVariable Long id, @Valid @RequestBody User newUser){
 		User updated=userService.updateUser(id, newUser);
 		if(updated!=null)
 			return ResponseEntity.status(HttpStatus.OK).body(updated);
@@ -68,7 +70,7 @@ public class UserController {
 	}
 	
 	@PatchMapping("/{id}")
-	public ResponseEntity<User> patchUser(@PathVariable Long id, @RequestBody User patch){
+	public ResponseEntity<User> patchUser(@PathVariable Long id,@Valid @RequestBody User patch){
 		User user=userService.patchUser(id, patch);
 		if(user!=null)
 			return ResponseEntity.status(HttpStatus.OK).body(user);

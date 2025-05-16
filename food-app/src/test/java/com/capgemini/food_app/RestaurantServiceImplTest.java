@@ -68,11 +68,11 @@ class RestaurantServiceImplTest {
         List<Restaurant> restaurants = Arrays.asList(
                 new Restaurant(1L, "Res1", "Loc1", "123", 10L, "img1.jpg", new ArrayList<>())
         );
-        when(restaurantRepository.findAllByOwnerId(10L)).thenReturn(restaurants);
+        when(restaurantRepository.findByOwnerId(10L)).thenReturn((Restaurant) restaurants);
 
-        List<Restaurant> result = restaurantService.getRestaurantsByOwner(10L);
+        List<Restaurant> result = (List<Restaurant>) restaurantService.getRestaurantByOwner(10L);
         assertEquals(1, result.size());
-        verify(restaurantRepository).findAllByOwnerId(10L);
+        verify(restaurantRepository).findByOwnerId(10L);
     }
 
     @Test

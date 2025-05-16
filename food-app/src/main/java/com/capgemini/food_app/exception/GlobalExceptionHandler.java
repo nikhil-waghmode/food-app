@@ -18,13 +18,13 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
 	
-	@ExceptionHandler(UserNotFoundException.class)
-	public ResponseEntity<Object> handleUserNotFound(UserNotFoundException ex) {
-		Map<String, Object> errorDetails = new HashMap<>();
-		errorDetails.put("timestamp", LocalDateTime.now());
-		errorDetails.put("message", ex.getMessage());
-		errorDetails.put("status", HttpStatus.NOT_FOUND.value());
-		return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
+	@ExceptionHandler(OwnerAlreadyHasRestaurantException.class)
+	public ResponseEntity<Object> handleOwnerAlreadyHasRestaurant(OwnerAlreadyHasRestaurantException ex) {
+	    Map<String, Object> errorDetails = new HashMap<>();
+	    errorDetails.put("timestamp", LocalDateTime.now());
+	    errorDetails.put("message", ex.getMessage());
+	    errorDetails.put("status", HttpStatus.BAD_REQUEST.value());
+	    return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
 	}
 	
 	@ExceptionHandler(OrderNotFoundException.class)
@@ -69,6 +69,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
 		return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
 	}
 	
+	@ExceptionHandler(EmailAlreadyExistsException.class)
+	public ResponseEntity<Object> handleEmailAlreadyExistsException(EmailAlreadyExistsException ex){
+		Map<String, Object> errorDetails = new HashMap<>();
+		errorDetails.put("timestamp", LocalDateTime.now());
+		errorDetails.put("message", ex.getMessage());
+		errorDetails.put("status", HttpStatus.NOT_FOUND.value());
+		return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
+	}
+	
 	@Override
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
 			HttpHeaders headers, HttpStatusCode status, WebRequest request) {
@@ -92,4 +101,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler{
 		errorDetails.put("details", ex.getMessage());
 		return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+	
+	
 }

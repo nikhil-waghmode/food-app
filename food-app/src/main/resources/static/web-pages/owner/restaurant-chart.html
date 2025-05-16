@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Restaurant Report</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
+  <style>
+    h2,
+    h4 {
+      font-weight: bold;
+      color: #2c3e50;
+    }
+
+    .stats-card {
+      background-color: #fff;
+      border: 1px solid #dee2e6;
+      border-radius: 0.75rem;
+      padding: 1rem;
+      text-align: center;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .stats-card h6 {
+      font-size: 0.95rem;
+      color: #6c757d;
+    }
+
+    .stats-card p {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin: 0;
+    }
+
+    table {
+      background-color: #fff;
+    }
+
+    .section-divider {
+      border-top: 2px solid #ccc;
+      margin: 4rem 0 2rem;
+    }
+
+    .download-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 1000;
+    }
+
+    #topItemsChart {
+      max-height: 250px !important;
+      max-width: 250px;
+      margin: 0 auto;
+    }
+
+    .stats-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: space-between;
+    }
+
+    .stats-card {
+      flex: 1 1 calc(25% - 1rem);
+      min-width: 200px;
+      background-color: #ffffff;
+      border: 1px solid #dee2e6;
+      border-radius: 0.75rem;
+      padding: 1rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    body {
+      background-color: #f9fafb;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 1.5cm;
+      /* Use padding instead of margin to avoid print margin issues */
+      box-sizing: border-box;
+    }
+
+    .chart-container {
+      width: 100%;
+      max-width: 100%;
+      overflow: hidden;
+      padding: 1rem;
+      box-sizing: border-box;
+    }
+
+
+    .chart-section {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      justify-content: space-between;
+      margin-top: 2rem;
+    }
+
+    #revenueByCategoryChart {
+      max-height: 250px !important;
+      max-width: 250px;
+      margin: 0 auto;
+    }
+
+    .card-header {
+      font-size: 1.1rem;
+      font-weight: 600;
+      background-color: #f1f1f1;
+      color: #333;
+    }
+
+    .chart-container {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    canvas {
+  max-width: 100% !important;
+  height: auto !important;
+  display: block;
+  page-break-inside: avoid;
+}
+@media print {
+  body {
+    padding: 1cm;
+    background: white;
+    color: black;
+  }
+
+  .chart-section {
+    break-inside: avoid;
+  }
+
+  .stats-row,
+  .chart-container,
+  .table-responsive {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .download-btn {
+    display: none;
+  }
+
+  .card {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+  }
+}
+
+
+  </style>
+</head>
+
+<body class="container my-5">
+  <div id="reportContent">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2>Restaurant Report</h2>
+      <input type="date" id="reportDate" class="form-control w-auto" />
+    </div>
+
+    <div class="mb-5 p-4 bg-white rounded shadow-sm d-flex justify-content-between align-items-center">
+      <div>
+        <h4>Restaurant Information</h4>
+        <p><strong>Name:</strong> <span id="reportRestaurantName"></span></p>
+        <p><strong>Phone:</strong> <span id="reportRestaurantPhone"></span></p>
+        <p><strong>Location:</strong> <span id="reportRestaurantLocation"></span></p>
+      </div>
+      <img id="restaurantImage" src="" alt="Restaurant Image"
+        style="width: 250px; height: 150px; border-radius: 8px;" />
+    </div>
+
+
+
+
+
+    <!-- Summary Cards -->
+    <div class="row mb-5 text-center">
+      <div class="col-md-3 mb-3">
+        <div class="stats-card">
+          <h6>Total Orders</h6>
+          <p id="totalOrders">-</p>
+        </div>
+      </div>
+      <div class="col-md-3 mb-3">
+        <div class="stats-card">
+          <h6>Orders on Date</h6>
+          <p id="ordersOnDate">-</p>
+        </div>
+      </div>
+      <div class="col-md-3 mb-3">
+        <div class="stats-card">
+          <h6>Total Revenue</h6>
+          <p id="totalRevenue">-</p>
+        </div>
+      </div>
+      <div class="col-md-3 mb-3">
+        <div class="stats-card">
+          <h6>Revenue on Date</h6>
+          <p id="revenueOnDate">-</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Orders Table -->
+    <h4 class="mb-3">Orders</h4>
+    <table class="table table-bordered table-hover mb-5">
+      <thead class="table-light">
+        <tr>
+          <th>Order ID</th>
+          <th>Customer</th>
+          <th>Location</th>
+          <th>Date</th>
+          <th>Items</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody id="ordersTable"></tbody>
+    </table>
+
+    <!-- Items Sold Chart -->
+    <h4 class="mb-3">Items Sold Today</h4>
+    <canvas id="topItemsChart" height="150"></canvas>
+
+    <!-- Page Divider -->
+    <div class="section-divider"></div>
+
+    <!-- Second Page Content Placeholder -->
+    <h4 class="mb-3">Overall Demographics as of <span id="demographicDate">[Date]</span></h4>
+    <div class="mb-4">
+      <h4 class="fw-bold mb-3">Top Customer</h4>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Customer ID</th>
+            <th>Customer Name</th>
+            <th>Total Orders</th>
+            <th>Total Spend</th>
+            <th>Last Order Date</th>
+          </tr>
+        </thead>
+        <tbody id="topCustomersTable">
+          <!-- Orders will be populated here -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mb-4">
+      <h4 class="fw-bold mb-3">Recent Orders</h4>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Customer </th>
+            <th>Order Date</th>
+            <th>Total Amount</th>
+          </tr>
+        </thead>
+        <tbody id="recentOrdersTable">
+          <!-- Orders will be populated here -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mb-4">
+      <h4 class="fw-bold mb-3">Recently Added Item</h4>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Item ID</th>
+            <th>Item Name</th>
+            <th>Item Category</th>
+            <th>Item Price</th>
+          </tr>
+        </thead>
+        <tbody id="recentAddedItemTable">
+          <!-- Orders will be populated here -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="stats-row mb-4">
+      <div class="stats-card">
+        <h5>Best Selling Item</h5>
+        <h3 id="bestSellingItem"></h3>
+      </div>
+      <div class="stats-card">
+        <h5>Least Selling Item</h5>
+        <h3 id="leastSellingItem"></h3>
+      </div>
+    </div>
+
+
+    <div class="chart-section">
+      <div class="chart-container">
+        <div class="card text-center">
+          <div class="card-header">Orders Per Week</div>
+          <div class="card-body">
+            <canvas id="ordersPerWeekChart" height="150"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-container">
+        <div class="card text-center">
+          <div class="card-header">Revenue by Category</div>
+          <div class="card-body">
+            <canvas id="revenueByCategoryChart"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="chart-container">
+        <div class="card text-center">
+          <div class="card-header">Revenue Per Week</div>
+          <div class="card-body">
+            <canvas id="revenuePerWeekChart" height="150"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-container">
+        <div class="card text-center">
+          <div class="card-header">Revenue per Month</div>
+          <div class="card-body">
+            <canvas id="revenuePerMonthChart" height="150"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class=" text-center py-2 text-muted">
+      &copy; 2025 SnapEats. All rights reserved.
+    </div>
+
+  </div>
+
+  <button class="btn btn-success download-btn" onclick="exportToPDF()">📄 Download PDF</button>
+
+  <script>
+    currentOwnerId = localStorage.getItem("currentOwnerId");
+    topItemsChart = null;
+    document.getElementById('reportDate').addEventListener('change', generateReport);
+
+    today = new Date().toISOString().split('T')[0];
+      document.getElementById('reportDate').value = today;
+      generateReport();
+      loadReportRestaurantData();
+      renderRecentOrders();
+      renderRecentFoodItems();
+      renderRevenueByCategoryChart();
+      renderTopCustomers();
+      renderOrdersPerWeekChart();
+      renderRevenuePerWeekChart();
+      renderRevenuePerMonthChart();
+      renderBestAndLeastSellingItem();
+    async function loadReportRestaurantData() {
+      try {
+        currentOwnerId = localStorage.getItem("currentOwnerId");
+        console.log("first")
+console.log(currentOwnerId)
+        res = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        restaurant = await res.json();
+        console.log(restaurant)
+
+        document.getElementById("reportRestaurantName").textContent = restaurant.name;
+        document.getElementById("reportRestaurantPhone").textContent = restaurant.phone;
+        document.getElementById("reportRestaurantLocation").textContent = restaurant.location;
+        document.getElementById('restaurantImage').src = `${apiUrl}/restaurants/image/${restaurant.resImage}`;
+        document.getElementById('restaurantImage').alt = restaurant.name;
+        console.log("restaurant", restaurant)
+      } catch (err) {
+        console.error("Error loading restaurant info for report:", err);
+      }
+    }
+
+    async function generateReport() {
+      date = document.getElementById('reportDate').value;
+      document.getElementById("demographicDate").innerText = date;
+
+      res = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
+      restaurant = await res.json();
+      restaurantId = restaurant.id;
+
+      document.getElementById('totalOrders').innerText =
+        await (await fetch(`${apiUrl}/orders/restaurant/count/${restaurantId}`)).text();
+
+      document.getElementById('ordersOnDate').innerText =
+        await (await fetch(`${apiUrl}/orders/restaurant/count/${restaurantId}?date=${date}`)).text();
+
+      document.getElementById('totalRevenue').innerText = "₹" +
+        await (await fetch(`${apiUrl}/orders/restaurant/revenue/${restaurantId}`)).text();
+
+      document.getElementById('revenueOnDate').innerText = "₹" +
+        await (await fetch(`${apiUrl}/orders/restaurant/revenue/${restaurantId}?date=${date}`)).text();
+
+      orders = await (await fetch(`${apiUrl}/orders/detail/restaurant/${restaurantId}?date=${date}`)).json();
+      tbody = document.getElementById("ordersTable");
+      tbody.innerHTML = "";
+      orders.forEach(o => {
+        tbody.innerHTML += `<tr>
+          <td>${o.orderID}</td>
+          <td>${o.customerName}</td>
+          <td>${o.customerLocation}</td>
+          <td>${o.orderDate}</td>
+          <td>${o.items}</td>
+          <td>₹${o.totalAmount}</td>
+        </tr>`;
+      });
+
+      itemsRes = await fetch(`${apiUrl}/fooditems/sold/${restaurantId}?date=${date}`);
+      items = await itemsRes.json();
+      itemNames = items.map(item => item[0]);
+      itemQuantities = items.map(item => item[1]);
+
+      ctx = document.getElementById('topItemsChart').getContext('2d');
+      if (topItemsChart) topItemsChart.destroy();
+
+      topItemsChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: itemNames,
+          datasets: [{
+            label: 'Quantity Sold',
+            data: itemQuantities,
+            backgroundColor: '#0d6efd'
+          }]
+        }
+      });
+    }
+
+    async function renderRecentOrders() {
+      currentRestaurantRes = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
+      currentRestaurant = await currentRestaurantRes.json();
+
+      currentRestaurantId = currentRestaurant.id;
+
+      //  recentOrdersRes = await fetch(`${apiUrl}/orders/recents/${currentRestaurantId}`);
+      recentOrdersRes = await fetch(`${apiUrl}/orders/detail/restaurant/${currentRestaurantId}`);
+
+      recentOrdersData = await recentOrdersRes.json();
+      limitedOrders = recentOrdersData.slice(0, 3);
+      // console.log(recentOrdersData)
+      tableBody = document.getElementById("recentOrdersTable");
+      tableBody.innerHTML = "";
+      limitedOrders.forEach(order => {
+        tableBody.innerHTML += `
+      <tr>
+        <td>${order.orderID}</td>
+        <td>${order.customerName}</td>
+        <td>${order.orderDate}</td>
+        <td>₹${order.totalAmount}</td>
+      </tr>
+    `;
+      });
+    }
+
+    async function renderRecentFoodItems() {
+      currentRestaurantRes = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
+      currentRestaurant = await currentRestaurantRes.json();
+      currentRestaurantId = currentRestaurant.id;
+
+      res = await fetch(`${apiUrl}/fooditems/recent/${currentRestaurantId}`);
+      fooditems = await res.json();
+      tbody = document.getElementById("recentAddedItemTable");
+      tbody.innerHTML = "";
+
+      fooditems.forEach(fooditem => {
+        row = document.createElement("tr");
+        row.innerHTML = ` <td>${fooditem.id}</td>
+                        <td>${fooditem.name}</td>
+                        <td>${fooditem.category}</td>
+                        <td>${fooditem.price}</td>`;
+        tbody.appendChild(row);
+      })
+
+    }
+
+    async function renderTopCustomers() {
+      currentRestaurantRes = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
+      currentRestaurant = await currentRestaurantRes.json();
+      currentRestaurantId = currentRestaurant.id;
+
+      res = await fetch(`${apiUrl}/restaurants/customers/details/${currentRestaurantId}`);
+      customers = await res.json();
+
+      tbody = document.getElementById("topCustomersTable");
+      tbody.innerHTML = "";
+
+      customers.forEach(customer => {
+        row = document.createElement("tr");
+        row.innerHTML = ` <td>${customer[0]}</td>
+                        <td>${customer[1]}</td>
+                        <td>${customer[2]}</td>
+                        <td>${customer[3]}</td>
+                        <td>${customer[4]}</td>`;
+        tbody.appendChild(row);
+      })
+
+    }
+
+    async function renderOrdersPerWeekChart() {
+      currentRestaurantRes = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
+      currentRestaurant = await currentRestaurantRes.json();
+      currentRestaurantId = currentRestaurant.id;
+
+      ordersPerWeekRes = await fetch(`${apiUrl}/orders/restaurant/charts/orders-per-week/${currentRestaurantId}`);
+      ordersPerWeekData = await ordersPerWeekRes.json();
+
+      weeks = ordersPerWeekData.map(item => item[0]);
+      orders = ordersPerWeekData.map(item => item[1]);
+      new Chart(document.getElementById('ordersPerWeekChart'), {
+        type: 'line',
+        data: {
+          labels: weeks,
+          datasets: [{
+            label: 'Orders',
+            data: orders,
+            fill: false,
+            borderColor: 'rgb(75, 192, 192)',
+            tension: 0.3
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              precision: 0
+            }
+          }
+        }
+      });
+    }
+
+    async function renderRevenueByCategoryChart() {
+      currentRestaurantRes = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
+      currentRestaurant = await currentRestaurantRes.json();
+      currentRestaurantId = currentRestaurant.id;
+
+      revenueCategoryRes = await fetch(`${apiUrl}/orders/restaurant/charts/revenue-by-category/${currentRestaurantId}`);
+      revenueCategoryData = await revenueCategoryRes.json();
+
+      categories = revenueCategoryData.map(item => item[0]);
+      revenues = revenueCategoryData.map(item => item[1]);
+
+
+      new Chart(document.getElementById('revenueByCategoryChart'), {
+        type: 'pie',
+        data: {
+          labels: categories,
+          datasets: [{
+            label: 'Revenue by Category',
+            data: revenues,
+            backgroundColor: [
+              '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'
+            ]
+          }]
+        },
+        options: {
+          responsive: true,
+        }
+      });
+    }
+
+    async function renderRevenuePerWeekChart() {
+      currentRestaurantRes = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
+      currentRestaurant = await currentRestaurantRes.json();
+      currentRestaurantId = currentRestaurant.id;
+
+      revenuePerWeekRes = await fetch(`${apiUrl}/orders/restaurant/charts/revenue-per-week/${currentRestaurantId}`);
+      revenuePerWeekData = await revenuePerWeekRes.json();
+
+      weeks = revenuePerWeekData.map(item => item[0]);
+      revenues = revenuePerWeekData.map(item => item[1]);
+
+      new Chart(document.getElementById('revenuePerWeekChart'), {
+        type: 'line',
+        data: {
+          labels: weeks,
+          datasets: [{
+            label: 'Revenue',
+            data: revenues,
+            fill: false,
+            borderColor: '#28a745',
+            tension: 0.3
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+
+    async function renderRevenuePerMonthChart() {
+
+      currentRestaurantRes = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
+      currentRestaurant = await currentRestaurantRes.json();
+      currentRestaurantId = currentRestaurant.id;
+
+      revenuePerMonthRes = await fetch(`${apiUrl}/orders/restaurant/charts/revenue-per-month/${currentRestaurantId}`);
+      revenuePerMonthData = await revenuePerMonthRes.json();
+
+      months = revenuePerMonthData.map(item => item[0]);
+      revenues = revenuePerMonthData.map(item => item[1]);
+
+      new Chart(document.getElementById('revenuePerMonthChart'), {
+        type: 'bar',
+        data: {
+          labels: months,
+          datasets: [{
+            label: 'Revenue per Month (₹)',
+            data: revenues,
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+
+    async function renderBestAndLeastSellingItem() {
+
+      currentRestaurantRes = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
+      currentRestaurant = await currentRestaurantRes.json();
+      currentRestaurantId = currentRestaurant.id;
+
+
+      bestItemRes = await fetch(`${apiUrl}/fooditems/best/${currentRestaurantId}`);
+      bestItem = await bestItemRes.json();
+      leastItemRes = await fetch(`${apiUrl}/fooditems/least/${currentRestaurantId}`);
+      leastItem = await leastItemRes.json();
+      document.getElementById("bestSellingItem").innerHTML = `${bestItem[0][1]}`;
+      document.getElementById("leastSellingItem").innerHTML = `${leastItem[0][1]}`;
+
+    }
+
+    function exportToPDF() {
+      element = document.getElementById("reportContent");
+      date = document.getElementById('reportDate').value
+      html2pdf().set({
+        margin: 0.5,
+        filename: `Report_${date}.pdf`,
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+      }).from(element).save();
+    }
+
+
+  </script>
+</body>
+
+</html>

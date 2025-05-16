@@ -1,4 +1,4 @@
-package com.capgemini.food_app.controller;
+package com.capgemini.food_app.rest;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.capgemini.food_app.model.Review;
 import com.capgemini.food_app.service.ReviewService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api")
@@ -20,7 +22,7 @@ public class ReviewController {
 	}
 
 	@PostMapping("/reviews")
-	public ResponseEntity<Review> createReview(@RequestBody Review review) {
+	public ResponseEntity<Review> createReview(@Valid @RequestBody Review review) {
 		return ResponseEntity.status(201).body(reviewService.createReview(review));
 	}
 
@@ -35,7 +37,11 @@ public class ReviewController {
 	}
 
 	@PutMapping("/reviews/{id}")
-	public ResponseEntity<Review> updateReview(@PathVariable Long id, @RequestBody Review review) {
+	public ResponseEntity<Review> updateReview(@PathVariable Long id, @Valid @RequestBody Review review) {
+		return ResponseEntity.ok(reviewService.updateReview(id, review));
+	}
+	@PatchMapping("/reviews/{id}")
+	public ResponseEntity<Review> patchReview(@PathVariable Long id, @Valid @RequestBody Review review) {
 		return ResponseEntity.ok(reviewService.updateReview(id, review));
 	}
 

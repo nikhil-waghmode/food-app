@@ -6,6 +6,11 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name="users")
@@ -14,14 +19,20 @@ public class User {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Long id;
 	
+	@NotBlank(message = "Name is mandatory.")
 	String name;
 	
+	@Email(message = "Invalid email format.")
 	String email;
 	
+	@NotBlank
+	@Size(min=5,message = "Length should minimum 5")
 	String password;
 	
+	@Pattern(regexp = "^\\d{10}$",message = "Invalid phone number.")
 	String phone;
 	
+	@NotBlank(message = "User type is mandatory")
 	@Column(name="user_type")
 	String userType;
 	
@@ -31,12 +42,10 @@ public class User {
 	String userImg;
 	
 	public User() {
-		super();
 	}
 
 	public User(Long id, String name, String email, String password, String phone, String userType, String location,
 			String userImg) {
-		super();
 		this.id = id;
 		this.name = name;
 		this.email = email;

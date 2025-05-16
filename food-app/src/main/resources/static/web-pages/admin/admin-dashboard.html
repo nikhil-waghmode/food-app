@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+          background-color: #f9fafb;
+        }
+    
+        h2#welcomeMessage {
+          font-weight: bold;
+          color: #2c3e50;
+        }
+    
+        .stats-row {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 1rem;
+          justify-content: space-between;
+        }
+    
+        .stats-card {
+          flex: 1 1 calc(10% - 1rem);
+          min-width: 100px;
+          background-color: #ffffff;
+          border: 1px solid #dee2e6;
+          border-radius: 0.75rem;
+          padding: 1rem;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+    
+    
+        .stats-card:nth-child(odd) {
+          border-left-color: #ced4da;
+        }
+    
+        .stats-card h5 {
+          font-size: 1rem;
+          color: #6c757d;
+          margin-bottom: 0.5rem;
+          align-items: center;
+        }
+    
+        .stats-card p {
+          font-size: 1.5rem;
+          font-weight: bold;
+          white-space: nowrap;
+        }
+    
+        .stats-card p[title] {
+          cursor: help;
+        }
+      </style>
+</head>
+
+<body class="container my-5">
+    <h2 class="fw-bold" id="welcomeMessage"></h2>
+    <p class="text-muted">Here's a summary across all restaurants on the platform.</p>
+
+    <div class="mb-4">
+        <h4 class="fw-bold mb-3">Recent Orders</h4>
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Restaurant Name</th>
+              <th>Customer</th>
+              <th>Order Date</th>
+              <th>Total Amount</th>
+            </tr>
+          </thead>
+          <tbody id="recentOrdersTable">
+            <!-- Orders will be populated here -->
+          </tbody>
+        </table>
+      </div>
+
+    <h4 class="fw-bold mb-3">Total Stats</h4>
+    <div class="stats-row mb-2">
+        <div class="stats-card">
+          <h5>Total Restaurants</h5>
+          <p id="totalRestaurants">0</p>
+        </div>
+        <div class="stats-card">
+          <h5>Total FoodItems</h5>
+          <p id="totalFoodItems">0</p>
+        </div>
+        <div class="stats-card">
+          <h5>Total Orders</h5>
+          <p id="totalOrders">0</p>
+        </div>
+        <div class="stats-card">
+            <h5>Total Customers</h5>
+            <p id="totalCustomers">0</p>
+        </div>
+        <div class="stats-card">
+            <h5>Total Owners</h5>
+            <p id="totalOwners">0</p>
+        </div>
+        <div class="stats-card">
+            <h5>Total Users</h5>
+            <p id="totalUsers">0</p>
+        </div>
+      </div>
+
+      <h4 class="fw-bold mb-3">Food Items</h4>
+      <div class="stats-row mb-2">
+          <div class="stats-card">
+            <h5>Best Selling</h5>
+            <p id="bestSelling"></p>
+          </div>
+          <div class="stats-card">
+            <h5>Least Selling</h5>
+            <p id="leastSelling"></p>
+          </div>
+        </div>
+        <div class="mb-4">
+            <h4 class="fw-bold mb-3">Top Restaurants</h4>
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Restaurant ID</th>
+                  <th>Restaurant</th>
+                  <th>Total Orders</th>
+                </tr>
+              </thead>
+              <tbody id="topRestaurantsTable">
+                <!-- Orders will be populated here -->
+              </tbody>
+            </table>
+          </div>
+
+
+    <script>
+
+        welcomeMessage = document.getElementById("welcomeMessage");
+        currentAdminId = localStorage.getItem("currentAdminId");
+
+
+        totalOrders = document.getElementById("totalOrders");
+        totalRestaurants = document.getElementById("totalRestaurants");
+        totalFoodItems = document.getElementById("totalFoodItems")
+        totalUsers = document.getElementById("totalUsers");
+        totalCustomers = document.getElementById("totalCustomers");
+        totalOwners = document.getElementById("totalOwners");
+        bestSellingInput = document.getElementById("bestSelling");
+        leastSellingInput = document.getElementById("leastSelling");
+
+        async function fetchAllData() {
+            const[restaurantsResponse, usersResponse, ordersResponse, foodItemsResponse, bestSellingResponse, leastSellingResponse] = await Promise.all([
+            await fetch(`${apiUrl}/restaurants`),
+            await fetch(`${apiUrl}/users`),
+            await fetch(`${apiUrl}/orders`),
+            await fetch(`${apiUrl}/fooditems`),
+            await fetch(`${apiUrl}/fooditems/best`),
+            await fetch(`${apiUrl}/fooditems/least`),
+
+            ]);
+
+            const [restaurants, users, orders, foodItems, bestSelling, leastSelling] = await Promise.all([
+            restaurantsResponse.json(),
+            usersResponse.json(),
+            ordersResponse.json(),
+            foodItemsResponse.json(),
+            bestSellingResponse.json(),
+            leastSellingResponse.json()
+            
+            ]);
+            renderQuickStats(restaurants,users, orders, foodItems, bestSelling, leastSelling)
+        }
+
+        fetchAllData()
+
+        async function renderQuickStats(restaurants,users, orders,foodItems, bestSelling, leastSelling) {
+            try {
+                currentAdminRes = await fetch(`${apiUrl}/users/${currentAdminId}`);
+                currentAdminData = await currentAdminRes.json();
+
+                welcomeMessage.innerHTML = `Welcome, ${currentAdminData.name} 👩🏻‍💼`;
+
+                customerUsers = users.filter(user => user.userType === "customer");
+                // console.log("Total Customers:", customerUsers.length);
+                ownerUsers = users.filter(user => user.userType === "owner");
+                totalRestaurants.innerHTML = `${restaurants.length}`
+                totalOrders.innerHTML = `${orders.length}`
+                totalFoodItems.innerHTML = `${foodItems.length}`
+                totalUsers.innerHTML = `${users.length}`
+                totalCustomers.innerHTML = `${customerUsers.length}`;
+                totalOwners.innerHTML = `${ownerUsers.length}`;
+                bestSellingInput.innerHTML = `${bestSelling[0][1]} - ${bestSelling[0][3]}`;
+                leastSellingInput.innerHTML = `${leastSelling[0][1]} - ${leastSelling[0][3]}`;
+
+        } catch (error) {
+                console.error("Failed to render quick stats :", error);
+            }
+        }
+
+
+        async function renderRecentOrders() {
+
+      const recentOrdersRes = await fetch(`${apiUrl}/orders/recents`);
+      const recentOrdersData = await recentOrdersRes.json(); 
+// console.log(recentOrdersData)
+      const tableBody = document.getElementById("recentOrdersTable");
+      tableBody.innerHTML = "";
+      recentOrdersData.forEach(order => {
+        tableBody.innerHTML += `
+      <tr>
+        <td>${order.orderID}</td>
+        <td>${order.restaurantID}</td>
+        <td>${order.customerName}</td>
+        <td>${order.orderDate}</td>
+        <td>₹${order.totalAmount}</td>
+      </tr>
+    `;
+      });
+    }
+    renderRecentOrders();
+
+    
+
+    async function renderTopRestaurants() {
+
+ topRestaurantsRes = await fetch(`${apiUrl}/restaurants/sorted-by-orders`);
+ topRestaurantsData = await topRestaurantsRes.json(); 
+console.log(topRestaurantsData)
+ tableBody = document.getElementById("topRestaurantsTable");
+tableBody.innerHTML = "";
+topRestaurantsData.forEach(restaurant => {
+  tableBody.innerHTML += `
+<tr>
+  <td>${restaurant[0]}</td>
+  <td>${restaurant[1]}</td>
+  <td>${restaurant[2]}</td>
+</tr>
+`;
+});
+}
+renderTopRestaurants();
+
+        // restaurantIds = {}
+        // function restaurantsRanking() {
+        //     fetch(`${apiUrl}/restaurants`)
+        //         .then(res => res.json())
+        //         .then(data => {
+        //             restaurants = data
+        //             restaurantIds = restaurants.map(restaurant => restaurant.id)
+        //             // console.log(restaurants)
+        //             restaurants.forEach(restaurant => {
+
+        //                 // restaurantIds[restaurant.id] = 
+        //             }
+        //             )
+        //             // console.log(restaurantIds)
+        //         })
+
+        // }
+
+        // fetch(`${apiUrl}/orders`)
+        //     .then(res => res.json())
+        //     .then(data => {
+
+        //     })
+        // async function ranking() {
+        //     restaurantsRes = await fetch(`${apiUrl}/restaurants`)
+        //     restaurants = await restaurantsRes.json()
+        //     console.log(restaurants)
+        //     ordersRes = await fetch(`${apiUrl}/orders`)
+        //     orders = await ordersRes.json()
+        //     console.log(orders)
+        //     restaurantsRanking()
+        // }
+        // ranking()
+
+    </script>
+</body>
+
+</html>

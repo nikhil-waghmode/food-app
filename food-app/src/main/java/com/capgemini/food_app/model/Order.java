@@ -8,6 +8,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 //edited
 
 @Entity
@@ -18,11 +21,17 @@ public class Order {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@NotNull(message = "User ID must not be null")
 	private Long userId;
+	@NotNull(message = "Restaurant ID must not be null")
 	private Long restaurantId;
 	
+	@NotNull(message = "Order date must not be null")
+    @PastOrPresent(message = "Order date cannot be in the future")
 	private LocalDate date;
 	
+	@NotNull(message = "Total amount must not be null")
+	@DecimalMin(value = "0.0", inclusive = true, message = "Total amount must be zero or greater")
 	private Double totalAmount;
 
 	public Order() {

@@ -5,17 +5,23 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
-@Table(name="order_items")
+@Table(name = "order_items")
 public class OrderItem {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Long id;
 
+	@NotNull(message = "Order ID must not be null")
 	private Long orderId;
+	@NotNull(message = "Item ID must not be null")
 	private Long itemId;
+	@NotNull(message = "Quantity must not be null")
+	@Min(value = 1, message = "Quantity must be at least 1")
 	private Integer quantity;
 
 	public OrderItem() {

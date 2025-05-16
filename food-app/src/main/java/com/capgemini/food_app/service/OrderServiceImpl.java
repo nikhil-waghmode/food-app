@@ -1,5 +1,6 @@
 package com.capgemini.food_app.service;
 
+import com.capgemini.food_app.exception.OrderNotFoundException;
 import com.capgemini.food_app.model.Order;
 import com.capgemini.food_app.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order getOrderById(Long id) {
-        return orderRepository.findById(id).orElseThrow(()-> new RuntimeException("Order not found with id: "+id ));
+        return orderRepository.findById(id).orElseThrow(()-> new OrderNotFoundException("Order not found with id: "+id ));
     }
 
     @Override
@@ -33,8 +34,13 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public boolean orderExists(Long orderId) {
+        return orderRepository.existsById(orderId);
+    }
+    
+    @Override
     public Order updateOrder(Long id, Order updatedOrder) {
-        Order order =  orderRepository.findById(id).orElseThrow(() -> new RuntimeException("Order not found with id " + id));
+        Order order =  orderRepository.findById(id).orElseThrow(() -> new OrderNotFoundException("Order not found with id " + id));
         order.setUserId(updatedOrder.getUserId());
         order.setRestaurantId(updatedOrder.getRestaurantId());
         order.setDate(updatedOrder.getDate());
@@ -45,7 +51,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
 	public Order patchOrder(Long id, Order newOrder) {
 		Order oldOrder = orderRepository.findById(id)
-				.orElseThrow(() -> new RuntimeException("Order not found with id: " + id));
+				.orElseThrow(() -> new OrderNotFoundException("Order not found with id: " + id));
 		if (newOrder.getUserId() != null) {
 			oldOrder.setUserId(newOrder.getUserId());
 		}
@@ -66,4 +72,10 @@ public class OrderServiceImpl implements OrderService {
     public void deleteOrder(Long id) {
         orderRepository.deleteById(id);
     }
+    
+    @Override
+    public List<Order> getOrdersByRestaurantId(Long restaurantId) {
+        return orderRepository.findByRestaurantId(restaurantId);
+    }
+
 }

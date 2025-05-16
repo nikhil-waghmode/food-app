@@ -1,5 +1,6 @@
 package com.capgemini.food_app.service;
 
+import com.capgemini.food_app.exception.OrderItemNotFoundException;
 import com.capgemini.food_app.model.OrderItem;
 import com.capgemini.food_app.repository.OrderItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ public class OrderItemServiceImpl implements OrderItemService {
 	@Override
 	public OrderItem getOrderItemById(Long id) {
 		return orderItemRepository.findById(id)
-				.orElseThrow(() -> new RuntimeException("OrderItem not found with id:" + id));
+				.orElseThrow(() -> new OrderItemNotFoundException("OrderItem not found with id:" + id));
 	}
 
 	@Override
@@ -48,8 +49,8 @@ public class OrderItemServiceImpl implements OrderItemService {
 				existing.setQuantity(partialOrderItem.getQuantity());
 			}
 			return orderItemRepository.save(existing);
-		}).orElseThrow(() -> new RuntimeException("OrderItem not found"));
-	}
+		}).orElseThrow(() -> new OrderItemNotFoundException("OrderItem not found"));
+	} 
 
 	@Override
 	public void deleteOrderItem(Long id) {

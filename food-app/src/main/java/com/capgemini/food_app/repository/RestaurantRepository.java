@@ -8,7 +8,7 @@ import java.util.List;
 
 @Repository
 public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
-    List<Restaurant> findAllByOwnerId(Long ownerId);
+    Restaurant findByOwnerId(Long ownerId);
 
 //    @Query("SELECT r.id, r.name, COUNT(o.id) FROM Restaurant r LEFT JOIN r.foodOrders o " +
 //           "GROUP BY r.id ORDER BY COUNT(o.id) DESC")
@@ -18,5 +18,7 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
 //           "JOIN o.customer c WHERE o.restaurant.id = ?1")
 //    List<Object[]> findCustomerDetailsByRestaurant(Long restaurantId);
 
+
 }
+
 
