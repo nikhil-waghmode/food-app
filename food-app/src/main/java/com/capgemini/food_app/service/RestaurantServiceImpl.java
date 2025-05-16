@@ -120,7 +120,7 @@ public class RestaurantServiceImpl implements RestaurantService {
         restaurant.setRestaurantImg(newFilename);
     }
 
-    private void deleteImage(String filename) {
+    public void deleteImage(String filename) {
         if (filename == null) return;
 
         try {
