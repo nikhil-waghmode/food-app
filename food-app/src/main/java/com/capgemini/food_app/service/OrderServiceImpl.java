@@ -78,4 +78,24 @@ public class OrderServiceImpl implements OrderService {
     public List<Order> getTop3OrdersByDateDesc() {
         return orderRepository.findTop3ByOrderByDateDesc();
     }
+
+	@Override
+	public List<Object[]> getRevenueByCategoryForAdmin() {
+		return orderRepository.getRevenueByCategoryForAdmin();
+	}
+	
+	@Override
+	public List<Object[]> getOrdersPerWeek() {
+		return orderRepository.getOrdersPerWeek();
+	}
+	
+	@Override
+	public List<Object[]> getRevenuePerWeek() {
+		return orderRepository.getRevenuePerWeek();
+	}
+	
+	@Override
+	public List<Object[]> getRevenuePerMonth() {
+		return orderRepository.getRevenuePerMonth();
+	}
 }

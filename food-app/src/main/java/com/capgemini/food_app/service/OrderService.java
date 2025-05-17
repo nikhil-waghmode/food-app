@@ -18,6 +18,17 @@ public interface OrderService {
 	boolean orderExists(Long orderId);
 
 	void deleteOrder(Long id);
+
 	
 	List<Order> getTop3OrdersByDateDesc();
+
+
+	List<Object[]> getRevenueByCategoryForAdmin();
+
+	List<Object[]> getOrdersPerWeek();
+
+	List<Object[]> getRevenuePerWeek();
+
+	List<Object[]> getRevenuePerMonth();
+
 }

@@ -1,6 +1,7 @@
 package com.capgemini.food_app.rest;
 
 import com.capgemini.food_app.model.Order;
+import com.capgemini.food_app.repository.OrderRepository;
 import com.capgemini.food_app.service.OrderService;
 
 import jakarta.validation.Valid;
@@ -20,10 +21,12 @@ public class OrderController {
 
 
     private OrderService orderService;
+    private OrderRepository orderRepository;
     
     @Autowired
-    public OrderController(OrderService orderService) {
+    public OrderController(OrderService orderService,OrderRepository orderRepository) {
     	this.orderService = orderService;
+    	this.orderRepository=orderRepository;
     }
 
 
@@ -65,10 +68,30 @@ public class OrderController {
         orderService.deleteOrder(id);
         return ResponseEntity.noContent().build();
     }
+
+//    @GetMapping("/recents")
+//    public ResponseEntity<List<Order>> getRecentOrders() {
+//        List<Order> orders = orderService.getTop3OrdersByDateDesc();
+//        return ResponseEntity.ok(orders);
+//    }
     
-    @GetMapping("/recents")
-    public ResponseEntity<List<Order>> getRecentOrders() {
-        List<Order> orders = orderService.getTop3OrdersByDateDesc();
-        return ResponseEntity.ok(orders);
+    @GetMapping("/restaurant/charts/orders-per-week")
+    public List<Object[]> getOrdersPerWeek() {
+        return orderRepository.getOrdersPerWeek();
+    }
+    
+    @GetMapping("/restaurant/charts/revenue-per-week")
+    public List<Object[]> getRevenuePerWeek() {
+        return orderRepository.getRevenuePerWeek();
+    }
+
+    @GetMapping("/restaurant/charts/revenue-per-month")
+    public List<Object[]> getRevenuePerMonth() {
+        return orderRepository.getRevenuePerMonth();
+    }
+    
+    @GetMapping("/restaurant/charts/revenue-by-category")
+	public ResponseEntity<List<Object[]>> getRevenueByCategoryForAdmin() {
+		return ResponseEntity.status(HttpStatus.OK).body(orderService.getRevenueByCategoryForAdmin());
     }
 }
