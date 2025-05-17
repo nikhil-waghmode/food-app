@@ -27,9 +27,9 @@
       <div class="invalid-feedback">Wrong location.</div>
     </div>
     <div class="mb-3">
-      <label for="restaurantPhone" class="form-label">Phone</label>
-      <input type="text" class="form-control" id="restaurantPhone" required>
-      <div class="invalid-feedback">Enter valid phone starting from 7, 8 or 9.</div>
+      <label for="restaurantcontact" class="form-label">contact</label>
+      <input type="text" class="form-control" id="restaurantcontact" required>
+      <div class="invalid-feedback">Enter valid contact starting from 7, 8 or 9.</div>
     </div>
     <div class="mb-3">
       <label for="ownerID" class="form-label">Owner ID</label>
@@ -50,7 +50,7 @@
         <th>ID</th>
         <th>Restaurant Name <i class="bi bi-arrow-down-up"></i></th>
         <th>Location</th>
-        <th>Phone</th>
+        <th>contact</th>
         <th>Owner ID</th>
         <th>Actions</th>
       </tr>
@@ -79,7 +79,7 @@
     restNameInput = document.getElementById("restaurantName");
     restLocationInput = document.getElementById("restaurantLocation");
     restOwnerIdInput = document.getElementById("ownerID");
-    restPhoneInput = document.getElementById("restaurantPhone");
+    restcontactInput = document.getElementById("restaurantcontact");
     resImageInput = document.getElementById("restImage");
 
 currentOwnerId = localStorage.getItem("currentOwnerId");
@@ -103,14 +103,14 @@ async function renderRestaurants(restaurantsData) {
       tbody.innerHTML = ""; //clearing table body content before display.
       //get each restaurant object from the restaurants table and add it to tablebody.
       restaurantsData.forEach(restaurant => {
-        ownerData = fetch(`${apiUrl}/users/${restaurant.ownerID}`);
+      //  ownerData = fetch(`${apiUrl}/users/${restaurant.ownerID}`);
         row = document.createElement("tr");
         row.innerHTML = `
         <td>${restaurant.id}</td>
       <td>${restaurant.name}</td>
       <td>${restaurant.location}</td>
-      <td>${restaurant.phone}</td>
-      <td>${restaurant.ownerID}</td>
+      <td>${restaurant.contact}</td>
+      <td>${restaurant.ownerId}</td>
       <td>
         <button class="btn btn-sm btn-outline-primary me-1 edit-btn" data-id="${restaurant.id}"> 
           <i class="bi bi-pencil-square"></i>
@@ -159,7 +159,7 @@ async function renderRestaurants(restaurantsData) {
     //     <td>${restaurant.id}</td>
     //   <td>${restaurant.name}</td>
     //   <td>${restaurant.location}</td>
-    //   <td>${restaurant.phone}</td>
+    //   <td>${restaurant.contact}</td>
     //   <td>${ownerName}</td>
     //   <td>
     //     <button class="btn btn-sm btn-outline-primary me-1 edit-btn" data-id="${restaurant.id}"> 
@@ -205,8 +205,8 @@ async function renderRestaurants(restaurantsData) {
         .then(data => {
           restNameInput.value = data.name;
           restLocationInput.value = data.location;
-          restPhoneInput.value = data.phone;
-          restOwnerIdInput.value = data.ownerID
+          restcontactInput.value = data.contact;
+          restOwnerIdInput.value = data.ownerId
           editId = id;
           submitBtn.textContent = "Update Restaurant";
           location.hash = "#top";
@@ -214,16 +214,16 @@ async function renderRestaurants(restaurantsData) {
     }
 
     // Add validation functions here
-    restPhoneInput.addEventListener("input", () => {
+    restcontactInput.addEventListener("input", () => {
       isValid = true;
-      phoneRegex = /^[789]\d{9}$/;
-      if (phoneRegex.test(restPhoneInput.value.trim())) {
-        restPhoneInput.classList.add("is-valid");
-        restPhoneInput.classList.remove("is-invalid");
+      contactRegex = /^[789]\d{9}$/;
+      if (contactRegex.test(restcontactInput.value.trim())) {
+        restcontactInput.classList.add("is-valid");
+        restcontactInput.classList.remove("is-invalid");
         isValid = true;
       } else {
-        restPhoneInput.classList.remove("is-valid");
-        restPhoneInput.classList.add("is-invalid");
+        restcontactInput.classList.remove("is-valid");
+        restcontactInput.classList.add("is-invalid");
         isValid = false;
       }
     })
@@ -238,8 +238,8 @@ function createFormData() {
   const formData = new FormData();
   formData.append('name', restNameInput.value.trim());
   formData.append('location', restLocationInput.value.trim());
-  formData.append('phone', restPhoneInput.value.trim());
-  formData.append('ownerID', restOwnerIdInput.value.trim());
+  formData.append('contact', restcontactInput.value.trim());
+  formData.append('ownerId', restOwnerIdInput.value.trim());
   
   if (resImageInput.files[0]) {
     formData.append('resImage', resImageInput.files[0]);
@@ -259,7 +259,7 @@ function createFormData() {
       // newRestaurant = {
       //   name: restNameInput.value.trim(),
       //   location: restLocationInput.value.trim(),
-      //   phone: restPhoneInput.value.trim(),
+      //   contact: restcontactInput.value.trim(),
       //   ownerID: restOwnerIdInput.value.trim()
       // };
       // console.log(editId);

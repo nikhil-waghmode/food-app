@@ -28,57 +28,30 @@
 
 
     <script>
-        function fetchDailyOrderSummary() {
-            fetch(`${apiUrl}/restaurants`)
-                .then(response => response.json())
-                .then(restaurants => {
-                    orderFetches = restaurants.map(restaurant => {
-                        return fetch(`${apiUrl}/orders?restaurantID=${restaurant.id}`)
-                            .then(response => response.json())
-                            .then(orders => {
-                                // Group orders by date
-                                grouped = orders.reduce((acc, order) => {
-                                    date = new Date(order.orderDate).toISOString().split('T')[0];
-                                    key = `${restaurant.name}_${date}`;
+    
 
-                                    if (!acc[key]) {
-                                        acc[key] = {
-                                            restaurantName: restaurant.name,
-                                            date,
-                                            totalOrders: 0,
-                                            totalRevenue: 0
-                                        };
-                                    }
-                                    acc[key].totalOrders += 1;
-                                    acc[key].totalRevenue += order.totalAmount;
-                                    return acc;
-                                }, {});
+    function fetchDailyOrderSummary() {
+      fetch(`${apiUrl}/restaurants/daily-orders`)
+        .then(res => res.json())
+        .then(data => {
+          const tbody = document.querySelector("#dailyOrderSummaryTable tbody");
+          tbody.innerHTML = "";
 
-                                return Object.values(grouped);
-                            });
-                    });
+          data.forEach(entry => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td>${entry.restaurantName}</td>
+              <td>${entry.date}</td>
+              <td>${entry.totalOrders}</td>
+              <td>₹${entry.totalRevenue.toFixed(2)}</td>
+            `;
+            tbody.appendChild(row);
+          });
+        })
+        .catch(err => console.error("Error fetching daily order summary:", err));
+    }
 
-                    Promise.all(orderFetches)
-                        .then(results => {
-                            flatResults = results.flat(); // Combine all restaurants' results
-                            tbody = document.getElementById("dailyOrderSummaryTable").querySelector("tbody");
-                            tbody.innerHTML = "";
-
-                            flatResults.forEach(rowData => {
-                                row = document.createElement("tr");
-                                row.innerHTML = `
-                            <td>${rowData.restaurantName}</td>
-                            <td>${rowData.date}</td>
-                            <td>${rowData.totalOrders}</td>
-                            <td>${rowData.totalRevenue}</td>
-                        `;
-                                tbody.appendChild(row);
-                            });
-                        });
-                })
-                .catch(error => console.error("Error fetching daily order summary:", error));
-        }
-        fetchDailyOrderSummary();
+    fetchDailyOrderSummary();
 
     </script>
 </body>

@@ -72,4 +72,24 @@ public class OrderServiceImpl implements OrderService {
     public void deleteOrder(Long id) {
         orderRepository.deleteById(id);
     }
+    
+	@Override
+	public List<Object[]> getRevenueByCategoryForAdmin() {
+		return orderRepository.getRevenueByCategoryForAdmin();
+	}
+	
+	@Override
+	public List<Object[]> getOrdersPerWeek() {
+		return orderRepository.getOrdersPerWeek();
+	}
+	
+	@Override
+	public List<Object[]> getRevenuePerWeek() {
+		return orderRepository.getRevenuePerWeek();
+	}
+	
+	@Override
+	public List<Object[]> getRevenuePerMonth() {
+		return orderRepository.getRevenuePerMonth();
+	}
 }
