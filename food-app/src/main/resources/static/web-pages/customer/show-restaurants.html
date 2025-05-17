@@ -66,19 +66,19 @@
                 .then(restaurants => {
                     restaurants.forEach(restaurant => {
                         console.log(restaurant)
-                        console.log(restaurant.resImage);
+                        console.log(restaurant.restaurantImg);
                         col = document.createElement("div");
                         col.className = "col-md-3";
                         col.innerHTML = `
               <div class="card mb-2 shadow-sm">
-                <img src="http://localhost:8080/api/restaurants/image/${restaurant.resImage}" class="card-img-top" alt="${restaurant.name}">
+                <img src="http://localhost:8080/api/restaurants/image/${restaurant.restaurantImg}" class="card-img-top" alt="${restaurant.name}">
                 <div class="card-body">
                   <h5 class="card-title fs-5 mb-3">${restaurant.name}</h5>
                   <p class="card-text mb-2 text-muted">
                     <i class="bi bi-geo-alt-fill me-2"></i>${restaurant.location}
                   </p>
                   <p class="card-text text-muted">
-                    <i class="bi bi-telephone-fill me-2"></i>+91 ${restaurant.phone}
+                    <i class="bi bi-telephone-fill me-2"></i>+91 ${restaurant.contact}
                   </p>
                   <button class="btn btn-primary mt-3" onclick="viewMenu('${restaurant.id}')">View Menu</button>
                 </div>
@@ -99,7 +99,7 @@
             restaurant = await restaurantRes.json();
             document.getElementById("menu-restaurant-name").textContent = restaurant.name;
             document.getElementById("menu-restaurant-location").textContent = restaurant.location;
-            document.getElementById("menu-restaurant-phone").textContent = "+91 " + restaurant.phone;
+            document.getElementById("menu-restaurant-phone").textContent = "+91 " + restaurant.contact;
 
             const container = document.getElementById("menu-items");
             container.innerHTML = "";
@@ -113,6 +113,8 @@
             }
             menuItems.forEach(item => {
                 const col = document.createElement("div");
+                console.log("printing the item");
+                console.log(item);
 
                 col.className = "col-md-3";
             //     col.innerHTML = `
@@ -128,12 +130,12 @@
             // `;
             col.innerHTML = `
               <div class="card mb-4 shadow-sm menu-item-card">
-                <img src="http://localhost:8080/api/fooditems/image/${item.foodImage}" class="card-img-top" alt="${item.name}">
+                <img src="http://localhost:8080/api/fooditems/image/${item.itemImg}" class="card-img-top" alt="${item.name}">
                 <div class="card-body">
                   <h5 class="card-title">${item.name}</h5>
                   <p class="card-text text-muted">${item.category}</p>
                   <p class="card-text fw-bold">₹${item.price}</p>
-                  <button class="btn btn-sm btn-outline-primary" onclick='addToCart(${JSON.stringify(item)})'>Add to Cart</button>
+                  <button class="btn btn-sm btn-outline-primary" onclick='addToCart(${JSON.stringify(item)}, ${restaurantId})'>Add to Cart</button>
                 </div>
               </div>
             `;
@@ -150,7 +152,7 @@
         renderRestaurants();
         cartItems = [];
 
-        function addToCart(item) {
+        function addToCart(item,restaurantId) {
             currentUserId = localStorage.getItem("currentUserId");
 
             if (!currentUserId) {
@@ -161,7 +163,7 @@
             cartKey = `cart_${currentUserId}`;
             cartItems = JSON.parse(localStorage.getItem(cartKey)) || [];
 
-            console.log(cartItems)
+            console.log(cartItems);
 
             existingItemIndex = cartItems.findIndex(cartItem => cartItem.id === item.id);
 
@@ -177,7 +179,7 @@
                     name: item.name,
                     price: item.price,
                     category: item.category,
-                    restaurantID: item.restaurantID,
+                    restaurantID: restaurantId,
                     quantity: 1
                 };
                 cartItems.push(newItem);

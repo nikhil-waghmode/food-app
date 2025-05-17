@@ -52,8 +52,8 @@ public class FoodItemController {
         foodItemService.deleteFoodItem(id);
     }
 
-//    @GetMapping("/restaurant/{restaurantId}")
-//    public List<FoodItem> getFoodItemsByRestaurantId(@PathVariable Long restaurantId) {
-//        return foodItemService.getFoodItemsForRestaurant(restaurantId);
-//    }
+    @GetMapping("/restaurant/{restaurantId}")
+    public List<FoodItem> getFoodItemsByRestaurantId(@PathVariable Long restaurantId) {
+        return foodItemService.getFoodItemsForRestaurant(restaurantId);
+    }
 }
