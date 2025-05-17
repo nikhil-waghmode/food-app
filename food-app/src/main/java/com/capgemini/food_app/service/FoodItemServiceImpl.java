@@ -80,5 +80,19 @@ public class FoodItemServiceImpl implements FoodItemService {
 
 		return foodItemRepo.save(existing);
 	}
+	
+	@Override
+	public FoodItem getMostOrderedFoodItem() {
+		FoodItem foodItems = foodItemRepo.findMostOrderedFoodItem();
+		return foodItems;
+	}
+
+	@Override
+	public FoodItem getLeastOrderedFoodItem() {
+		FoodItem foodItems = foodItemRepo.findLeastOrderedFoodItem();
+		return foodItems;
+	}
+	
+	
 
 }

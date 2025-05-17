@@ -52,7 +52,7 @@ public class FoodItem {
 
 	public FoodItem() {
 		super();
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	public FoodItem(Long id, String name, String category, Integer price, String itemImg) {

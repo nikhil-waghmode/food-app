@@ -65,4 +65,10 @@ public class OrderController {
         orderService.deleteOrder(id);
         return ResponseEntity.noContent().build();
     }
+    
+    @GetMapping("/recents")
+    public ResponseEntity<List<Order>> getRecentOrders() {
+        List<Order> orders = orderService.getTop3OrdersByDateDesc();
+        return ResponseEntity.ok(orders);
+    }
 }

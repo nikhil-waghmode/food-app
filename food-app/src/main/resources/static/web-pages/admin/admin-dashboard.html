@@ -119,21 +119,21 @@
             <p id="leastSelling"></p>
           </div>
         </div>
-        <!-- <div class="mb-4">
+        <div class="mb-4">
             <h4 class="fw-bold mb-3">Top Restaurants</h4>
             <table class="table table-bordered">
               <thead>
                 <tr>
-                  <th>Restaurant ID</th>
-                  <th>Restaurant</th>
-                  <th>Total Orders</th>
+                  <th>Restaurant Name</th>
+                  <th>Restaurant Location</th>
+                  <th>Average Rating</th>
                 </tr>
               </thead>
               <tbody id="topRestaurantsTable">
                
               </tbody>
             </table>
-          </div> -->
+          </div> 
 
 
     <script>
@@ -201,60 +201,34 @@
 
     
 
-  /*  async function renderTopRestaurants() {
+async function renderTopRestaurants() {
+  try {
+    const topRestaurantsRes = await fetch(`http://localhost:8080/api/restaurants/top-rated`);
+    const topRestaurantsData = await topRestaurantsRes.json();
 
- topRestaurantsRes = await fetch(`${apiUrl}/restaurants/sorted-by-orders`);
- topRestaurantsData = await topRestaurantsRes.json(); 
-console.log(topRestaurantsData)
- tableBody = document.getElementById("topRestaurantsTable");
-tableBody.innerHTML = "";
-topRestaurantsData.forEach(restaurant => {
-  tableBody.innerHTML += `
-<tr>
-  <td>${restaurant[0]}</td>
-  <td>${restaurant[1]}</td>
-  <td>${restaurant[2]}</td>
-</tr>
-`;
-});
+    console.log(topRestaurantsData);
+
+    const tableBody = document.getElementById("topRestaurantsTable");
+    tableBody.innerHTML = "";
+
+    topRestaurantsData.forEach(item => {
+      const restaurant = item.restaurant;
+      const avgRating = item.averageRating;
+
+      tableBody.innerHTML += `
+        <tr>
+          <td>${restaurant.name}</td>
+          <td>${restaurant.location}</td>
+          <td>${avgRating.toFixed(2)}</td>
+        </tr>
+      `;
+    });
+  } catch (error) {
+    console.error("Failed to load top restaurants:", error);
+  }
 }
+
 renderTopRestaurants();
-*/
-
-
-        // restaurantIds = {}
-        // function restaurantsRanking() {
-        //     fetch(`${apiUrl}/restaurants`)
-        //         .then(res => res.json())
-        //         .then(data => {
-        //             restaurants = data
-        //             restaurantIds = restaurants.map(restaurant => restaurant.id)
-        //             // console.log(restaurants)
-        //             restaurants.forEach(restaurant => {
-
-        //                 // restaurantIds[restaurant.id] = 
-        //             }
-        //             )
-        //             // console.log(restaurantIds)
-        //         })
-
-        // }
-
-        // fetch(`${apiUrl}/orders`)
-        //     .then(res => res.json())
-        //     .then(data => {
-
-        //     })
-        // async function ranking() {
-        //     restaurantsRes = await fetch(`${apiUrl}/restaurants`)
-        //     restaurants = await restaurantsRes.json()
-        //     console.log(restaurants)
-        //     ordersRes = await fetch(`${apiUrl}/orders`)
-        //     orders = await ordersRes.json()
-        //     console.log(orders)
-        //     restaurantsRanking()
-        // }
-        // ranking()
 
     </script>
 </body>

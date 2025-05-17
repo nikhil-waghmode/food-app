@@ -1,7 +1,10 @@
 package com.capgemini.food_app.rest;
 
+import com.capgemini.food_app.dto.TopRestaurantDTO;
 import com.capgemini.food_app.model.Restaurant;
 import com.capgemini.food_app.service.RestaurantService;
+import com.capgemini.food_app.service.TopRestaurantDTOService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -22,10 +25,12 @@ import java.util.List;
 public class RestaurantController {
 
     private final RestaurantService restaurantService;
+    private final TopRestaurantDTOService topRestaurantDTOService;
 
     @Autowired
-    public RestaurantController(RestaurantService restaurantService) {
+    public RestaurantController(RestaurantService restaurantService, TopRestaurantDTOService topRestaurantDTOService) {
         this.restaurantService = restaurantService;
+        this.topRestaurantDTOService = topRestaurantDTOService;
     }
 
     @GetMapping
@@ -111,5 +116,10 @@ public class RestaurantController {
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(contentType))
                 .body(resource);
+    }
+    
+    @GetMapping("/top-rated")
+    public List<TopRestaurantDTO> getTopRatedRestaurants() {
+        return topRestaurantDTOService.findTopRestaurantsByAverageRating();
     }
 }

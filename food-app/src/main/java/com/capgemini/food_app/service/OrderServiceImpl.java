@@ -72,4 +72,10 @@ public class OrderServiceImpl implements OrderService {
     public void deleteOrder(Long id) {
         orderRepository.deleteById(id);
     }
+    
+    
+    @Override
+    public List<Order> getTop3OrdersByDateDesc() {
+        return orderRepository.findTop3ByOrderByDateDesc();
+    }
 }
