@@ -2,88 +2,96 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Manage Food Items</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Manage Food Items</title>
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+	rel="stylesheet" />
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+	rel="stylesheet" />
 </head>
 
 <body class="container my-5">
-  <a id="top"></a>
-  <h2 class="mb-4">Manage Food Items</h2>
+	<a id="top"></a>
+	<h2 class="mb-4">Manage Food Items</h2>
 
-  <form id="foodItemsForm" class="mb-4">
-    <div class="mb-3">
-      <label for="itemName" class="form-label">Item Name</label>
-      <input type="text" class="form-control" id="itemName" required minlength="5">
-      <div class="invalid-feedback">At least 5 characters required.</div>
-    </div>
-    <div class="mb-3">
-      <label for="itemCategory" class="form-label">Item Category</label>
-      <input type="text" class="form-control" id="itemCategory" required>
-      <div class="invalid-feedback">Category required.</div>
-    </div>
-    <div class="mb-3">
-      <label for="itemPrice" class="form-label">Item Price</label>
-      <input type="number" class="form-control" id="itemPrice" required min="0">
-      <div class="invalid-feedback">Enter a valid price (Non-Negative)</div>
-    </div>
-    <div class="mb-3">
-      <label for="itemCuisine" class="form-label">Cuisine</label>
-      <input type="text" class="form-control" id="itemCuisine" required>
-      <div class="invalid-feedback">Cuisine is required.</div>
-    </div>
-    <div class="mb-3">
-      <label for="foodImage" class="form-label">Food Item Image</label>
-      <input type="file" class="form-control" id="foodImage" accept="image/*">
-      <small class="form-text text-muted" id="currentImageText"></small>
-    </div>
-    <button type="submit" class="btn btn-primary" id="submitBtn">Add Item on Menu</button>
-  </form>
+	<form id="foodItemsForm" class="mb-4">
+		<div class="mb-3">
+			<label for="itemName" class="form-label">Item Name</label> <input
+				type="text" class="form-control" id="itemName" required
+				minlength="5">
+			<div class="invalid-feedback">At least 5 characters required.</div>
+		</div>
+		<div class="mb-3">
+			<label for="itemCategory" class="form-label">Item Category</label> <input
+				type="text" class="form-control" id="itemCategory" required>
+			<div class="invalid-feedback">Category required.</div>
+		</div>
+		<div class="mb-3">
+			<label for="itemPrice" class="form-label">Item Price</label> <input
+				type="number" class="form-control" id="itemPrice" required min="0">
+			<div class="invalid-feedback">Enter a valid price
+				(Non-Negative)</div>
+		</div>
+		<div class="mb-3">
+			<label for="itemCuisine" class="form-label">Cuisine</label> <input
+				type="text" class="form-control" id="itemCuisine" required>
+			<div class="invalid-feedback">Cuisine is required.</div>
+		</div>
+		<div class="mb-3">
+			<label for="foodImage" class="form-label">Food Item Image</label> <input
+				type="file" class="form-control" id="foodImage" accept="image/*">
+			<small class="form-text text-muted" id="currentImageText"></small>
+		</div>
+		<button type="submit" class="btn btn-primary" id="submitBtn">Add
+			Item on Menu</button>
+	</form>
 
-  <table class="table table-bordered">
-    <thead>
-      <tr>
-        <th>Item ID</th>
-        <th>Item Name<i class="bi bi-arrow-down-up"></i></th>
-        <th>Item Category</th>
-        <th>Item Price</th>
-        <th>Cuisine</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody id="foodItemsTableBody"></tbody>
-  </table>
+	<table class="table table-bordered">
+		<thead>
+			<tr>
+				<th>Item ID</th>
+				<th>Item Name<i class="bi bi-arrow-down-up"></i></th>
+				<th>Item Category</th>
+				<th>Item Price</th>
+				<th>Cuisine</th>
+				<th>Actions</th>
+			</tr>
+		</thead>
+		<tbody id="foodItemsTableBody"></tbody>
+	</table>
 
-  <script>
-    const apiUrl = "http://localhost:8080/api";
-    const currentOwnerId = localStorage.getItem("currentOwnerId");
-
+<script src="../js/script.js"></script>
+	<script>
+    
+     currentOwnerId = localStorage.getItem("currentOwnerId");
+//Line
     let currentRestaurantID = null;
     let fooditems = [];
     let editId = null;
     let currentItemImg = null;
 
-    const form = document.getElementById("foodItemsForm");
-    const submitBtn = document.getElementById("submitBtn");
-    const itemNameInput = document.getElementById("itemName");
-    const itemCategoryInput = document.getElementById("itemCategory");
-    const itemPriceInput = document.getElementById("itemPrice");
-    const itemCuisineInput = document.getElementById("itemCuisine");
-    const foodImageInput = document.getElementById("foodImage");
-    const currentImageText = document.getElementById("currentImageText");
+     form = document.getElementById("foodItemsForm");
+     submitBtn = document.getElementById("submitBtn");
+     itemNameInput = document.getElementById("itemName");
+     itemCategoryInput = document.getElementById("itemCategory");
+     itemPriceInput = document.getElementById("itemPrice");
+     itemCuisineInput = document.getElementById("itemCuisine");
+     foodImageInput = document.getElementById("foodImage");
+     currentImageText = document.getElementById("currentImageText");
 
     async function fetchAndRenderFoodItems() {
       try {
-        const res = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
+         res = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
         if (!res.ok) throw new Error('Failed to fetch restaurant');
-        const restaurant = await res.json();
+         restaurant = await res.json();
         currentRestaurantID = restaurant.id;
         
-        const menuRes = await fetch(`${apiUrl}/fooditems/restaurant/${currentRestaurantID}`);
+         menuRes = await fetch(`${apiUrl}/fooditems/restaurant/${currentRestaurantID}`);
         if (!menuRes.ok) throw new Error('Failed to fetch food items');
-        const menuData = await menuRes.json();
+         menuData = await menuRes.json();
         fooditems = menuData;
         renderFoodItems(fooditems);
       } catch (error) {
@@ -93,10 +101,10 @@
     }
 
     function renderFoodItems(items) {
-      const tbody = document.getElementById("foodItemsTableBody");
+       tbody = document.getElementById("foodItemsTableBody");
       tbody.innerHTML = "";
       items.forEach(fooditem => {
-        const row = document.createElement("tr");
+         row = document.createElement("tr");
         row.innerHTML = `
           <td>${fooditem.id}</td>
           <td>${fooditem.name}</td>
@@ -169,7 +177,7 @@
     }
 
     function createFormData() {
-      const formData = new FormData();
+       formData = new FormData();
       formData.append('name', itemNameInput.value.trim());
       formData.append('category', itemCategoryInput.value.trim());
       formData.append('price', itemPriceInput.value.trim());
@@ -191,7 +199,7 @@
       if (editId) {
         if (foodImageInput.files[0]) {
           // If there's a new image, use FormData for multipart upload
-          const formData = new FormData();
+           formData = new FormData();
           formData.append('name', itemNameInput.value.trim());
           formData.append('category', itemCategoryInput.value.trim());
           formData.append('price', itemPriceInput.value.trim());
@@ -222,7 +230,7 @@
           });
         } else {
           // If no new image, use JSON with the existing image URL
-          const updatedItem = {
+           updatedItem = {
             name: itemNameInput.value.trim(),
             category: itemCategoryInput.value.trim(),
             price: parseInt(itemPriceInput.value.trim()),
@@ -292,23 +300,23 @@
     let sortDirection = 1;
     document.querySelector("th:nth-child(2)").style.cursor = "pointer";
     document.querySelector("th:nth-child(2)").addEventListener("click", () => {
-      const sorted = [...fooditems].sort((a, b) =>
+       sorted = [...fooditems].sort((a, b) =>
         a.name.localeCompare(b.name) * sortDirection
       );
       sortDirection *= -1;
       renderFoodItems(sorted);
     });
 
-    const searchInput = document.createElement("input");
+     searchInput = document.createElement("input");
     searchInput.setAttribute("type", "text");
     searchInput.setAttribute("placeholder", "Search by Food Item Name..");
     searchInput.classList.add("form-control", "mb-3");
-    const table = document.querySelector("table");
+     table = document.querySelector("table");
     table.parentNode.insertBefore(searchInput, table);
 
     searchInput.addEventListener("input", () => {
-      const term = searchInput.value.toLowerCase();
-      const filtered = fooditems.filter(item => item.name.toLowerCase().includes(term));
+       term = searchInput.value.toLowerCase();
+       filtered = fooditems.filter(item => item.name.toLowerCase().includes(term));
       renderFoodItems(filtered);
     });
 

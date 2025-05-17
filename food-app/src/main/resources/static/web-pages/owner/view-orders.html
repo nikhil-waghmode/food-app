@@ -29,58 +29,48 @@
             <!-- Orders will be populated here -->
         </tbody>
     </table>
+    <script src="../js/script.js"></script>
 
     <script>
-        let sortDateDirection = 1;
-        const apiUrl = "http://localhost:8080/api";
-        const currentOwnerId = localStorage.getItem("currentOwnerId");
-        let orders = [];
+         sortDateDirection = 1;
+         //apiUrl = "http://localhost:8080/api";
+         currentOwnerId = localStorage.getItem("currentOwnerId");
+         orders = [];
 
-        async function fetchAndRenderOrders() {
-            try {
-                // Fetch current restaurant for the owner
-                const currentRestaurantRes = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
-                const currentRestaurant = await currentRestaurantRes.json();
-                const currentRestaurantId = currentRestaurant.id;
+         async function fetchAndRenderOrders() {
+             try {
+                 // console.log("fetch orders called")
+                 currentRestaurantRes = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
+                 currentRestaurant = await currentRestaurantRes.json();
+                 // console.log(currentRestaurant)
 
-                // Fetch orders for the restaurant
-                const ordersRes = await fetch(`${apiUrl}/orders/detail/restaurant/${currentRestaurantId}`);
-                let rawOrders = await ordersRes.json();
+                 currentRestaurantId = currentRestaurant.id;
+                 // console.log(currentRestaurantId)
 
-                // Map backend data to expected frontend structure
-                orders = rawOrders.map(order => ({
-                    orderID: order.id,
-                    customerName: "User #" + order.userId, // Since only userId is available
-                    customerLocation: "", // Not available in backend response
-                    orderDate: order.date,
-                    items: "", // Not available in backend response
-                    totalAmount: order.totalAmount
-                }));
-
-                // Sort orders by date when clicking the Order Date header
-                const orderDateTh = document.querySelector("th:nth-child(4)");
-                orderDateTh.style.cursor = "pointer";
-                orderDateTh.onclick = () => {
-                    const sortedByDate = [...orders].sort((a, b) => {
-                        return (new Date(a.orderDate) - new Date(b.orderDate)) * sortDateDirection;
-                    });
-                    sortDateDirection *= -1; // Toggle direction
-                    renderOrders(sortedByDate);
-                };
-
-                renderOrders(orders);
-            } catch (error) {
-                console.error("Error fetching orders:", error);
-                renderOrders([]); // Render empty table on error
-            }
-        }
+                 ordersRes = await fetch(`${apiUrl}/orders/detail/restaurant/${currentRestaurantId}`);
+                 orders = await ordersRes.json();
+                
+                 // Sort orders by date when clicking the Order Date header
+                 document.querySelector("th:nth-child(4)").style.cursor = "pointer";
+                 document.querySelector("th:nth-child(4)").addEventListener("click", () => {
+                     sortedByDate = [...orders].sort((a, b) => {
+                         return (new Date(a.orderDate) - new Date(b.orderDate)) * sortDateDirection;
+                     });
+                     sortDateDirection *= -1; // Toggle direction
+                     renderOrders(sortedByDate);
+                 });
+                 renderOrders(orders);
+             } catch (error) {
+                 console.error("Error fetching orders:", error);
+             }
+         }
 
         function renderOrders(ordersToRender) {
-            const tbody = document.getElementById("ordersTableBody");
+             tbody = document.getElementById("ordersTableBody");
             tbody.innerHTML = "";
 
             ordersToRender.forEach(order => {
-                const row = document.createElement("tr");
+                 row = document.createElement("tr");
                 row.innerHTML = `
                     <td>${order.orderID}</td>
                     <td>${order.customerName}</td>
@@ -95,8 +85,8 @@
 
         // Search functionality
         document.getElementById("searchInput").addEventListener("input", (e) => {
-            const searchTerm = e.target.value.toLowerCase();
-            const filtered = orders.filter(order =>
+             searchTerm = e.target.value.toLowerCase();
+             filtered = orders.filter(order =>
                 (order.customerName ?? "").toLowerCase().includes(searchTerm)
             );
             renderOrders(filtered);

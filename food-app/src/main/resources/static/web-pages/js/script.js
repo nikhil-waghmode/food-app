@@ -86,5 +86,5 @@ function logout() {
     window.location.href = "login.html";
 }
 
-apiUrl = "http://localhost:8080/api/";
+apiUrl = "http://localhost:8080/api";
 

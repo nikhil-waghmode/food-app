@@ -105,4 +105,10 @@ public class FoodItemController {
         List<FoodItem> items = foodItemService.getFoodItemsByCategory(category);
         return ResponseEntity.ok(items);
     }
+    @GetMapping("/recent/{restaurantID}")
+    public ResponseEntity<List<FoodItem>> getMostRecentFoodItem(@PathVariable Long restaurantID) {
+        List<FoodItem> items = foodItemService.findRecentlyAddedItemByRestaurantID(restaurantID);
+        return ResponseEntity.ok(items);
+    }
+
 }

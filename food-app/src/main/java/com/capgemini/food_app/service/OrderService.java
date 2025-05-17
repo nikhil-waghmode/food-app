@@ -1,10 +1,14 @@
 package com.capgemini.food_app.service;
 
+import com.capgemini.food_app.dto.OrderDTO;
 import com.capgemini.food_app.model.Order;
+
+import java.time.LocalDate;
 import java.util.List;
+
 //edited
 public interface OrderService {
- 
+
 	Order createOrder(Order order);
 
 	Order getOrderById(Long id);
@@ -18,6 +22,19 @@ public interface OrderService {
 	boolean orderExists(Long orderId);
 
 	void deleteOrder(Long id);
+
 	List<Order> getOrdersByRestaurantId(Long restaurantId);
+
+	Long getOrderCountByRestaurant(Long restaurantId);
+
+	Long getOrderCountByRestaurantAndDate(Long restaurantId, LocalDate date);
+
+	Double getTotalRevenueByRestaurant(Long restaurantId);
+
+	Double getRevenueByRestaurantAndDate(Long restaurantId, LocalDate date);
+
+	List<OrderDTO> getRecentOrdersByRestaurantId(Long restaurantId);
+
+	public List<OrderDTO> getViewOrdersDetailsForRestaurant(Long restaurantId, LocalDate date);
 
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.capgemini.food_app.dto.OrderDTO;
 import com.capgemini.food_app.model.FoodItem;
 
 public interface FoodItemService {
@@ -32,4 +33,5 @@ public interface FoodItemService {
     List<FoodItem> getFoodItemsByCategory(String category);
     
     String saveImageFile(MultipartFile image);
-}
+    List<FoodItem> findRecentlyAddedItemByRestaurantID(Long restaurantID);
+    }

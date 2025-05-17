@@ -112,4 +112,9 @@ public class RestaurantController {
                 .contentType(MediaType.parseMediaType(contentType))
                 .body(resource);
     }
+    @GetMapping("/customers/details/{restaurantID}")
+    public ResponseEntity<List<Object[]>> getCustomerDetailsByRestaurantID(@PathVariable Long restaurantID) {
+        return ResponseEntity.ok(restaurantService.getCustomerDetailsByRestaurantID(restaurantID));
+    }
+
 }
