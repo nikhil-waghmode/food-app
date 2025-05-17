@@ -1,6 +1,5 @@
 package com.capgemini.food_app.model;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,131 +13,123 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
-
 @Entity
-@Table(name="restaurants")
+@Table(name = "restaurants")
 public class Restaurant {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-	private String name;
-	private String location;
-	private String contact;
-	private Long ownerId;
-	private String restaurantImg;
-	
-	@OneToMany(mappedBy="restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
-	@JsonManagedReference
-	private List<FoodItem> foodItem = new ArrayList<FoodItem>();
-	
-	@OneToMany(mappedBy="restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
-	@JsonManagedReference
-	private List<Review> review = new ArrayList<Review>();
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String name;
+    private String location;
+    private String contact;
+    private Long ownerId;
+    private String restaurantImg;
 
-	public Restaurant() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<FoodItem> foodItem = new ArrayList<FoodItem>();
 
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Review> review = new ArrayList<Review>();
 
-	public Restaurant(Long id, String name, String location, String contact, Long ownerId, String restaurantImg,
-			List<FoodItem> foodItem) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.location = location;
-		this.contact = contact;
-		this.ownerId = ownerId;
-		this.restaurantImg = restaurantImg;
-		this.foodItem = foodItem;
-	}
-	
-	
+    public Restaurant() {
+        super();
+    }
 
-	public Restaurant(Long id, String name, String location, String contact, Long ownerId, String restaurantImg,
-			List<FoodItem> foodItem, List<Review> review) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.location = location;
-		this.contact = contact;
-		this.ownerId = ownerId;
-		this.restaurantImg = restaurantImg;
-		this.foodItem = foodItem;
-		this.review = review;
-	}
+    public Restaurant(Long id, String name, String location, String contact, Long ownerId, String restaurantImg,
+                      List<FoodItem> foodItem) {
+        super();
+        this.id = id;
+        this.name = name;
+        this.location = location;
+        this.contact = contact;
+        this.ownerId = ownerId;
+        this.restaurantImg = restaurantImg;
+        this.foodItem = foodItem;
+    }
 
-	public Long getId() {
-		return id;
-	}
+    public Restaurant(Long id, String name, String location, String contact, Long ownerId, String restaurantImg,
+                      List<FoodItem> foodItem, List<Review> review) {
+        super();
+        this.id = id;
+        this.name = name;
+        this.location = location;
+        this.contact = contact;
+        this.ownerId = ownerId;
+        this.restaurantImg = restaurantImg;
+        this.foodItem = foodItem;
+        this.review = review;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getLocation() {
-		return location;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setLocation(String location) {
-		this.location = location;
-	}
+    public String getLocation() {
+        return location;
+    }
 
-	public String getContact() {
-		return contact;
-	}
+    public void setLocation(String location) {
+        this.location = location;
+    }
 
-	public void setContact(String contact) {
-		this.contact = contact;
-	}
+    public String getContact() {
+        return contact;
+    }
 
-	public Long getOwnerId() {
-		return ownerId;
-	}
+    public void setContact(String contact) {
+        this.contact = contact;
+    }
 
-	public void setOwnerId(Long ownerId) {
-		this.ownerId = ownerId;
-	}
+    public Long getOwnerId() {
+        return ownerId;
+    }
 
-	public String getRestaurantImg() {
-		return restaurantImg;
-	}
+    public void setOwnerId(Long ownerId) {
+        this.ownerId = ownerId;
+    }
 
-	public void setRestaurantImg(String restaurantImg) {
-		this.restaurantImg = restaurantImg;
-	}
+    public String getRestaurantImg() {
+        return restaurantImg;
+    }
 
-	public List<FoodItem> getFoodItem() {
-		return foodItem;
-	}
+    public void setRestaurantImg(String restaurantImg) {
+        this.restaurantImg = restaurantImg;
+    }
 
-	public void setFoodItem(List<FoodItem> foodItem) {
-		this.foodItem = foodItem;
-	}
+    public List<FoodItem> getFoodItem() {
+        return foodItem;
+    }
 
-	public List<Review> getReview() {
-		return review;
-	}
+    public void setFoodItem(List<FoodItem> foodItem) {
+        this.foodItem = foodItem;
+    }
 
-	public void setReview(List<Review> review) {
-		this.review = review;
-	}
+    public List<Review> getReview() {
+        return review;
+    }
 
-	@Override
-	public String toString() {
-		return "Restaurant [id=" + id + ", name=" + name + ", location=" + location + ", contact=" + contact + ", ownerId="
-				+ ownerId + ", restaurantImg=" + restaurantImg + "]";
-	}
-	
-	
+    public void setReview(List<Review> review) {
+        this.review = review;
+    }
 
+    @Override
+    public String toString() {
+        return "Restaurant [id=" + id + ", name=" + name + ", location=" + location + ", contact=" + contact
+                + ", ownerId=" + ownerId + ", restaurantImg=" + restaurantImg + "]";
+    }
 }

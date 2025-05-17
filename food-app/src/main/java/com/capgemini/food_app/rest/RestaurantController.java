@@ -137,4 +137,9 @@ public class RestaurantController {
     public List<TopRestaurantDTO> getTopRatedRestaurants() {
         return topRestaurantDTOService.findTopRestaurantsByAverageRating();
     }
+    @GetMapping("/customers/details/{restaurantID}")
+    public ResponseEntity<List<Object[]>> getCustomerDetailsByRestaurantID(@PathVariable Long restaurantID) {
+        return ResponseEntity.ok(restaurantService.getCustomerDetailsByRestaurantID(restaurantID));
+    }
+
 }

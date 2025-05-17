@@ -1,5 +1,6 @@
 package com.capgemini.food_app.dto;
 
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +19,8 @@ public class OrderDTO {
 	String customerName;
 	String customerLocation;
 	LocalDate orderDate;
-	Long totalAmount;
+
+	Double totalAmount;
 	List<String> items = new ArrayList<>(); // item names + quantities
 	String restaurantID;
 	Integer itemPrice;
@@ -27,7 +29,8 @@ public class OrderDTO {
 		super();
 	}
 
-	public OrderDTO(Long orderID, String customerName, String customerLocation, LocalDate orderDate, Long totalAmount,
+
+	public OrderDTO(Long orderID, String customerName, String customerLocation, LocalDate orderDate, Double totalAmount,
 			List<String> items, String restaurantID, Integer itemPrice) {
 		super();
 		this.orderID = orderID;
@@ -72,11 +75,14 @@ public class OrderDTO {
 		this.orderDate = orderDate;
 	}
 
-	public Long getTotalAmount() {
+
+
+
+	public Double getTotalAmount() {
 		return totalAmount;
 	}
 
-	public void setTotalAmount(Long totalAmount) {
+	public void setTotalAmount(Double totalAmount) {
 		this.totalAmount = totalAmount;
 	}
 

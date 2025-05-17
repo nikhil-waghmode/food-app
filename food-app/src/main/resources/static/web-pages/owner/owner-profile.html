@@ -40,10 +40,10 @@
         <!-- <div class="container"> -->
             <div class="row">
                 <h4 class="mb-4 text-center"><i class="bi bi-shop-window me-2"></i>Restaurant Profile</h4>
+                        <form id="restaurant-form">
 
                 <div class="col-lg-6 mb-4">
                     <div class="card p-4">
-                        <form id="restaurant-form">
                             <h5 class="mt-4"><i class="bi bi-person-circle me-2"></i>Restaurant Details</h5>
                             <div class="mb-3">
                                 <label class="form-label">Restaurant ID</label>
@@ -54,8 +54,8 @@
                                 <input type="text" id="restaurantName" class="form-control" disabled>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Phone</label>
-                                <input type="text" id="restaurantPhone" class="form-control" disabled>
+                                <label class="form-label">Contact</label>
+                                <input type="text" id="restaurantContact" class="form-control" disabled>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Location</label>
@@ -63,9 +63,12 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Owner ID</label>
-                                <input type="text" id="restaurantOwnerID" class="form-control" disabled>
+                                <input type="text" id="restaurantOwnerId" class="form-control" disabled>
                             </div>
-                        </form>
+                                <div class="mb-3">
+      <label for="restImage" class="form-label">Restaurant Image</label>
+      <input type="file" class="form-control" id="restImage" accept="image/*">
+    </div>
                     </div>
                 </div>
         
@@ -81,8 +84,8 @@
                             <input type="email" id="email" class="form-control" disabled />
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Owner Phone</label>
-                            <input type="text" id="phone" class="form-control" disabled />
+                            <label class="form-label">Owner Contact</label>
+                            <input type="text" id="contact" class="form-control" disabled />
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Owner Location</label>
@@ -96,6 +99,7 @@
                         <button type="button" id="cancel-btn" class="btn btn-secondary d-none">Cancel</button>
                     </div>
                 </div>
+                </form>
             </div>
         </div>
         
@@ -107,126 +111,178 @@
         &copy; 2025 SnapEats. All rights reserved.
     </footer>
 
-    <script>
+  <script>
+    // Variable declarations
+    let restaurantID, restaurantName, restaurantContact, restaurantLocation, restaurantOwnerId, resImageInput;
+    let nameInput, emailInput, contactInput, locationInput;
+    let editBtn, saveBtn, cancelBtn;
+    let currentRestaurant = {};
+    let currentUserData = null;
+    let currentOwnerId = null;
+    const apiUrl = "http://localhost:8080/api"; // Change as needed
 
-         restaurantID = document.getElementById("restaurantID");
-         restaurantName = document.getElementById("restaurantName");
-         restaurantPhone = document.getElementById("restaurantPhone");
-         restaurantLocation = document.getElementById("restaurantLocation");
-         restaurantOwnerID = document.getElementById("restaurantOwnerID");
+    // DOM assignments
+    restaurantID = document.getElementById("restaurantID");
+    restaurantName = document.getElementById("restaurantName");
+    restaurantContact = document.getElementById("restaurantContact");
+    restaurantLocation = document.getElementById("restaurantLocation");
+    restaurantOwnerId = document.getElementById("restaurantOwnerId");
+    resImageInput = document.getElementById("restImage");
 
-         nameInput = document.getElementById("name");
-         emailInput = document.getElementById("email");
-         phoneInput = document.getElementById("phone");
-         locationInput = document.getElementById("location");
+    nameInput = document.getElementById("name");
+    emailInput = document.getElementById("email");
+    contactInput = document.getElementById("contact");
+    locationInput = document.getElementById("location");
 
-         editBtn = document.getElementById("edit-btn");
-         saveBtn = document.getElementById("save-btn");
-         cancelBtn = document.getElementById("cancel-btn");
+    editBtn = document.getElementById("edit-btn");
+    saveBtn = document.getElementById("save-btn");
+    cancelBtn = document.getElementById("cancel-btn");
 
-         currentRestaurant = {};
+    // Create FormData for restaurant
+    function createFormData() {
+        const formData = new FormData();
+        formData.append('name', restaurantName.value.trim());
+        formData.append('location', restaurantLocation.value.trim());
+        formData.append('contact', restaurantContact.value.trim());
+        formData.append('ownerId', restaurantOwnerId.value.trim());
 
-        async function loadProfile() {
-            try {
-                 currentOwnerId = localStorage.getItem("currentOwnerId");
-
-                 res = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
-                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-                currentRestaurant = await res.json();
-
-                restaurantID.value = currentRestaurant.id;
-                restaurantName.value = currentRestaurant.name;
-                restaurantPhone.value = currentRestaurant.phone;
-                restaurantLocation.value = currentRestaurant.location;
-                restaurantOwnerID.value = currentRestaurant.ownerID;
-
-
-                 response = await fetch(`${apiUrl}/users/${currentOwnerId}`);
-
-                currentUserData = await response.json();
-
-                nameInput.value = currentUserData.name;
-                emailInput.value = currentUserData.email;
-                phoneInput.value = currentUserData.phone;
-                locationInput.value = currentUserData.location;
-            } catch (err) {
-                console.error("Error fetching restaurant:", err);
-                alert("Failed to load restaurant details.");
-            }
+        if (resImageInput.files[0]) {
+            formData.append('restImage', resImageInput.files[0]);
         }
 
-        editBtn.addEventListener("click", () => {
-            nameInput.disabled = false;
-            phoneInput.disabled = false;
-            locationInput.disabled = false;
-            emailInput.disabled = false;
-            
-            restaurantName.disabled = false;
-            restaurantPhone.disabled = false;
-            restaurantLocation.disabled = false;
+        return formData;
+    }
 
-            editBtn.classList.add("d-none");
-            saveBtn.classList.remove("d-none");
-            cancelBtn.classList.remove("d-none");
-        });
+    // Create FormData for owner (user)
+    function createFormDataOwner() {
+        const formData = new FormData();
+        formData.append('name', nameInput.value.trim());
+        formData.append('email', emailInput.value.trim());
+        formData.append('phone', contactInput.value.trim());
+        formData.append('location', locationInput.value.trim());
 
-        cancelBtn.addEventListener("click", () => {
-            loadProfile(currentRestaurant);
+        // Use existing userType and password from loaded user data
+        formData.append('userType', currentUserData.userType);
+        formData.append('password', currentUserData.password);
+
+        // If you add a file input for owner image, handle it here
+        // Example:
+        // let ownerImgInput = document.getElementById("ownerImg");
+        // if (ownerImgInput && ownerImgInput.files[0]) {
+        //     formData.append('userImg', ownerImgInput.files[0]);
+        // }
+
+        return formData;
+    }
+
+    // Load profile data
+    async function loadProfile() {
+        try {
+            currentOwnerId = localStorage.getItem("currentOwnerId");
+
+            // Fetch restaurant details
+            let res = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
+            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+            currentRestaurant = await res.json();
+
+            restaurantID.value = currentRestaurant.id;
+            restaurantName.value = currentRestaurant.name;
+            restaurantContact.value = currentRestaurant.contact;
+            restaurantLocation.value = currentRestaurant.location;
+            restaurantOwnerId.value = currentRestaurant.ownerId;
+
+            // Fetch owner (user) details
+            let response = await fetch(`${apiUrl}/users/${currentOwnerId}`);
+            currentUserData = await response.json();
+
+            // Fill owner fields with loaded user data
+            nameInput.value = currentUserData.name;
+            emailInput.value = currentUserData.email;
+            contactInput.value = currentUserData.phone;
+            locationInput.value = currentUserData.location;
+        } catch (err) {
+            console.error("Error fetching restaurant:", err);
+            alert("Failed to load restaurant details.");
+        }
+    }
+
+    // Edit button handler
+    editBtn.addEventListener("click", () => {
+        nameInput.disabled = false;
+        contactInput.disabled = false;
+        locationInput.disabled = false;
+        emailInput.disabled = false;
+
+        restaurantName.disabled = false;
+        restaurantContact.disabled = false;
+        restaurantLocation.disabled = false;
+
+        editBtn.classList.add("d-none");
+        saveBtn.classList.remove("d-none");
+        cancelBtn.classList.remove("d-none");
+    });
+
+    // Cancel button handler
+    cancelBtn.addEventListener("click", () => {
+        loadProfile();
+        nameInput.disabled = true;
+        contactInput.disabled = true;
+        locationInput.disabled = true;
+        emailInput.disabled = true;
+
+        restaurantName.disabled = true;
+        restaurantContact.disabled = true;
+        restaurantLocation.disabled = true;
+        saveBtn.classList.add("d-none");
+        cancelBtn.classList.add("d-none");
+        editBtn.classList.remove("d-none");
+    });
+
+    // Save (form submit) handler
+    document.getElementById("restaurant-form").addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        try {
+            // Update restaurant
+            let response = await fetch(`${apiUrl}/restaurants/${currentRestaurant.id}`, {
+                method: "PUT",
+                body: createFormData()
+            });
+            if (!response.ok) throw new Error(`Update failed: ${response.statusText}`);
+            currentRestaurant = await response.json();
+
+            // Update owner (user)
+            let ownerRes = await fetch(`${apiUrl}/users/${currentOwnerId}`, {
+                method: "PUT",
+                body: createFormDataOwner()
+            });
+            if (!ownerRes.ok) throw new Error(`Owner update failed: ${ownerRes.statusText}`);
+            currentUserData = await ownerRes.json();
+
+            alert("Restaurant profile updated successfully!");
+            loadProfile();
+
             nameInput.disabled = true;
-            phoneInput.disabled = true;
+            contactInput.disabled = true;
             locationInput.disabled = true;
             emailInput.disabled = true;
 
             restaurantName.disabled = true;
-            restaurantPhone.disabled = true;
+            restaurantContact.disabled = true;
             restaurantLocation.disabled = true;
             saveBtn.classList.add("d-none");
             cancelBtn.classList.add("d-none");
             editBtn.classList.remove("d-none");
-        });
+        } catch (err) {
+            console.error(err);
+            alert("Error updating restaurant profile.");
+        }
+    });
 
-        document.getElementById("restaurant-form").addEventListener("submit", async function (e) {
-            e.preventDefault();
-
-             updatedData = {
-                ...currentRestaurant,
-                name: restaurantName.value,
-                phone: restaurantPhone.value,
-                location: restaurantLocation.value
-            };
-
-            try {
-                 response = await fetch(`${apiUrl}/restaurants/${currentRestaurant.id}`, {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(updatedData)
-                });
-
-                if (!response.ok) throw new Error(`Update failed: ${response.statusText}`);
-
-                currentRestaurant = await response.json();
-                alert("Restaurant profile updated successfully!");
-                loadProfile(currentRestaurant);
-
-                nameInput.disabled = true;
-                phoneInput.disabled = true;
-                locationInput.disabled = true;
-                emailInput.disabled = true;
-
-                restaurantName.disabled = true;
-                restaurantPhone.disabled = true;
-                restaurantLocation.disabled = true;
-                saveBtn.classList.add("d-none");
-                cancelBtn.classList.add("d-none");
-                editBtn.classList.remove("d-none");
-            } catch (err) {
-                console.error(err);
-                alert("Error updating restaurant profile.");
-            }
-        });
-
-        loadProfile();
-    </script>
+    // Initial load
+    loadProfile();
+</script>
+  
 </body>
 
 </html>

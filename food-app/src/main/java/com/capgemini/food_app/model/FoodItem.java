@@ -3,6 +3,7 @@ package com.capgemini.food_app.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -37,9 +38,11 @@ public class FoodItem {
     @Min(value = 1, message = "Price must be at least 1")
     private Integer price;
 
+   // Or an appropriate size
     @NotBlank(message = "Item image URL is mandatory")
-    @Size(max = 255, message = "Item image URL cannot exceed 255 characters")
+    @Size(max = 1000, message = "Item image URL cannot exceed 1000 characters")
     private String itemImg;
+
 
     @NotBlank(message = "Cuisine is mandatory")
     @Size(max = 50, message = "Cuisine cannot exceed 50 characters")

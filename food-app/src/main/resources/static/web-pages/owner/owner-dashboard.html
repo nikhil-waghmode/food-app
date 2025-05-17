@@ -35,9 +35,7 @@
       padding: 1rem;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
-
-
-    .stats-card:nth-child(odd) {
+	.stats-card:nth-child(odd) {
       border-left-color: #ced4da;
     }
 
@@ -154,150 +152,184 @@
       </tbody>
     </table>
   </div>
-
+	<script src="../js/script.js"></script>
   <script>
-    welcomeMessage = document.getElementById("welcomeMessage");
-    ordersToday = document.getElementById("ordersToday");
-    totalOrders = document.getElementById("totalOrders");
-    revenueToday = document.getElementById("revenueToday")
-    topItem = document.getElementById("topItem");
-    totalRevenue = document.getElementById("totalRevenue")
-    orders = []
-    currentOwnerId = localStorage.getItem("currentOwnerId");
+ //  apiUrl = "http://localhost:8080/api"; // No trailing slash
 
-     today = new Date();
+   welcomeMessage = document.getElementById("welcomeMessage");
+   ordersToday = document.getElementById("ordersToday");
+   totalOrders = document.getElementById("totalOrders");
+   revenueToday = document.getElementById("revenueToday");
+   totalRevenue = document.getElementById("totalRevenue");
+   currentOwnerId = localStorage.getItem("currentOwnerId");
+   today = new Date();
+   formattedDate = today.toISOString().split('T')[0];
 
-// Format the date to "yyyy-MM-dd"
- formattedDate = today.toISOString().split('T')[0];
+  // Utility: Safely set innerHTML if element exists
+  function safeSetInnerHTML(el, value) {
+    if (el) el.innerHTML = value;
+  }
 
-// console.log(formattedDate); 
+  // Utility: Get table body by id, or return null
+  function getTableBody(id) {
+    return document.getElementById(id) || null;
+  }
 
-
-    async function countOrders() {
-      //fetching current res details
-      restaurantsRes = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
-      restaurant = await restaurantsRes.json();
-
-      id = restaurant.id;
-      welcomeMessage.innerHTML = `Welcome, ${restaurant.name}👋`;
-      // console.log(restaurants)
-      // console.log("first")
-      // console.log(id)
-      ordersRes = await fetch(`${apiUrl}/orders/restaurant/${id}`);
-      orders = await ordersRes.json();
-      console.log(orders)
-
-      currentRestaurantRes = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
-            currentRestaurant = await currentRestaurantRes.json();
-            currentRestaurantId = currentRestaurant.id;
-console.log("resres: ", currentRestaurant);
-console.log("resres1: ", currentRestaurantId);
-
-      countRes = await fetch(`${apiUrl}/orders/restaurant/count/${currentRestaurantId}`);
-      count = await countRes.text()
-
-      console.log("count", count)
-      totalOrders.innerHTML = `${count}`
-
-      todayOrdersRes = await fetch(`${apiUrl}/orders/restaurant/count/${currentRestaurantId}?date=${formattedDate}`);
-      todayCount = await todayOrdersRes.text()
-
-      ordersToday.innerHTML = `${todayCount}`;
+  async function fetchRestaurant() {
+    try {
+       res = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
+      if (!res.ok) throw new Error("Restaurant not found");
+      return await res.json();
+    } catch (error) {
+      console.error("Error fetching restaurant:", error);
+      safeSetInnerHTML(welcomeMessage, "No restaurant found for this owner.");
+      throw error;
     }
-    countOrders();
+  }
 
-    async function calculateRevenue() {
-      currentRestaurantRes = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
-            currentRestaurant = await currentRestaurantRes.json();
-            currentRestaurantId = currentRestaurant.id;
-            
-      revenueRes = await fetch(`${apiUrl}/orders/restaurant/revenue/${currentRestaurantId}`);
-      revenue = await revenueRes.text()
+  async function countOrders() {
+    try {
+       restaurant = await fetchRestaurant();
+       id = restaurant.id;
+      safeSetInnerHTML(welcomeMessage, `Welcome, ${restaurant.name}👋`);
 
-      totalRevenue.innerHTML = `₹${revenue}`
+      let countRes = await fetch(`${apiUrl}/orders/restaurant/count/${id}`);
+      let count = countRes.ok ? await countRes.text() : "0";
+      safeSetInnerHTML(totalOrders, `${count}`);
 
-      date = 
-      todayRevenueRes = await fetch(`${apiUrl}/orders/restaurant/revenue/${currentRestaurantId}?date=${formattedDate}`);
-      todayRevenue = await todayRevenueRes.text()
-      if (todayRevenue === "") {
-        todayRevenue = "0";
+      let todayOrdersRes = await fetch(`${apiUrl}/orders/restaurant/count/${id}?date=${formattedDate}`);
+      let todayCount = todayOrdersRes.ok ? await todayOrdersRes.text() : "0";
+      safeSetInnerHTML(ordersToday, `${todayCount}`);
+    } catch (error) {
+      safeSetInnerHTML(totalOrders, "0");
+      safeSetInnerHTML(ordersToday, "0");
+    }
+  }
+  countOrders();
+
+  async function calculateRevenue() {
+    try {
+       restaurant = await fetchRestaurant();
+       id = restaurant.id;
+
+      let revenueRes = await fetch(`${apiUrl}/orders/restaurant/revenue/${id}`);
+      let revenue = revenueRes.ok ? await revenueRes.text() : "0";
+      safeSetInnerHTML(totalRevenue, `₹${revenue}`);
+
+      let todayRevenueRes = await fetch(`${apiUrl}/orders/restaurant/revenue/${id}?date=${formattedDate}`);
+      let todayRevenue = todayRevenueRes.ok ? await todayRevenueRes.text() : "0";
+      safeSetInnerHTML(revenueToday, `₹${todayRevenue || 0}`);
+    } catch (error) {
+      safeSetInnerHTML(totalRevenue, "₹0");
+      safeSetInnerHTML(revenueToday, "₹0");
+    }
+  }
+  calculateRevenue();
+
+  async function renderRecentOrders() {
+    try {
+       restaurant = await fetchRestaurant();
+       id = restaurant.id;
+
+      let recentOrdersRes = await fetch(`${apiUrl}/orders/detail/restaurant/${id}`);
+      let recentOrdersData = [];
+      if (recentOrdersRes.ok) {
+        recentOrdersData = await recentOrdersRes.json();
       }
-      revenueToday.innerHTML = `₹${todayRevenue}`;
-    }
-    calculateRevenue()
+      let limitedOrders = Array.isArray(recentOrdersData) ? recentOrdersData.slice(0, 3) : [];
 
-    async function renderRecentOrders() {
-      currentRestaurantRes = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
-      currentRestaurant = await currentRestaurantRes.json();
-
-      currentRestaurantId = currentRestaurant.id;
-
-      //  recentOrdersRes = await fetch(`${apiUrl}/orders/recents/${currentRestaurantId}`);
-       recentOrdersRes = await fetch(`${apiUrl}/orders/detail/restaurant/${currentRestaurantId}`);
-
-       recentOrdersData = await recentOrdersRes.json(); 
-       limitedOrders = recentOrdersData.slice(0, 3); 
-// console.log(recentOrdersData)
-       tableBody = document.getElementById("recentOrdersTable");
+       tableBody = getTableBody("recentOrdersTable");
+      if (!tableBody) return;
       tableBody.innerHTML = "";
-      limitedOrders.forEach(order => {
-        tableBody.innerHTML += `
-      <tr>
-        <td>${order.orderID}</td>
-        <td>${order.customerName}</td>
-        <td>${order.orderDate}</td>
-        <td>₹${order.totalAmount}</td>
-      </tr>
-    `;
-      });
+
+      if (limitedOrders.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="4" class="text-center text-muted">No recent orders</td></tr>`;
+      } else {
+        limitedOrders.forEach(order => {
+          tableBody.innerHTML += `
+            <tr>
+              <td>${order.orderID ?? ""}</td>
+              <td>${order.customerName ?? ""}</td>
+              <td>${order.orderDate ?? ""}</td>
+              <td>₹${order.totalAmount ?? ""}</td>
+            </tr>
+          `;
+        });
+      }
+    } catch (error) {
+       tableBody = getTableBody("recentOrdersTable");
+      if (tableBody) tableBody.innerHTML = `<tr><td colspan="4" class="text-center text-danger">Error loading orders</td></tr>`;
     }
-    renderRecentOrders();
+  }
+  renderRecentOrders();
 
-    async function renderRecentFoodItems() {
-      currentRestaurantRes = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
-      currentRestaurant = await currentRestaurantRes.json();
-      currentRestaurantId = currentRestaurant.id;
+  async function renderRecentFoodItems() {
+    try {
+       restaurant = await fetchRestaurant();
+       id = restaurant.id;
 
-       res = await fetch(`${apiUrl}/fooditems/recent/${currentRestaurantId}`);
-       fooditems = await res.json();
-      tbody = document.getElementById("recentAddedItemTable");
-      tbody.innerHTML ="";
-      
-      fooditems.forEach(fooditem => {
-        row = document.createElement("tr");
-        row.innerHTML =` <td>${fooditem.id}</td>
-                        <td>${fooditem.name}</td>
-                        <td>${fooditem.category}</td>
-                        <td>${fooditem.price}</td>`;
-                        tbody.appendChild(row);      
-      })
-              
+      let res = await fetch(`${apiUrl}/fooditems/recent/${id}`);
+      let fooditems = [];
+      if (res.ok) {
+        fooditems = await res.json();
+      }
+       tbody = getTableBody("recentAddedItemTable");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+
+      if (!Array.isArray(fooditems) || fooditems.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted">No recent food items</td></tr>`;
+      } else {
+        fooditems.forEach(fooditem => {
+           row = document.createElement("tr");
+          row.innerHTML = `<td>${fooditem.id ?? ""}</td>
+                           <td>${fooditem.name ?? ""}</td>
+                           <td>${fooditem.category ?? ""}</td>
+                           <td>${fooditem.price ?? ""}</td>`;
+          tbody.appendChild(row);
+        });
+      }
+    } catch (error) {
+       tbody = getTableBody("recentAddedItemTable");
+      if (tbody) tbody.innerHTML = `<tr><td colspan="4" class="text-center text-danger">Error loading food items</td></tr>`;
     }
-    renderRecentFoodItems();
+  }
+  renderRecentFoodItems();
 
-    async function renderTopCustomers() {
-      currentRestaurantRes = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
-      currentRestaurant = await currentRestaurantRes.json();
-      currentRestaurantId = currentRestaurant.id;
+  async function renderTopCustomers() {
+    try {
+       restaurant = await fetchRestaurant();
+       id = restaurant.id;
 
-       res = await fetch(`${apiUrl}/restaurants/customers/details/${currentRestaurantId}`);
-       customers = await res.json();
+      let res = await fetch(`${apiUrl}/restaurants/customers/details/${id}`);
+      let customers = [];
+      if (res.ok) {
+        customers = await res.json();
+      }
+       tbody = getTableBody("topCustomersTable");
+      if (!tbody) return;
+      tbody.innerHTML = "";
 
-      tbody = document.getElementById("topCustomersTable");
-      tbody.innerHTML ="";
-      
-      customers.forEach(customer => {
-        row = document.createElement("tr");
-        row.innerHTML =` <td>${customer[0]}</td>
-                        <td>${customer[1]}</td>
-                        <td>${customer[2]}</td>
-                        <td>${customer[3]}</td>
-                        <td>${customer[4]}</td>`;
-                        tbody.appendChild(row);      
-      })
-              
+      if (!Array.isArray(customers) || customers.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">No customer data</td></tr>`;
+      } else {
+        customers.forEach(customer => {
+           row = document.createElement("tr");
+          row.innerHTML = `<td>${customer[0] ?? ""}</td>
+                           <td>${customer[1] ?? ""}</td>
+                           <td>${customer[2] ?? ""}</td>
+                           <td>${customer[3] ?? ""}</td>
+                           <td>${customer[4] ?? ""}</td>`;
+          tbody.appendChild(row);
+        });
+      }
+    } catch (error) {
+       tbody = getTableBody("topCustomersTable");
+      if (tbody) tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">Error loading customers</td></tr>`;
     }
-    renderTopCustomers();
+  }
+  renderTopCustomers();
+
   </script>
 </body>
 

@@ -18,39 +18,37 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
 
-
-
 @Entity
-@Table(name="reviews")
+@Table(name = "reviews")
 public class Review {
-   @Id
-   @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @ManyToOne
     @JsonBackReference
-    @JoinColumn(name="restaurant_id")
+    @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
-	
-	@NotNull(message = "Rating must not be null")
+
+    @NotNull(message = "Rating must not be null")
     @DecimalMin(value = "0.0", message = "Rating must be at least 0.0")
     @DecimalMax(value = "5.0", message = "Rating must be at most 5.0")
-	private Float rating;
-	
+    private Float rating;
+
     @NotBlank(message = "Feedback must not be blank")
     @Size(max = 500, message = "Feedback must be less than 500 characters")
     private String feedback;
-    
+
     @NotNull(message = "Date must not be null")
     @PastOrPresent(message = "Date cannot be in the future")
     private LocalDate date;
-    
+
     @NotNull(message = "User ID must not be null")
     private Long userId;
 
     public Review() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
     public Review(Long id, Float rating, String feedback, LocalDate date, Long userId) {
@@ -68,6 +66,14 @@ public class Review {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Restaurant getRestaurant() {
+        return restaurant;
+    }
+
+    public void setRestaurant(Restaurant restaurant) {
+        this.restaurant = restaurant;
     }
 
     public Float getRating() {
@@ -101,19 +107,10 @@ public class Review {
     public void setUserId(Long userId) {
         this.userId = userId;
     }
-    
-    public Restaurant getRestaurant() {
-		return restaurant;
-	}
-
-	public void setRestaurant(Restaurant restaurant) {
-		this.restaurant = restaurant;
-	}
 
     @Override
     public String toString() {
-        return "Reviews [id=" + id + ", rating=" + rating + ", feedback=" + feedback
+        return "Review [id=" + id + ", rating=" + rating + ", feedback=" + feedback
                 + ", date=" + date + ", userId=" + userId + "]";
     }
-
 }
