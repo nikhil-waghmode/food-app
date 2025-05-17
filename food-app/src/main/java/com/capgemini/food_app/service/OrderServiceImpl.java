@@ -1,12 +1,17 @@
 package com.capgemini.food_app.service;
 
+import com.capgemini.food_app.dto.OrderDTO;
 import com.capgemini.food_app.exception.OrderNotFoundException;
 import com.capgemini.food_app.model.Order;
 import com.capgemini.food_app.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 //edited
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -72,6 +77,7 @@ public class OrderServiceImpl implements OrderService {
     public void deleteOrder(Long id) {
         orderRepository.deleteById(id);
     }
+
     
     
     @Override
@@ -97,5 +103,43 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public List<Object[]> getRevenuePerMonth() {
 		return orderRepository.getRevenuePerMonth();
+	}
+    @Override
+	public List<OrderDTO> getMyOrdersDetailsForCustomer(Long customerID) {
+
+		List<Object[]> rows = orderRepository.getMyOrdersDetailsForCustomer(customerID);
+		Map<Long, OrderDTO> orderMap = new LinkedHashMap<>(); // preserves insertion order
+
+		for (Object[] row : rows) {
+			Long orderID = ((Number) row[0]).longValue();
+//			String customerName = (String) row[1];
+//			String customerLocation = (String) row[2];
+			LocalDate orderDate = ((java.sql.Date) row[1]).toLocalDate();
+			String itemName = (String) row[2];
+			Integer itemPrice = ((Number) row[3]).intValue();
+			Integer quantity = ((Number) row[4]).intValue();
+			Long totalAmount = ((Number) row[5]).longValue();
+			String restaurantID = (String) row[6];
+			OrderDTO dto = orderMap.get(orderID);
+
+			if (dto == null) {
+				dto = new OrderDTO();
+				dto.setOrderID(orderID);
+//				dto.setCustomerName(customerName);
+//				dto.setCustomerLocation(customerLocation);
+				dto.setOrderDate(orderDate);
+				dto.setItemPrice(itemPrice);
+				dto.setTotalAmount(totalAmount);
+				dto.setRestaurantID(restaurantID);
+				orderMap.put(orderID, dto);
+			}
+
+			// Add item to list
+			dto.getItems().add(String.format("%s (x%d)", itemName, quantity));
+		}
+//		System.out.println(orderMap.values());
+
+		return new ArrayList<>(orderMap.values());
+
 	}
 }

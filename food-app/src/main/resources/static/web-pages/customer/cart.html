@@ -44,6 +44,7 @@
       /* Compensate for fixed navbar */
     }
   </style>
+  <script src="../js/script.js"></script>
   <script>
     // Function to load the layout (header + footer)
     function includeLayout() {
@@ -92,8 +93,10 @@
         alert("Cart is empty.");
         return;
       }
-      console.log(cart)
+      console.log(cart);
       restaurantID = cart[0].restaurantID;
+      console.log("printing restaurantID form cart");
+      console.log(restaurantID);
       totalAmount = cart.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
 
       try {
@@ -101,9 +104,9 @@
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            userID: userId,
-            restaurantID: restaurantID,
-            orderDate: new Date().toISOString(),
+            userId: userId,
+            restaurantId: restaurantID,
+            date: new Date().toISOString(),            
             totalAmount: totalAmount
           })
         });
@@ -115,15 +118,15 @@
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              orderID: newOrder.id,
-              itemID: item.id,
+              orderId: newOrder.id,
+              itemId: item.id,
               quantity: item.quantity
             })
           });
         }
         clearCart();
         alert("Order placed successfully!");
-        window.location.href = "./my-orders.html"
+        window.location.href = "./my-orders.html";
 
 
       } catch (error) {

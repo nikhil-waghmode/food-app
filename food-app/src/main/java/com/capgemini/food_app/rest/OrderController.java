@@ -1,5 +1,6 @@
 package com.capgemini.food_app.rest;
 
+import com.capgemini.food_app.dto.OrderDTO;
 import com.capgemini.food_app.model.Order;
 import com.capgemini.food_app.repository.OrderRepository;
 import com.capgemini.food_app.service.OrderService;
@@ -47,6 +48,9 @@ public class OrderController {
     public ResponseEntity<List<Order>> getAllOrders() {
         return ResponseEntity.ok(orderService.getAllOrders());
     }
+    
+    
+    
 
     @PutMapping("/{id}")
     public ResponseEntity<Order> updateOrder(@PathVariable Long id, @Valid @RequestBody Order order) {
@@ -68,6 +72,7 @@ public class OrderController {
         orderService.deleteOrder(id);
         return ResponseEntity.noContent().build();
     }
+
 
 //    @GetMapping("/recents")
 //    public ResponseEntity<List<Order>> getRecentOrders() {
@@ -94,4 +99,10 @@ public class OrderController {
 	public ResponseEntity<List<Object[]>> getRevenueByCategoryForAdmin() {
 		return ResponseEntity.status(HttpStatus.OK).body(orderService.getRevenueByCategoryForAdmin());
     }
+
+    @GetMapping("/detail/customer/{customerID}")
+	ResponseEntity<List<OrderDTO>> getMyOrdersDetailsForCustomer(@PathVariable Long customerID) {
+		return ResponseEntity.status(HttpStatus.OK).body(orderService.getMyOrdersDetailsForCustomer(customerID));
+	}
+
 }

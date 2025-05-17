@@ -44,17 +44,15 @@
         <div id="orders-container" class="row"></div>
     </div>
 
+	<script src="../js/script.js"></script>
     <script>
 
         async function fetchMyOrders() {
             currentUserId = localStorage.getItem("currentUserId")
-
-            // console.log(currentUserId)
-
+            
             myOrdersRes = await fetch(`${apiUrl}/orders/detail/customer/${currentUserId}`);
-            // console.log(myOrdersRes)
             myOrdersData = await myOrdersRes.json();
-            // console.log("myOrdersData", myOrdersData)
+            console.log("myOrdersData", myOrdersData)
             container = document.getElementById("orders-container");
 
 

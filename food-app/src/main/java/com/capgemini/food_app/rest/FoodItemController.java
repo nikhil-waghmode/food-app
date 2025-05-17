@@ -52,6 +52,7 @@ public class FoodItemController {
 		foodItemService.deleteFoodItem(id);
 	}
 
+
 //    @GetMapping("/restaurant/{restaurantId}")
 //    public List<FoodItem> getFoodItemsByRestaurantId(@PathVariable Long restaurantId) {
 //        return foodItemService.getFoodItemsForRestaurant(restaurantId);
@@ -68,4 +69,9 @@ public class FoodItemController {
 		FoodItem foodItem = foodItemService.getLeastOrderedFoodItem();
 		return foodItem != null ? ResponseEntity.ok(foodItem) : ResponseEntity.noContent().build();
 	}
+
+    @GetMapping("/restaurant/{restaurantId}")
+    public List<FoodItem> getFoodItemsByRestaurantId(@PathVariable Long restaurantId) {
+        return foodItemService.getFoodItemsForRestaurant(restaurantId);
+    }
 }
