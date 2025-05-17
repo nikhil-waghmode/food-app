@@ -19,6 +19,11 @@ public interface FoodItemService {
 	void deleteFoodItem(Long id);
 
 	List<FoodItem> getFoodItemsForRestaurant(Long restaurantID);
+	
+	FoodItem getMostOrderedFoodItem();
+
+	FoodItem getLeastOrderedFoodItem();
+	
 
 
 }

@@ -41,9 +41,9 @@ public class UserServiceImpl implements UserService{
 			present.setUserType(updated.getUserType());
 			present.setLocation(updated.getLocation());
 			present.setUserImg(updated.getUserImg());
-			if(userRepository.existsByEmail(updated.getEmail())) {
-				throw new EmailAlreadyExistsException("Email already exists");
-			}
+//			if(userRepository.existsByEmail(updated.getEmail())) {
+//				throw new EmailAlreadyExistsException("Email already exists");
+//			}
 			return userRepository.save(present);
 
 	}
