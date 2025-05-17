@@ -42,7 +42,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 	List<Object[]> getRecentOrdersByRestaurantId(Long restaurantId);
 
 	@Query(value = "SELECT o.id, u.name, u.location, o.date, fi.name, oi.quantity, o.total_amount " + "FROM orders o "
-			+ "JOIN users u ON o.user_id = u.id " + "JOIN order_item oi ON o.id = oi.order_id "
+			+ "JOIN users u ON o.user_id = u.id " + "JOIN order_items oi ON o.id = oi.order_id "
 			+ "JOIN food_items fi ON oi.item_id = fi.id " + "WHERE o.restaurant_id = ?1 "
 			+ "ORDER BY o.date DESC", nativeQuery = true)
 	List<Object[]> getOrderDetailsByRestaurantId(Long restaurantId);
@@ -53,17 +53,21 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 	@NativeQuery("SELECT o.id, u.name, u.location, o.date, fi.name, oi.quantity, o.total_amount FROM orders o, order_items oi, users u, food_items fi, restaurants r WHERE o.user_id = u.id AND o.id = oi.order_id AND oi.item_id = fi.id AND o.restaurant_id = r.id AND r.id = ?1")
 	List<Object[]> getViewOrdersDetailsByRestaurantID(Long restaurantID);
 
-	@Query(
-			  value = "SELECT o.id, u.name, u.location, o.date, fi.name, oi.quantity, o.total_amount " +
-			          "FROM orders o, order_items oi, users u, food_items fi, restaurants r " +
-			          "WHERE o.user_id = u.id " +
-			          "AND o.id = oi.order_id " +
-			          "AND oi.item_id = fi.id " +
-			          "AND o.restaurant_id = r.id " +
-			          "AND r.id = ?1 " +
-			          "AND o.date = ?2",
-			  nativeQuery = true
-			)
-			List<Object[]> getViewOrdersDetailsByRestaurantIDAndOrderDate(Long restaurantID, LocalDate orderDate);
+	@Query(value = "SELECT o.id, u.name, u.location, o.date, fi.name, oi.quantity, o.total_amount "
+			+ "FROM orders o, order_items oi, users u, food_items fi, restaurants r " + "WHERE o.user_id = u.id "
+			+ "AND o.id = oi.order_id " + "AND oi.item_id = fi.id " + "AND o.restaurant_id = r.id " + "AND r.id = ?1 "
+			+ "AND o.date = ?2", nativeQuery = true)
+	List<Object[]> getViewOrdersDetailsByRestaurantIDAndOrderDate(Long restaurantID, LocalDate orderDate);
 
+	@NativeQuery("SELECT fi.category, SUM(fi.price * oi.quantity) AS revenue FROM order_items oi, food_items fi, orders o WHERE oi.item_id = fi.id AND oi.order_id = o.id AND fi.restaurant_id = ?1 GROUP BY fi.category")
+	List<Object[]> getRevenueByCategory(Long restaurantID);
+
+	@NativeQuery("select WEEK(date) as Weeks, COUNT(*) AS Orders from orders o WHERE o.restaurant_id=?1 group by Weeks order by Weeks;")
+	List<Object[]> dataForOrdersPerWeekChart(Long restaurantID);
+
+	@NativeQuery("select WEEK(date) as Weeks, SUM(o.total_amount) AS Orders from orders o WHERE o.restaurant_id=?1 group by Weeks order by Weeks;")
+	List<Object[]> dataForRevenuePerWeekChart(Long restaurantID);
+
+	@NativeQuery("select MONTH(date) as Months, SUM(o.total_amount) AS Orders from orders o WHERE o.restaurant_id=?1 group by Months order by Months;")
+	List<Object[]> dataForRevenuePerMonthChart(Long restaurantID);
 }

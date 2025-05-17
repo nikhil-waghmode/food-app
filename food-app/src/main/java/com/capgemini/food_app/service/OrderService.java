@@ -37,4 +37,11 @@ public interface OrderService {
 
 	public List<OrderDTO> getViewOrdersDetailsForRestaurant(Long restaurantId, LocalDate date);
 
+	List<Object[]> dataForOrdersPerWeekChart(Long restaurantID);
+
+	List<Object[]> dataForRevenuePerWeekChart(Long restaurantID);
+
+	List<Object[]> dataForRevenuePerMonthChart(Long restaurantID);
+
+	List<Object[]> getRevenueByCategory(Long restaurantID);
 }

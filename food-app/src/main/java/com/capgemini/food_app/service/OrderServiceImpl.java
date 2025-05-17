@@ -104,63 +104,88 @@ public class OrderServiceImpl implements OrderService {
 	public Double getRevenueByRestaurantAndDate(Long restaurantId, LocalDate date) {
 		return orderRepository.getRevenueByRestaurantAndDate(restaurantId, date);
 	}
+
 	@Override
 	public List<OrderDTO> getRecentOrdersByRestaurantId(Long restaurantId) {
-	    List<Object[]> rows = orderRepository.getRecentOrdersByRestaurantId(restaurantId);
-	    List<OrderDTO> dtos = new ArrayList<>();
-	    for (Object[] row : rows) {
-	        OrderDTO dto = new OrderDTO();
-	        dto.setOrderID(((Number) row[0]).longValue());
-	        dto.setCustomerName((String) row[1]);
-	        dto.setOrderDate(((java.sql.Date) row[2]).toLocalDate());
-	        dto.setTotalAmount(((Number) row[3]).doubleValue());
-	        dtos.add(dto);
-	    }
-	    return dtos;
+		List<Object[]> rows = orderRepository.getRecentOrdersByRestaurantId(restaurantId);
+		List<OrderDTO> dtos = new ArrayList<>();
+		for (Object[] row : rows) {
+			OrderDTO dto = new OrderDTO();
+			dto.setOrderID(((Number) row[0]).longValue());
+			dto.setCustomerName((String) row[1]);
+			dto.setOrderDate(((java.sql.Date) row[2]).toLocalDate());
+			dto.setTotalAmount(((Number) row[3]).doubleValue());
+			dtos.add(dto);
+		}
+		return dtos;
 	}
+
 	@Override
 	public List<OrderDTO> getViewOrdersDetailsForRestaurant(Long restaurantId, LocalDate date) {
-	    List<Object[]> rows;
-	    // Fetch rows based on date filter
-	    if (date == null) {
-	        rows = orderRepository.getViewOrdersDetailsByRestaurantID(restaurantId);
-	    } else {
-	        rows = orderRepository.getViewOrdersDetailsByRestaurantIDAndOrderDate(restaurantId, date);
-	    }
+		List<Object[]> rows;
+		// Fetch rows based on date filter
+		if (date == null) {
+			rows = orderRepository.getViewOrdersDetailsByRestaurantID(restaurantId);
+		} else {
+			rows = orderRepository.getViewOrdersDetailsByRestaurantIDAndOrderDate(restaurantId, date);
+		}
 
-	    // Use LinkedHashMap to preserve insertion order and group by orderID
-	    Map<Long, OrderDTO> orderMap = new LinkedHashMap<>();
+		// Use LinkedHashMap to preserve insertion order and group by orderID
+		Map<Long, OrderDTO> orderMap = new LinkedHashMap<>();
 
-	    for (Object[] row : rows) {
-	    	Long orderID = ((Number) row[0]).longValue();
-	    	String customerName = (String) row[1];
-	    	String customerLocation = (String) row[2];
-	    	LocalDate orderDate = ((java.sql.Date) row[3]).toLocalDate();
-	    	String itemName = (String) row[4];
-	    	Integer quantity = ((Number) row[5]).intValue();
-	    	Double totalAmount = ((Number) row[6]).doubleValue();
+		for (Object[] row : rows) {
+			Long orderID = ((Number) row[0]).longValue();
+			String customerName = (String) row[1];
+			String customerLocation = (String) row[2];
+			LocalDate orderDate = ((java.sql.Date) row[3]).toLocalDate();
+			String itemName = (String) row[4];
+			Integer quantity = ((Number) row[5]).intValue();
+			Double totalAmount = ((Number) row[6]).doubleValue();
 
-	        // Get or create DTO for this order
-	    	OrderDTO dto = orderMap.get(orderID);
-	    	if (dto == null) {
-	    	    dto = new OrderDTO();
-	    	    dto.setOrderID(orderID);
-	    	    dto.setCustomerName(customerName);
-	    	    dto.setCustomerLocation(customerLocation);
-	    	    dto.setOrderDate(orderDate);
-	    	    dto.setTotalAmount(totalAmount);
-	    	    orderMap.put(orderID, dto);
-	    	}
-	    	// Add item to items list
-	    	dto.getItems().add(String.format("%s (x%d)", itemName, quantity));
-	    	System.out.println("OrderID: " + orderID + ", Customer: " + customerName + ", Location: " + customerLocation + ", Date: " + orderDate + ", Item: " + itemName + ", Qty: " + quantity + ", Total: " + totalAmount);
+			// Get or create DTO for this order
+			OrderDTO dto = orderMap.get(orderID);
+			if (dto == null) {
+				dto = new OrderDTO();
+				dto.setOrderID(orderID);
+				dto.setCustomerName(customerName);
+				dto.setCustomerLocation(customerLocation);
+				dto.setOrderDate(orderDate);
+				dto.setTotalAmount(totalAmount);
+				orderMap.put(orderID, dto);
+			}
+			// Add item to items list
+			dto.getItems().add(String.format("%s (x%d)", itemName, quantity));
+			System.out.println("OrderID: " + orderID + ", Customer: " + customerName + ", Location: " + customerLocation
+					+ ", Date: " + orderDate + ", Item: " + itemName + ", Qty: " + quantity + ", Total: "
+					+ totalAmount);
 
-	    }
+		}
 
-	    // Return as a list
-	    return new ArrayList<>(orderMap.values());
+		// Return as a list
+		return new ArrayList<>(orderMap.values());
 	}
 
+	@Override
+	public List<Object[]> getRevenueByCategory(Long restaurantID) {
+		return orderRepository.getRevenueByCategory(restaurantID);
+	}
 
+	@Override
+	public List<Object[]> dataForOrdersPerWeekChart(Long restaurantID) {
+		// TODO Auto-generated method stub
+		return orderRepository.dataForOrdersPerWeekChart(restaurantID);
+	}
+
+	@Override
+	public List<Object[]> dataForRevenuePerWeekChart(Long restaurantID) {
+		// TODO Auto-generated method stub
+		return orderRepository.dataForRevenuePerWeekChart(restaurantID);
+	}
+
+	@Override
+	public List<Object[]> dataForRevenuePerMonthChart(Long restaurantID) {
+		// TODO Auto-generated method stub
+		return orderRepository.dataForRevenuePerMonthChart(restaurantID);
+	}
 
 }

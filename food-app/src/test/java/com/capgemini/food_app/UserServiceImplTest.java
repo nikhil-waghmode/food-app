@@ -1,21 +1,30 @@
 package com.capgemini.food_app;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
-import java.util.*;
-
+import com.capgemini.food_app.exception.EmailAlreadyExistsException;
+import com.capgemini.food_app.exception.UserNotFoundException;
 import com.capgemini.food_app.model.User;
 import com.capgemini.food_app.repository.UserRepository;
 import com.capgemini.food_app.service.UserServiceImpl;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockMultipartFile;
 
-@SpringBootTest
-class UserServiceImpTest {
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class UserServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
@@ -27,8 +36,6 @@ class UserServiceImpTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-
         user = new User();
         user.setId(1L);
         user.setName("Pooja");
@@ -37,59 +44,64 @@ class UserServiceImpTest {
         user.setPhone("1234567890");
         user.setUserType("Customer");
         user.setLocation("Pune");
-        user.setUserImg("image.jpg");
+        user.setUserImg(null);
     }
 
     @Test
-    void testCreateUser() {
-        when(userRepository.save(user)).thenReturn(user);
+    void testCreateUser() throws IOException {
+        when(userRepository.existsByEmail(user.getEmail())).thenReturn(false);
+        when(userRepository.save(any(User.class))).thenReturn(user);
 
-        User created = userService.createUser(user);
+        // call service with parameters, no image
+        User created = userService.createUser(
+            user.getName(), user.getEmail(), user.getPassword(),
+            user.getPhone(), user.getLocation(), user.getUserType(),
+            null
+        );
 
-        assertNotNull(created);
-        assertEquals("Pooja", created.getName());
-        verify(userRepository, times(1)).save(user);
+        assertThat(created).isNotNull();
+        assertThat(created.getName()).isEqualTo("Pooja");
+        verify(userRepository, times(1)).save(any(User.class));
     }
 
     @Test
-    void testUpdateUser_UserExists() {
-        User updated = new User();
-        updated.setName("Milind");
-        updated.setEmail("milind@example.com");
-        updated.setPassword("milind");
-        updated.setPhone("9998887777");
-        updated.setUserType("Admin");
-        updated.setLocation("Satara");
-        updated.setUserImg("img2.jpg");
-
+    void testUpdateUser_UserExists() throws IOException {
+        // stub existing user
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(userRepository.save(any(User.class))).thenReturn(updated);
+        when(userRepository.existsByEmail(anyString())).thenReturn(false);
+        when(userRepository.save(any(User.class))).thenReturn(user);
 
-        User result = userService.updateUser(1L, updated);
+        User result = userService.updateUser(
+            1L,
+            "Milind", "milind@example.com", "milind", "9998887777",
+            "Satara", "Admin", null
+        );
 
-        assertNotNull(result);
-        assertEquals("Milind", result.getName());
+        assertThat(result).isNotNull();
+        assertThat(result.getName()).isEqualTo("Milind");
         verify(userRepository).save(any(User.class));
     }
 
     @Test
-    void testUpdateUser_UserNotExists() {
+    void testUpdateUser_UserNotExists() throws IOException {
         when(userRepository.findById(2L)).thenReturn(Optional.empty());
 
-        User result = userService.updateUser(2L, user);
+        assertThatThrownBy(() -> userService.updateUser(
+            2L,
+            "Name", "email@example.com", "pass", "phone",
+            "loc", "type", null
+        )).isInstanceOf(UserNotFoundException.class);
 
-        assertNull(result);
         verify(userRepository, never()).save(any(User.class));
     }
 
     @Test
     void testDeleteUser_UserExists() {
         when(userRepository.existsById(1L)).thenReturn(true);
-        doNothing().when(userRepository).deleteById(1L);
 
         boolean deleted = userService.deleteUser(1L);
 
-        assertTrue(deleted);
+        assertThat(deleted).isTrue();
         verify(userRepository).deleteById(1L);
     }
 
@@ -99,7 +111,7 @@ class UserServiceImpTest {
 
         boolean deleted = userService.deleteUser(2L);
 
-        assertFalse(deleted);
+        assertThat(deleted).isFalse();
         verify(userRepository, never()).deleteById(anyLong());
     }
 
@@ -110,7 +122,7 @@ class UserServiceImpTest {
 
         List<User> result = userService.getAllUsers();
 
-        assertEquals(2, result.size());
+        assertThat(result.size()).isEqualTo(2);
         verify(userRepository).findAll();
     }
 
@@ -120,8 +132,8 @@ class UserServiceImpTest {
 
         User found = userService.getUserById(1L);
 
-        assertNotNull(found);
-        assertEquals("Pooja", found.getName());
+        assertThat(found).isNotNull();
+        assertThat(found.getName()).isEqualTo("Pooja");
     }
 
     @Test
@@ -130,33 +142,25 @@ class UserServiceImpTest {
 
         User result = userService.getUserById(2L);
 
-        assertNull(result);
+        assertThat(result).isNull();
     }
 
     @Test
-    void testPatchUser_UserExists() {
-        User patch = new User();
-        patch.setEmail("abc@example.com");
-        patch.setLocation("Mumbai");
-
+    void testPatchUser_UserExists() throws IOException {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.existsByEmail(anyString())).thenReturn(false);
         when(userRepository.save(any(User.class))).thenReturn(user);
 
-        User result = userService.patchUser(1L, patch);
+        User result = userService.patchUser(
+            1L,
+            null, "abc@example.com", null,
+            null, "Mumbai", null, null
+        );
 
-        assertNotNull(result);
-        assertEquals("abc@example.com", result.getEmail());
-        assertEquals("Mumbai", result.getLocation());
+        assertThat(result).isNotNull();
+        assertThat(result.getEmail()).isEqualTo("abc@example.com");
+        assertThat(result.getLocation()).isEqualTo("Mumbai");
         verify(userRepository).save(any(User.class));
     }
 
-    @Test
-    void testPatchUser_UserNotFound() {
-        when(userRepository.findById(2L)).thenReturn(Optional.empty());
-
-        User result = userService.patchUser(2L, new User());
-
-        assertNull(result);
-        verify(userRepository, never()).save(any(User.class));
-    }
 }

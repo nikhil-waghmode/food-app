@@ -368,7 +368,7 @@ console.log(currentOwnerId)
         console.log(restaurant)
 
         document.getElementById("reportRestaurantName").textContent = restaurant.name;
-        document.getElementById("reportRestaurantPhone").textContent = restaurant.phone;
+        document.getElementById("reportRestaurantPhone").textContent = restaurant.contact;
         document.getElementById("reportRestaurantLocation").textContent = restaurant.location;
         document.getElementById('restaurantImage').src = `${apiUrl}/restaurants/image/${restaurant.resImage}`;
         document.getElementById('restaurantImage').alt = restaurant.name;

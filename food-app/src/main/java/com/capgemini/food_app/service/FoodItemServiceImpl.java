@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -168,6 +169,21 @@ public class FoodItemServiceImpl implements FoodItemService {
 		return foodItemRepo.findRecentlyAddedItemByRestaurantID(restaurantID);
 	}
 
-	
+	@Override
+	public List<Object[]> getBottom1FoodItemByRestaurantID(Long restaurantID) {
+		// TODO Auto-generated method stub
+		return foodItemRepo.getBottom1FoodItemByRestaurantID(restaurantID);
+	}
+
+	@Override
+	public List<Object[]> getTop1FoodItemByRestaurantID(Long restaurantID) {
+		// TODO Auto-generated method stub
+		return foodItemRepo.getTop1FoodItemByRestaurantID(restaurantID);
+	}
+	@Override
+	public List<Object[]> getItemsSoldByRestaurantIDAndOnDate(Long restaurantID, LocalDate date) {
+		// TODO Auto-generated method stub
+		return foodItemRepo.getItemsSoldByRestaurantIDAndOnDate(restaurantID, date);
+	}
 
 }
