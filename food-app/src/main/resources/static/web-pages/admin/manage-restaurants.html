@@ -139,8 +139,6 @@ async function renderRestaurants(restaurantsData) {
       });
 
 }
-//
-
     // //renders contents in table body. Display Function.
     // function renderRestaurants(restaurants) {
     //   //for Owner Name
@@ -188,18 +186,14 @@ async function renderRestaurants(restaurantsData) {
     //     });
     //   });
     // }
-
-    function deleteRestaurant(id) {
+	function deleteRestaurant(id) {
       if (confirm("Are you sure you want to delete this restaurant?")) {
         fetch(`${apiUrl}/restaurants/${id}`, {
           method: "DELETE"
         }).then(() => fetchAndRenderRestaurants());
       }
     }
-
-
-
-    function loadRestaurantForEdit(id) {
+	function loadRestaurantForEdit(id) {
       fetch(`${apiUrl}/restaurants/${id}`)
         .then(response => response.json())
         .then(data => {
@@ -212,8 +206,7 @@ async function renderRestaurants(restaurantsData) {
           location.hash = "#top";
         });
     }
-
-    // Add validation functions here
+	// Add validation functions here
     restPhoneInput.addEventListener("input", () => {
       isValid = true;
       phoneRegex = /^[789]\d{9}$/;
