@@ -1,6 +1,7 @@
 package com.capgemini.food_app.service;
 
 import com.capgemini.food_app.exception.OwnerAlreadyHasRestaurantException;
+import com.capgemini.food_app.exception.RestaurantNotFoundException;
 import com.capgemini.food_app.model.Restaurant;
 import com.capgemini.food_app.repository.RestaurantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +44,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     @Override
     public Restaurant getRestaurantById(Long id) {
         return restaurantRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Restaurant not found with ID: " + id));
+                .orElseThrow(() -> new RestaurantNotFoundException("Restaurant not found with ID: " + id));
     }
 
     @Override
@@ -132,7 +133,7 @@ public class RestaurantServiceImpl implements RestaurantService {
         restaurant.setRestaurantImg(newFilename);
     }
 
-    private void deleteImage(String filename) {
+    public void deleteImage(String filename) {
         if (filename == null) return;
 
         try {

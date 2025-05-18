@@ -1,6 +1,5 @@
 package com.capgemini.food_app;
 
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -21,7 +20,7 @@ import com.capgemini.food_app.model.Order;
 import com.capgemini.food_app.rest.OrderController;
 import com.capgemini.food_app.service.OrderService;
 
-class OrderControllerTest {
+public class OrderControllerTest {
 
     @Mock
     private OrderService orderService;
@@ -117,6 +116,15 @@ class OrderControllerTest {
     }
 
     @Test
+    @DisplayName("Patch Order - Should throw OrderNotFoundException on failure")
+    void testPatchOrder_Exception() {
+        when(orderService.patchOrder(eq(1L), any(Order.class))).thenThrow(new OrderNotFoundException("Patch failed"));
+
+        assertThrows(OrderNotFoundException.class, () -> orderController.patchOrder(1L, sampleOrder));
+        verify(orderService).patchOrder(1L, sampleOrder);
+    }
+
+    @Test
     @DisplayName("Delete Order - Should return NO_CONTENT status")
     void testDeleteOrder() {
         doNothing().when(orderService).deleteOrder(1L);
@@ -126,23 +134,17 @@ class OrderControllerTest {
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         verify(orderService).deleteOrder(1L);
     }
+
     @Test
-    @DisplayName("Get Order By ID - Should throw RuntimeException when not found")
+    @DisplayName("Get Order By ID - Should return NOT_FOUND when not found")
     void testGetOrderById_Exception() {
         when(orderService.getOrderById(1L)).thenThrow(new OrderNotFoundException("Order not found"));
 
-        assertThrows(OrderNotFoundException.class, () -> orderController.getOrderById(1L));
+        ResponseEntity<Order> response = orderController.getOrderById(1L);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertNull(response.getBody());
         verify(orderService).getOrderById(1L);
     }
-    
-    @Test
-    @DisplayName("Patch Order - Should throw RuntimeException on failure")
-    void testPatchOrder_Exception() {
-        when(orderService.patchOrder(eq(1L), any(Order.class))).thenThrow(new OrderNotFoundException("Patch failed"));
-
-        assertThrows(OrderNotFoundException.class, () -> orderController.patchOrder(1L, sampleOrder));
-        verify(orderService).patchOrder(1L, sampleOrder);
-    }
-
 
 }

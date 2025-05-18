@@ -72,6 +72,14 @@ function getUserType() {
     return decoded.usertype;
 }
 
+function getCurrentRestaurantId() {
+    const token = localStorage.getItem("token");
+    if (!token)
+        window.location.href = "login.html";
+    const decoded = decodeJWT(token);
+    return decoded.currentRestaurantId;
+}
+
 function getAuthorization() {
     const token = localStorage.getItem("token");
     if (!token)
@@ -83,7 +91,7 @@ function getAuthorization() {
 function logout() {
     localStorage.removeItem("token");
     localStorage.clear();
-    window.location.href = "login.html";
+    window.location.href = "../pages/login.html";
 }
 
 apiUrl = "http://localhost:8080/api";

@@ -5,8 +5,10 @@ import com.capgemini.food_app.service.RestaurantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,6 +21,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/restaurants")
+//@PreAuthorize("hasRole('CUSTOMER') or hasRole('ADMIN') or hasRole('OWNER')")
+
 public class RestaurantController {
 
     private final RestaurantService restaurantService;
@@ -94,22 +98,22 @@ public class RestaurantController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/image/{filename:.+}")
-    public ResponseEntity<Resource> getImage(@PathVariable String filename) throws IOException {
-        Path filePath = Paths.get("uploads/restaurants", filename);
+	@GetMapping("/image/{filename}")
+	public ResponseEntity<Resource> getImage(@PathVariable String filename) throws IOException {
 
-        if (!Files.exists(filePath)) {
-            return ResponseEntity.notFound().build();
-        }
+		Path filePath = Paths.get("uploads/fooditems", filename);
 
-        Resource resource = new UrlResource(filePath.toUri());
-        String contentType = Files.probeContentType(filePath);
-        if (contentType == null) {
-            contentType = "application/octet-stream";
-        }
+		if (!Files.exists(filePath)) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
 
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .body(resource);
-    }
+		Resource resource = new UrlResource(filePath.toUri());
+
+		String contentType = Files.probeContentType(filePath);
+		if (contentType == null) {
+			contentType = "application/octet-stream"; // default fallback
+		}
+
+		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType)).body(resource);
+	}
 }

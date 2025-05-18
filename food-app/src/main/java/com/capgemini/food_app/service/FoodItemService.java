@@ -1,6 +1,9 @@
 package com.capgemini.food_app.service;
 
+import java.io.IOException;
 import java.util.List;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import com.capgemini.food_app.model.FoodItem;
 
@@ -10,8 +13,6 @@ public interface FoodItemService {
 
 	FoodItem getFoodItemById(Long id);
 
-	FoodItem createFoodItem(FoodItem foodItem);
-
 	FoodItem updateFoodItem(Long id, FoodItem foodItem);
 
 	FoodItem patchFoodItem(Long id, FoodItem foodItem);
@@ -19,6 +20,20 @@ public interface FoodItemService {
 	void deleteFoodItem(Long id);
 
 	List<FoodItem> getFoodItemsForRestaurant(Long restaurantID);
-
+    
+    
+    
+    FoodItem createFoodItemWithImage(String name, String category, Integer price, 
+                                    String cuisine, Long restaurantId, MultipartFile file) throws IOException;
+    
+    
+    
+      
+    List<FoodItem> searchFoodItems(String keyword);
+    
+    List<FoodItem> getFoodItemsByCuisine(String cuisine);
+    
+    List<FoodItem> getFoodItemsByCategory(String category);
+    
 
 }

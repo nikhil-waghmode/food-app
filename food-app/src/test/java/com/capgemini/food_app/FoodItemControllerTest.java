@@ -6,6 +6,8 @@ import com.capgemini.food_app.service.FoodItemService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.util.Arrays;
 import java.util.List;
@@ -34,30 +36,44 @@ class FoodItemControllerTest {
         List<FoodItem> foodItems = Arrays.asList(foodItem);
         when(foodItemService.getAllFoodItems()).thenReturn(foodItems);
 
-        List<FoodItem> result = foodItemController.getAllFoodItems();
+        ResponseEntity<List<FoodItem>> response = foodItemController.getAllFoodItems();
 
-        assertEquals(1, result.size());
-        assertEquals("Pizza", result.get(0).getName());
-        verify(foodItemService, times(1)).getAllFoodItems();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(1, response.getBody().size());
+        assertEquals("Pizza", response.getBody().get(0).getName());
+        verify(foodItemService).getAllFoodItems();
     }
 
     @Test
     void testGetFoodItemById() {
         when(foodItemService.getFoodItemById(1L)).thenReturn(foodItem);
 
-        FoodItem result = foodItemController.getFoodItemById(1L);
+        ResponseEntity<FoodItem> response = foodItemController.getFoodItemById(1L);
 
-        assertEquals("Pizza", result.getName());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Pizza", response.getBody().getName());
         verify(foodItemService).getFoodItemById(1L);
+    }
+
+    @Test
+    void testGetFoodItemById_NotFound() {
+        when(foodItemService.getFoodItemById(99L)).thenReturn(null);
+
+        ResponseEntity<FoodItem> response = foodItemController.getFoodItemById(99L);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertNull(response.getBody());
+        verify(foodItemService).getFoodItemById(99L);
     }
 
     @Test
     void testCreateFoodItem() {
         when(foodItemService.createFoodItem(foodItem)).thenReturn(foodItem);
 
-        FoodItem result = foodItemController.createFoodItem(foodItem);
+        ResponseEntity<FoodItem> response = foodItemController.createFoodItem(foodItem);
 
-        assertEquals("Pizza", result.getName());
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals(foodItem, response.getBody());
         verify(foodItemService).createFoodItem(foodItem);
     }
 
@@ -65,9 +81,10 @@ class FoodItemControllerTest {
     void testUpdateFoodItem() {
         when(foodItemService.updateFoodItem(1L, foodItem)).thenReturn(foodItem);
 
-        FoodItem result = foodItemController.updateFoodItem(1L, foodItem);
+        ResponseEntity<FoodItem> response = foodItemController.updateFoodItem(1L, foodItem);
 
-        assertEquals("Pizza", result.getName());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(foodItem, response.getBody());
         verify(foodItemService).updateFoodItem(1L, foodItem);
     }
 
@@ -75,9 +92,10 @@ class FoodItemControllerTest {
     void testPatchFoodItem() {
         when(foodItemService.patchFoodItem(1L, foodItem)).thenReturn(foodItem);
 
-        FoodItem result = foodItemController.patchFoodItem(1L, foodItem);
+        ResponseEntity<FoodItem> response = foodItemController.patchFoodItem(1L, foodItem);
 
-        assertEquals("Pizza", result.getName());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(foodItem, response.getBody());
         verify(foodItemService).patchFoodItem(1L, foodItem);
     }
 
@@ -85,8 +103,9 @@ class FoodItemControllerTest {
     void testDeleteFoodItem() {
         doNothing().when(foodItemService).deleteFoodItem(1L);
 
-        foodItemController.deleteFoodItem(1L);
+        ResponseEntity<Void> response = foodItemController.deleteFoodItem(1L);
 
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         verify(foodItemService).deleteFoodItem(1L);
     }
 }

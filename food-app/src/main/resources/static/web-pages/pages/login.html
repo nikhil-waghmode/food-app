@@ -71,9 +71,8 @@
     </div>
   </div>
 
+<script src="../js/script.js"></script>
   <script>
-    const apiUrl = "http://localhost:8080/api";
-
     const email = document.getElementById("email");
     const password = document.getElementById("password");
 
@@ -85,7 +84,7 @@
       }
     });
 
-    function verify() {
+    /* function verify() {
       const emailVal = email.value.trim();
       const passwordVal = password.value.trim();
       fetch(`${apiUrl}/users`)
@@ -115,7 +114,56 @@
           console.error("Error fetching users:", err);
         });
     }
+ */
+ function verify() {
+	  const email = document.getElementById("email").value;
+	  const password = document.getElementById("password").value;
 
+	  fetch("http://localhost:8080/auth/signin", {
+	    method: "POST",
+	    headers: {
+	      "Content-Type": "application/json",
+	    },
+	    body: JSON.stringify({ email: email, password: password })
+	  })
+	    .then(response => {
+	      // Handle HTTP status codes with console logs
+	      if (response.status === 200) {
+	        return response.json();
+	      } else if (response.status === 404) {
+	        document.getElementById("error").textContent = "404 Not Found - Users data not available.";
+	      } else if (response.status === 401) {
+	        document.getElementById("error").textContent = "401 Unauthorized - Invalid token or access denied.";
+	      } else if (response.status === 500) {
+	        document.getElementById("error").textContent = "500 Internal Server Error.";
+	      } else {
+	        document.getElementById("error").textContent = `Unexpected status code: ${response.status}`;
+	      }
+	    })
+	    .then(response => {
+	      if (!response) return;
+
+	      if (response.token)
+	        localStorage.setItem("token", response.token);
+	      else
+	        throw new Error("Token Not Found");
+
+	      const userType = getUserType();
+	      if (userType === "ADMIN") {
+	        window.location.href = "../admin/admin-homepage.html";
+	      } else if(userType === "CUSTOMER"){
+	        window.location.href = "../customer/view-restaurants.html";
+	      }
+	      else if(userType === "OWNER"){
+		        window.location.href = "../owner/owner-homepage.html";
+		      }
+	    }
+	    )
+	    .catch(error => {
+	      console.log(error);
+	      document.getElementById("error").textContent = "Something went wrong. Please try again.";
+	    });
+	}
     function validateEmail() {
       if (email.value && email.checkValidity()) {
         email.classList.add("is-valid");

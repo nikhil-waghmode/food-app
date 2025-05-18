@@ -80,6 +80,10 @@
         <label class="form-label">Location</label>
         <input type="text" id="locationInput" class="form-control" />
       </div>
+                  <div class="mb-3">
+      <label for="userImage" class="form-label">User Image</label>
+      <input type="file" class="form-control" id="userImage" accept="image/*">
+    </div>
 
       <div class="mb-3">
         <label class="form-label">User Type</label><br />
@@ -113,6 +117,11 @@
           <input type="text" id="restaurantPhone" class="form-control" />
           <div class="invalid-feedback">Enter a valid 10-digit phone starting with 7, 8, or 9.</div>
         </div>
+            <div class="mb-3">
+      <label for="restImage" class="form-label">Restaurant Image</label>
+      <input type="file" class="form-control" id="restImage" accept="image/*">
+    </div>
+
       </div>
       <button type="submit" id="submitBtn" class="btn btn-success w-100">Register User</button>
     </form>
@@ -131,10 +140,12 @@
     phoneInput = document.getElementById("phoneInput");
     locationInput = document.getElementById("locationInput");
     userRegForm = document.getElementById("userRegForm");
+    userImageInput = document.getElementById("userImage");
 
     restaurantNameInput = document.getElementById("restaurantName");
     restaurantLocationInput = document.getElementById("restaurantLocation");
     restaurantPhoneInput = document.getElementById("restaurantPhone");
+    resImageInput = document.getElementById("restImage");
 
     const userTypeRadios = document.querySelectorAll('input[name="usertype"]');
     const restaurantFields = document.getElementById("restaurantFields");
@@ -151,7 +162,7 @@
 
 
 
-    async function addUser() {
+  /*   async function addUser() {
       const newUser = {
         name: nameInput.value.trim(),
         email: emailInput.value.trim(),
@@ -174,7 +185,7 @@
         const userId = createdUser.id;
 
         // If Restaurant Owner, create associated restaurant
-        if (newUser.userType === "Restaurant Owner") {
+        if (newUser.userType === "OWNER") {
 
           const newRestaurant = {
             name: restaurantNameInput.value.trim(),
@@ -199,8 +210,61 @@
         console.error("Error:", err);
         alert("Something went wrong during registration.");
       }
-    }
+    } */
 
+    async function addUser() {
+    	  const newUser = {
+    	    name: nameInput.value.trim(),
+    	    email: emailInput.value.trim(),
+    	    password: passwordInput.value.trim(),
+    	    phone: phoneInput.value.trim(),
+    	    location: locationInput.value.trim(),
+/*     	    userImg: userImageInput.files[0],
+ */    	    userType: document.querySelector('input[name="usertype"]:checked').value
+    	  };
+			console.log(newUser);
+    	  try {
+    	    const response = await fetch("http://localhost:8080/auth/register", {
+    	      method: "POST",
+    	      headers: { "Content-Type": "application/json" },
+    	      body: JSON.stringify(newUser),
+    	    });
+
+    	    if (!response.ok) throw new Error("User creation failed.");
+
+    	    const createdUser = await response.json();
+    	    const userId = createdUser.id;
+      	  const formData = new FormData();
+    	  formData.append('name', restaurantNameInput.value.trim());
+    	  formData.append('location', restaurantLocationInput.value.trim());
+    	  formData.append('contact', restaurantPhoneInput.value.trim());
+    	  formData.append('ownerId', userId);
+    	  
+    	  if (resImageInput.files[0]) {
+    	    formData.append('resImage', resImageInput.files[0]);
+    	  }
+    	  
+    	    // Only if the user is an Owner, register the restaurant
+    	    if (newUser.userType === "OWNER") {
+
+
+    	      const restRes = await fetch("http://localhost:8080/api/restaurants", {
+    	        method: "POST",
+    	     
+    	        body: formData
+    	      });
+
+    	      if (!restRes.ok) throw new Error("Restaurant creation failed.");
+    	    }
+
+    	    alert("User Registration Successful! 🎉");
+    	    window.location.href = "./login.html";
+
+    	  } catch (err) {
+    	    console.error("Error:", err);
+    	    alert("Something went wrong during registration.");
+    	  }
+    	}
 
     function validatePhone() {
       const phoneRegex = /^[789]\d{9}$/;
@@ -249,8 +313,7 @@
       }
     }
 
-
-    async function checkEmailExits() {
+/*     async function checkEmailExits() {
       const email = emailInput.value.trim();
       if (validateEmail()) {
         try {
@@ -271,7 +334,7 @@
           console.error("Error checking email existence:", error);
         }
       }
-    }
+    } */
 
     function validateRestaurantPhone() {
       const phoneRegex = /^[789]\d{9}$/;
@@ -292,21 +355,21 @@
 
       const nameValid = nameInput.value.trim() !== "";
       const locationValid = locationInput.value.trim() !== "";
-      const emailValid = await checkEmailExits();
-      const phoneValid = validatePhone();
+/*       const emailValid = await checkEmailExits();
+ */      const phoneValid = validatePhone();
       const passwordValid = validatePassword();
 
       restaurantValid = true;
       const userType = document.querySelector('input[name="usertype"]:checked').value;
 
-      if (userType === "Restaurant Owner") {
+      if (userType === "OWNER") {
         const nameCheck = restaurantNameInput.value.trim() !== "";
         const locationCheck = restaurantLocationInput.value.trim() !== "";
         const phoneCheck = validateRestaurantPhone();
         restaurantValid = nameCheck && locationCheck && phoneCheck;
       }
 
-      if (nameValid && locationValid && emailValid && phoneValid && passwordValid && restaurantValid) {
+      if (nameValid && locationValid && phoneValid && passwordValid && restaurantValid) {
         addUser();
       } else {
         alert("Please fill in all required fields correctly.");

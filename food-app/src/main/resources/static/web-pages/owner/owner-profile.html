@@ -129,6 +129,10 @@
         async function loadProfile() {
             try {
                  currentOwnerId = localStorage.getItem("currentOwnerId");
+console.log("getUserType:",getUserType());
+console.log("getUserId:",getUserId());
+console.log("getCurrentRestaurantId:",getCurrentRestaurantId());
+
 
                  res = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
                 if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);

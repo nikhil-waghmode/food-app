@@ -34,9 +34,8 @@ public class FoodItemServiceImplTest {
     @Test
     void testGetAllFoodItems() {
         List<FoodItem> items = Arrays.asList(
-            new FoodItem(1L, "Pizza", "Fast Food", 200, "img.jpg"),
-            new FoodItem(2L, "Burger", "Fast Food", 150, "img2.jpg")
-        );
+                new FoodItem(1L, "Pizza", "Fast Food", 200, "img.jpg"),
+                new FoodItem(2L, "Burger", "Fast Food", 150, "img2.jpg"));
 
         when(foodItemRepo.findAll()).thenReturn(items);
 
@@ -102,8 +101,7 @@ public class FoodItemServiceImplTest {
         restaurant.setId(1L);
 
         List<FoodItem> items = Arrays.asList(
-            new FoodItem(1L, "Pizza", "Fast Food", 200, "img.jpg", restaurant)
-        );
+                new FoodItem(1L, "Pizza", "Fast Food", 200, "img.jpg", restaurant));
 
         when(foodItemRepo.findAllByRestaurantId(1L)).thenReturn(items);
 
