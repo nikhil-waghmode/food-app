@@ -45,7 +45,7 @@
     </div>
 
     <script>
-         currentAdminId = localStorage.getItem("currentAdminId");
+         currentAdminId = getUserId();
     
          nameInput = document.getElementById("name");
          emailInput = document.getElementById("email");
@@ -56,11 +56,17 @@
          saveBtn = document.getElementById("save-btn");
          cancelBtn = document.getElementById("cancel-btn");
     
-        let currentUserData = {};
+        currentUserData = {};
     
         async function loadProfile() {
           try {
-             response = await fetch(`${apiUrl}/users/${currentAdminId}`);
+             response = await fetch(`${apiUrl}/users/${currentAdminId}`, {
+                 method: "GET",
+                 headers: {
+                     "Content-Type": "application/json",
+                     "Authorization": getAuthorization()
+                 },
+             });
             currentUserData = await response.json();
     
             document.getElementById("id").value = currentUserData.id;
@@ -96,6 +102,20 @@
           editBtn.classList.remove("d-none");
         });
     
+        
+        function createFormDataAdmin() {
+            formData = new FormData();
+            formData.append('name', nameInput.value.trim());
+            formData.append('email', emailInput.value.trim());
+            formData.append('phone', phoneInput.value.trim());
+            formData.append('location', locationInput.value.trim());
+
+            // Use existing userType and password from loaded user data
+            formData.append('userType', currentUserData.userType);
+            formData.append('password', currentUserData.password);
+            return formData;
+        }
+        
         document.getElementById("profile-form").addEventListener("submit", function (e) {
           e.preventDefault();
     
@@ -107,10 +127,13 @@
             email: emailInput.value
           };
     
+           
           fetch(`${apiUrl}/users/${currentAdminId}`, {
             method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(updatedUser)
+            headers: {
+                "Authorization": getAuthorization()
+},  
+            body: createFormDataAdmin()
           })
             .then(res => res.json())
             .then(() => {

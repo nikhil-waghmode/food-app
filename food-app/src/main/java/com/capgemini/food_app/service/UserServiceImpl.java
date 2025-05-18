@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,30 +30,23 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public User createUser(String name, String email, String password, String phone, String location, String userType,
 			MultipartFile profileImage) throws IOException {
-		// Check if the email already exists
 		if (userRepository.existsByEmail(email)) {
 			throw new EmailAlreadyExistsException("Email already exists");
 		}
 
-		// Define the directory to save uploaded user profile images
 		String UPLOAD_DIR = "uploads/users/";
 
-		// Create the directory if it doesn't exist
 		Files.createDirectories(Paths.get(UPLOAD_DIR));
 
 		String fileName = null;
 
-		// Save profile image to disk if present
 		if (profileImage != null && !profileImage.isEmpty()) {
-			// Generate a unique file name
 			fileName = UUID.randomUUID() + "_" + profileImage.getOriginalFilename();
 			Path filePath = Paths.get(UPLOAD_DIR, fileName);
 
-			// Save the file
 			Files.copy(profileImage.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 		}
 
-		// Create and populate the User entity
 		User user = new User();
 		user.setName(name);
 		user.setEmail(email);
@@ -62,9 +54,8 @@ public class UserServiceImpl implements UserService {
 		user.setPhone(phone);
 		user.setLocation(location);
 		user.setUserType(userType);
-		user.setUserImg(fileName); // Save only the filename or full path if preferred
+		user.setUserImg(fileName); 
 
-		// Save the user to the database
 		return userRepository.save(user);
 	}
 
@@ -125,7 +116,6 @@ public class UserServiceImpl implements UserService {
 		User present = userRepository.findById(id)
 				.orElseThrow(() -> new UserNotFoundException("User with ID " + id + " not found."));
 
-		// Handle email patch and uniqueness check
 		if (email != null && !email.equals(present.getEmail())) {
 			if (userRepository.existsByEmail(email)) {
 				throw new EmailAlreadyExistsException("Email already exists");
@@ -133,7 +123,6 @@ public class UserServiceImpl implements UserService {
 			present.setEmail(email);
 		}
 
-		// Patch other fields if provided
 		if (name != null) {
 			present.setName(name);
 		}
@@ -160,5 +149,16 @@ public class UserServiceImpl implements UserService {
 		}
 
 		return userRepository.save(present);
+	}
+
+	@Override
+	public User findByEmail(String email) {
+		return userRepository.findByEmail(email).orElseThrow(()->new UserNotFoundException("User not found with email: "  + email));
+		
+	}
+
+	@Override
+	public boolean existsByEmail(String email) {
+		return userRepository.existsByEmail(email);
 	}
 }

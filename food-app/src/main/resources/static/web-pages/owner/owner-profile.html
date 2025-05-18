@@ -36,8 +36,8 @@
     </nav>
 
     <!-- Main Content -->
-    <!-- <div class="content"> -->
-        <!-- <div class="container"> -->
+<div class="content">
+        <div class="container">
             <div class="row">
                 <h4 class="mb-4 text-center"><i class="bi bi-shop-window me-2"></i>Restaurant Profile</h4>
                         <form id="restaurant-form">
@@ -66,8 +66,8 @@
                                 <input type="text" id="restaurantOwnerId" class="form-control" disabled>
                             </div>
                                 <div class="mb-3">
-      <label for="restImage" class="form-label">Restaurant Image</label>
-      <input type="file" class="form-control" id="restImage" accept="image/*">
+      <label for="resImage" class="form-label">Restaurant Image</label>
+      <input type="file" class="form-control" id="resImage" accept="image/*">
     </div>
                     </div>
                 </div>
@@ -102,7 +102,6 @@
                 </form>
             </div>
         </div>
-        
 
     </div>
 
@@ -113,13 +112,9 @@
 
   <script>
     // Variable declarations
-    let restaurantID, restaurantName, restaurantContact, restaurantLocation, restaurantOwnerId, resImageInput;
-    let nameInput, emailInput, contactInput, locationInput;
-    let editBtn, saveBtn, cancelBtn;
-    let currentRestaurant = {};
-    let currentUserData = null;
-    let currentOwnerId = null;
-    const apiUrl = "http://localhost:8080/api"; // Change as needed
+    currentRestaurant = {};
+    currentUserData = null;
+    currentOwnerId = null;
 
     // DOM assignments
     restaurantID = document.getElementById("restaurantID");
@@ -127,7 +122,7 @@
     restaurantContact = document.getElementById("restaurantContact");
     restaurantLocation = document.getElementById("restaurantLocation");
     restaurantOwnerId = document.getElementById("restaurantOwnerId");
-    resImageInput = document.getElementById("restImage");
+    resImageInput = document.getElementById("resImage");
 
     nameInput = document.getElementById("name");
     emailInput = document.getElementById("email");
@@ -140,14 +135,14 @@
 
     // Create FormData for restaurant
     function createFormData() {
-        const formData = new FormData();
+        formData = new FormData();
         formData.append('name', restaurantName.value.trim());
         formData.append('location', restaurantLocation.value.trim());
         formData.append('contact', restaurantContact.value.trim());
         formData.append('ownerId', restaurantOwnerId.value.trim());
 
         if (resImageInput.files[0]) {
-            formData.append('restImage', resImageInput.files[0]);
+            formData.append('resImage', resImageInput.files[0]);
         }
 
         return formData;
@@ -155,7 +150,7 @@
 
     // Create FormData for owner (user)
     function createFormDataOwner() {
-        const formData = new FormData();
+        formData = new FormData();
         formData.append('name', nameInput.value.trim());
         formData.append('email', emailInput.value.trim());
         formData.append('phone', contactInput.value.trim());
@@ -164,27 +159,23 @@
         // Use existing userType and password from loaded user data
         formData.append('userType', currentUserData.userType);
         formData.append('password', currentUserData.password);
-
-        // If you add a file input for owner image, handle it here
-        // Example:
-        // let ownerImgInput = document.getElementById("ownerImg");
-        // if (ownerImgInput && ownerImgInput.files[0]) {
-        //     formData.append('userImg', ownerImgInput.files[0]);
-        // }
-
         return formData;
     }
 
-    // Load profile data
     async function loadProfile() {
         try {
-            currentOwnerId = localStorage.getItem("currentOwnerId");
-
+            currentOwnerId = getUserId()
             // Fetch restaurant details
-            let res = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
+            res = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}` , {
+                method: "GET",
+                headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": getAuthorization()
+                },
+              });
             if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
             currentRestaurant = await res.json();
-
+            
             restaurantID.value = currentRestaurant.id;
             restaurantName.value = currentRestaurant.name;
             restaurantContact.value = currentRestaurant.contact;
@@ -192,7 +183,13 @@
             restaurantOwnerId.value = currentRestaurant.ownerId;
 
             // Fetch owner (user) details
-            let response = await fetch(`${apiUrl}/users/${currentOwnerId}`);
+            response = await fetch(`${apiUrl}/users/${currentOwnerId}` , {
+                method: "GET",
+                headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": getAuthorization()
+                },
+              });
             currentUserData = await response.json();
 
             // Fill owner fields with loaded user data
@@ -244,16 +241,22 @@
 
         try {
             // Update restaurant
-            let response = await fetch(`${apiUrl}/restaurants/${currentRestaurant.id}`, {
+            response = await fetch(`${apiUrl}/restaurants/${currentRestaurant.id}`, {
                 method: "PUT",
+                headers: {
+                    "Authorization": getAuthorization()
+                  },
                 body: createFormData()
             });
             if (!response.ok) throw new Error(`Update failed: ${response.statusText}`);
             currentRestaurant = await response.json();
 
             // Update owner (user)
-            let ownerRes = await fetch(`${apiUrl}/users/${currentOwnerId}`, {
+            ownerRes = await fetch(`${apiUrl}/users/${currentOwnerId}`, {
                 method: "PUT",
+                headers: {
+                    "Authorization": getAuthorization()
+                  },
                 body: createFormDataOwner()
             });
             if (!ownerRes.ok) throw new Error(`Owner update failed: ${ownerRes.statusText}`);

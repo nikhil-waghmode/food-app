@@ -35,50 +35,42 @@ public class DashboardDTOServiceImpl implements DashboardDTOService {
 	
 	@Override
 	public FoodItem getMostOrderedFoodItem() {
-		FoodItem foodItems = foodItemRepo.findMostOrderedFoodItem();
-		return foodItems;
+		return foodItemRepo.findMostOrderedFoodItem();
 	}
 	
 	@Override
 	public FoodItem getLeastOrderedFoodItem() {
-		FoodItem foodItems = foodItemRepo.findLeastOrderedFoodItem();
-		return foodItems;
+		return foodItemRepo.findLeastOrderedFoodItem();
 	}
 	
 	@Override
 	public int totalResaurants() {
-		int total = (int)restaurantRepository.count();
-		return total;
+		return (int)restaurantRepository.count();
 	}
 	
 	@Override
 	public int totalFoodItems() {
-		int total = (int)foodItemRepo.count();
-		return total;
+		return (int)foodItemRepo.count();
 	}
 	
 	@Override
 	public int totalOrders() {
-		int total = (int)orderRepository.count();
-		return total;
+		return (int)orderRepository.count();
 	}
 	
 	@Override
 	public int totalUsers() {
-		int total = (int)userRepository.count();
-		return total;
+		return (int)userRepository.count();
 	}
 	
 	@Override
 	public int totalCustomers() {
-		int total = userRepository.totalCustomer();
-	    return  total;
+		return userRepository.totalCustomer();
 	}
 	
 	@Override
 	public int totalOwners() {
-		int total = userRepository.totalOwner();
-	    return  total;
+		return userRepository.totalOwner();
 	}
 	
 	

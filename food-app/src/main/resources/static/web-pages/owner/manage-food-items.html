@@ -66,12 +66,11 @@
 <script src="../js/script.js"></script>
 	<script>
     
-     currentOwnerId = localStorage.getItem("currentOwnerId");
-//Line
-    let currentRestaurantID = null;
-    let fooditems = [];
-    let editId = null;
-    let currentItemImg = null;
+     currentOwnerId = getUserId();
+    currentRestaurantID = null;
+    fooditems = [];
+    editId = null;
+    currentItemImg = null;
 
      form = document.getElementById("foodItemsForm");
      submitBtn = document.getElementById("submitBtn");
@@ -84,12 +83,16 @@
 
     async function fetchAndRenderFoodItems() {
       try {
-         res = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
-        if (!res.ok) throw new Error('Failed to fetch restaurant');
-         restaurant = await res.json();
-        currentRestaurantID = restaurant.id;
+
+        currentRestaurantID = getCurrentRestaurantId();
         
-         menuRes = await fetch(`${apiUrl}/fooditems/restaurant/${currentRestaurantID}`);
+         menuRes = await fetch(`${apiUrl}/fooditems/restaurant/${currentRestaurantID}`, {
+             method: "GET",
+             headers: {
+               "Content-Type": "application/json",
+               "Authorization": getAuthorization()
+             },
+           });
         if (!menuRes.ok) throw new Error('Failed to fetch food items');
          menuData = await menuRes.json();
         fooditems = menuData;
@@ -128,7 +131,10 @@
 
     function deleteFoodItem(id) {
       if (confirm("Are you sure you want to delete this food item?")) {
-        fetch(`${apiUrl}/fooditems/${id}`, { method: "DELETE" })
+        fetch(`${apiUrl}/fooditems/${id}`, { method: "DELETE" ,
+        	"Content-Type": "application/json",
+            "Authorization": getAuthorization()
+        	})
           .then(response => {
             if (!response.ok) {
               throw new Error('Failed to delete item');
@@ -143,7 +149,13 @@
     }
 
     function loadFoodItemsForEdit(id) {
-      fetch(`${apiUrl}/fooditems/${id}`)
+      fetch(`${apiUrl}/fooditems/${id}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": getAuthorization()
+          },
+        })
         .then(response => {
           if (!response.ok) {
             throw new Error('Failed to fetch item details');
@@ -197,8 +209,6 @@
       }
 
       if (editId) {
-        if (foodImageInput.files[0]) {
-          // If there's a new image, use FormData for multipart upload
            formData = new FormData();
           formData.append('name', itemNameInput.value.trim());
           formData.append('category', itemCategoryInput.value.trim());
@@ -206,9 +216,12 @@
           formData.append('cuisine', itemCuisineInput.value.trim());
           formData.append('restaurantID', currentRestaurantID);
           formData.append('foodImage', foodImageInput.files[0]);
-          
+
           fetch(`${apiUrl}/fooditems/${editId}`, {
-            method: "POST", // Use POST for multipart form data
+            method: "PUT", 
+            headers: {
+              "Authorization": getAuthorization()
+            },
             body: formData
           })
           .then(response => {
@@ -228,44 +241,15 @@
             console.error("Error updating item:", error);
             alert("Error updating item. Please check console for details.");
           });
-        } else {
-          // If no new image, use JSON with the existing image URL
-           updatedItem = {
-            name: itemNameInput.value.trim(),
-            category: itemCategoryInput.value.trim(),
-            price: parseInt(itemPriceInput.value.trim()),
-            cuisine: itemCuisineInput.value.trim(),
-            itemImg: currentItemImg,
-            restaurant: { id: currentRestaurantID }
-          };
-          
-          fetch(`${apiUrl}/fooditems/${editId}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(updatedItem)
-          })
-          .then(response => {
-            if (!response.ok) {
-              return response.json().then(err => {
-                console.error("Server error details:", err);
-                throw new Error('Failed to update item: ' + JSON.stringify(err));
-              });
-            }
-            return response.json();
-          })
-          .then(data => {
-            fetchAndRenderFoodItems();
-            resetForm();
-          })
-          .catch(error => {
-            console.error("Error updating item:", error);
-            alert("Error updating item. Please check console for details.");
-          });
-        }
+       
       } else {
         // Create new food item
+
         fetch(`${apiUrl}/fooditems`, {
           method: "POST",
+          headers: {
+              "Authorization": getAuthorization()
+            },
           body: createFormData()
         })
         .then(response => {
@@ -297,7 +281,7 @@
     }
 
     // Sorting
-    let sortDirection = 1;
+    sortDirection = 1;
     document.querySelector("th:nth-child(2)").style.cursor = "pointer";
     document.querySelector("th:nth-child(2)").addEventListener("click", () => {
        sorted = [...fooditems].sort((a, b) =>

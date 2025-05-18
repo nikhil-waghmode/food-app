@@ -10,27 +10,18 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class RestaurantServiceImpl implements RestaurantService {
 
     private final RestaurantRepository restaurantRepository;
-    private final Path rootLocation = Paths.get("uploads/restaurants");
 
     @Autowired
     public RestaurantServiceImpl(RestaurantRepository restaurantRepository) {
         this.restaurantRepository = restaurantRepository;
-        initializeStorage();
     }
 
-    private void initializeStorage() {
-        try {
-            Files.createDirectories(rootLocation);
-        } catch (IOException e) {
-            throw new RuntimeException("Could not initialize storage directory", e);
-        }
-    }
 
     @Override
     public List<Restaurant> getAllRestaurants() {
@@ -53,28 +44,29 @@ public class RestaurantServiceImpl implements RestaurantService {
         return restaurantRepository.count();
     }
 
-//    @Override
-//    public List<Object[]> restaurantsBySorted() {
-//        return restaurantRepository.findRestaurantsWithOrderCount();
-//    }
-
     @Override
     public Restaurant createRestaurant(String name, String location, String contact,
-                                       Long ownerId, MultipartFile resImage) throws IOException {
+                                       Long ownerId, MultipartFile file) throws IOException {
         Restaurant existingRestaurant = getRestaurantByOwner(ownerId);
 
         if (existingRestaurant!= null) {
             throw new OwnerAlreadyHasRestaurantException("User already owns a restaurant");
         }
 
-        String filename = storeImage(resImage);
+     		String UPLOAD_DIR = "uploads/restaurants/";
+
+     		Files.createDirectories(Paths.get(UPLOAD_DIR));
+
+     		String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+     		Path filePath = Paths.get(UPLOAD_DIR, fileName);
+    		Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
         Restaurant restaurant = new Restaurant();
         restaurant.setName(name);
         restaurant.setLocation(location);
         restaurant.setContact(contact);
         restaurant.setOwnerId(ownerId);
-        restaurant.setRestaurantImg(filename);
+        restaurant.setRestaurantImg(fileName);
 
         return restaurantRepository.save(restaurant);
     }
@@ -82,63 +74,58 @@ public class RestaurantServiceImpl implements RestaurantService {
 
     @Override
     public Restaurant updateRestaurant(Long id, String name, String location, String contact,
-                                      Long ownerId, MultipartFile resImage) throws IOException {
+                                      Long ownerId, MultipartFile file) throws IOException {
         Restaurant existing = getRestaurantById(id);
+        if (file != null && !file.isEmpty()) {
+			String UPLOAD_DIR = "uploads/restaurants/";
+			Files.createDirectories(Paths.get(UPLOAD_DIR));
+			String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+			Path filePath = Paths.get(UPLOAD_DIR, fileName);
+			Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+			existing.setRestaurantImg(fileName);
+		}
 
+        
         if (name != null) existing.setName(name);
         if (location != null) existing.setLocation(location);
         if (contact != null) existing.setContact(contact);
         if (ownerId != null) existing.setOwnerId(ownerId);
-        if (resImage != null && !resImage.isEmpty()) {
-            updateImage(existing, resImage);
-        }
+
 
         return restaurantRepository.save(existing);
     }
 
     @Override
     public Restaurant patchRestaurant(Long id, String name, String location, String contact,
-                                     Long ownerId, MultipartFile resImage) throws IOException {
-        return updateRestaurant(id, name, location, contact, ownerId, resImage);
+                                     Long ownerId, MultipartFile file) throws IOException {
+        Restaurant existing = getRestaurantById(id);
+
+		if (name != null)
+			existing.setName(name);
+		if (location != null)
+			existing.setLocation(location);
+		if (contact != null)
+			existing.setContact(contact);
+		if (ownerId != null)
+			existing.setOwnerId(ownerId);
+
+		if (file != null && !file.isEmpty()) {
+			String UPLOAD_DIR = "uploads/restaurants/";
+			Files.createDirectories(Paths.get(UPLOAD_DIR));
+			String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+			Path filePath = Paths.get(UPLOAD_DIR, fileName);
+			Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+			existing.setRestaurantImg(fileName);
+		}
+        return restaurantRepository.save(existing);
     }
 
     @Override
     public void deleteRestaurant(Long id) {
-        Restaurant restaurant = getRestaurantById(id);
-        deleteImage(restaurant.getRestaurantImg());
+       
         restaurantRepository.deleteById(id);
     }
 
-//    @Override
-//    public List<Object[]> getCustomerDetailsByRestaurantID(Long restaurantID) {
-//        return restaurantRepository.findCustomerDetailsByRestaurant(restaurantID);
-//    }
-
-    private String storeImage(MultipartFile file) throws IOException {
-        if (file == null || file.isEmpty()) return null;
-
-        String filename = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-        Path destination = rootLocation.resolve(filename);
-        Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
-        return filename;
-    }
-
-    private void updateImage(Restaurant restaurant, MultipartFile newImage) throws IOException {
-        deleteImage(restaurant.getRestaurantImg());
-        String newFilename = storeImage(newImage);
-        restaurant.setRestaurantImg(newFilename);
-    }
-
-    public void deleteImage(String filename) {
-        if (filename == null) return;
-
-        try {
-            Path filePath = rootLocation.resolve(filename);
-            Files.deleteIfExists(filePath);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to delete image file: " + filename, e);
-        }
-    }
 
     @Override
     public List<Object[]> getCustomerDetailsByRestaurantID(Long restaurantID) {

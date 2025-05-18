@@ -2,7 +2,6 @@ package com.capgemini.food_app.service;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,5 +23,9 @@ public interface UserService {
 
 	public User createUser(String name, String email, String password, String phone, String location, String userType,
 			MultipartFile profileImage) throws IOException;
+
+	User findByEmail(String email); // jwt
+
+	public boolean existsByEmail(String email);
 
 }

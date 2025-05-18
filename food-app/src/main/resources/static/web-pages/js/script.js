@@ -72,6 +72,14 @@ function getUserType() {
     return decoded.usertype;
 }
 
+function getCurrentRestaurantId() {
+    const token = localStorage.getItem("token");
+    if (!token)
+        window.location.href = "login.html";
+    const decoded = decodeJWT(token);
+    return decoded.currentRestaurantId;
+}
+
 function getAuthorization() {
     const token = localStorage.getItem("token");
     if (!token)

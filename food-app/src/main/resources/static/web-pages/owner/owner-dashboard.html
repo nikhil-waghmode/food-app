@@ -161,7 +161,10 @@
    totalOrders = document.getElementById("totalOrders");
    revenueToday = document.getElementById("revenueToday");
    totalRevenue = document.getElementById("totalRevenue");
-   currentOwnerId = localStorage.getItem("currentOwnerId");
+   //currentOwnerId = localStorage.getItem("currentOwnerId");
+   currentOwnerId = getUserId();
+   console.log("user id:",getUserId())
+
    today = new Date();
    formattedDate = today.toISOString().split('T')[0];
 
@@ -177,7 +180,13 @@
 
   async function fetchRestaurant() {
     try {
-       res = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
+       res = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`, {
+           method: "GET",
+           headers: {
+             "Content-Type": "application/json",
+             "Authorization": getAuthorization()
+           },
+         });
       if (!res.ok) throw new Error("Restaurant not found");
       return await res.json();
     } catch (error) {
@@ -190,14 +199,27 @@
   async function countOrders() {
     try {
        restaurant = await fetchRestaurant();
-       id = restaurant.id;
+       id = getCurrentRestaurantId();
+       console.log("id:", id);
       safeSetInnerHTML(welcomeMessage, `Welcome, ${restaurant.name}👋`);
 
-      let countRes = await fetch(`${apiUrl}/orders/restaurant/count/${id}`);
+      let countRes = await fetch(`${apiUrl}/orders/restaurant/count/${id}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": getAuthorization()
+          },
+        });
       let count = countRes.ok ? await countRes.text() : "0";
       safeSetInnerHTML(totalOrders, `${count}`);
 
-      let todayOrdersRes = await fetch(`${apiUrl}/orders/restaurant/count/${id}?date=${formattedDate}`);
+      let todayOrdersRes = await fetch(`${apiUrl}/orders/restaurant/count/${id}?date=${formattedDate}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": getAuthorization()
+          },
+        });
       let todayCount = todayOrdersRes.ok ? await todayOrdersRes.text() : "0";
       safeSetInnerHTML(ordersToday, `${todayCount}`);
     } catch (error) {
@@ -210,13 +232,25 @@
   async function calculateRevenue() {
     try {
        restaurant = await fetchRestaurant();
-       id = restaurant.id;
+       id = getCurrentRestaurantId();
 
-      let revenueRes = await fetch(`${apiUrl}/orders/restaurant/revenue/${id}`);
+      let revenueRes = await fetch(`${apiUrl}/orders/restaurant/revenue/${id}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": getAuthorization()
+          },
+        });
       let revenue = revenueRes.ok ? await revenueRes.text() : "0";
       safeSetInnerHTML(totalRevenue, `₹${revenue}`);
 
-      let todayRevenueRes = await fetch(`${apiUrl}/orders/restaurant/revenue/${id}?date=${formattedDate}`);
+      let todayRevenueRes = await fetch(`${apiUrl}/orders/restaurant/revenue/${id}?date=${formattedDate}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": getAuthorization()
+          },
+        });
       let todayRevenue = todayRevenueRes.ok ? await todayRevenueRes.text() : "0";
       safeSetInnerHTML(revenueToday, `₹${todayRevenue || 0}`);
     } catch (error) {
@@ -229,9 +263,15 @@
   async function renderRecentOrders() {
     try {
        restaurant = await fetchRestaurant();
-       id = restaurant.id;
+       id = getCurrentRestaurantId();
 
-      let recentOrdersRes = await fetch(`${apiUrl}/orders/detail/restaurant/${id}`);
+      let recentOrdersRes = await fetch(`${apiUrl}/orders/detail/restaurant/${id}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": getAuthorization()
+          },
+        })
       let recentOrdersData = [];
       if (recentOrdersRes.ok) {
         recentOrdersData = await recentOrdersRes.json();
@@ -266,9 +306,15 @@
   async function renderRecentFoodItems() {
     try {
        restaurant = await fetchRestaurant();
-       id = restaurant.id;
-
-      let res = await fetch(`${apiUrl}/fooditems/recent/${id}`);
+       id = getCurrentRestaurantId();
+console.log()
+      let res = await fetch(`${apiUrl}/fooditems/recent/${id}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": getAuthorization()
+          },
+        })
       let fooditems = [];
       if (res.ok) {
         fooditems = await res.json();
@@ -299,9 +345,15 @@
   async function renderTopCustomers() {
     try {
        restaurant = await fetchRestaurant();
-       id = restaurant.id;
+       id = getCurrentRestaurantId();
 
-      let res = await fetch(`${apiUrl}/restaurants/customers/details/${id}`);
+      let res = await fetch(`${apiUrl}/restaurants/customers/details/${id}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": getAuthorization()
+          },
+        });
       let customers = [];
       if (res.ok) {
         customers = await res.json();

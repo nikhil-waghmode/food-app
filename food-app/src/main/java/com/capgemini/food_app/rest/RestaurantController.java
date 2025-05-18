@@ -15,6 +15,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,7 +28,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/restaurants")
-
+@PreAuthorize("hasRole('CUSTOMER') or hasRole('ADMIN') or hasRole('OWNER')")
 public class RestaurantController {
 
     private final RestaurantService restaurantService;
@@ -55,7 +56,6 @@ public class RestaurantController {
 
     @GetMapping("/owner/{ownerId}")
     public ResponseEntity<Restaurant> getRestaurantsByOwner(@PathVariable Long ownerId) {
-//        return ResponseEntity.ok(restaurantService.getRestaurantsByOwner(ownerId));
         return ResponseEntity.status(200).body(restaurantService.getRestaurantByOwner(ownerId));
 
     }
@@ -109,17 +109,21 @@ public class RestaurantController {
         return ResponseEntity.noContent().build();
     }
 
+	// To serve image if needed
 	@GetMapping("/image/{filename}")
 	public ResponseEntity<Resource> getImage(@PathVariable String filename) throws IOException {
+		// Point to the correct subdirectory
+		Path filePath = Paths.get("uploads/restaurants", filename);
 
-		Path filePath = Paths.get("uploads/fooditems", filename);
-
+		// Check if file exists
 		if (!Files.exists(filePath)) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
 
+		// Create resource
 		Resource resource = new UrlResource(filePath.toUri());
 
+		// Determine content type
 		String contentType = Files.probeContentType(filePath);
 		if (contentType == null) {
 			contentType = "application/octet-stream"; // default fallback

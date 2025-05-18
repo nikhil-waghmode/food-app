@@ -8,7 +8,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
@@ -30,7 +29,7 @@ public class User {
 	String password;
 	
 	@Pattern(regexp = "^\\d{10}$",message = "Invalid phone number.")
-	String phone;
+	private String phone;
 	
 	@NotBlank(message = "User type is mandatory")
 	@Column(name="user_type")

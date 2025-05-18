@@ -95,7 +95,7 @@
 
 </script>
   <script>
-    const currentUserId = localStorage.getItem("currentUserId");
+    const currentUserId = getUserId();
 
     const nameInput = document.getElementById("name");
     const emailInput = document.getElementById("email");
@@ -110,7 +110,13 @@
 
     async function loadProfile() {
       try {
-        const response = await fetch(`${apiUrl}/users/${currentUserId}`);
+        const response = await fetch(`${apiUrl}/users/${currentUserId}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": getAuthorization()
+            },
+        });
         currentUserData = await response.json();
 
         document.getElementById("id").value = currentUserData.id;
@@ -147,6 +153,19 @@
       editBtn.classList.remove("d-none");
     });
 
+    function createFormData() {
+        formData = new FormData();
+        formData.append('name', nameInput.value.trim());
+        formData.append('email', emailInput.value.trim());
+        formData.append('phone', phoneInput.value.trim());
+        formData.append('location', locationInput.value.trim());
+
+        // Use existing userType and password from loaded user data
+        formData.append('userType', currentUserData.userType);
+        formData.append('password', currentUserData.password);
+        return formData;
+    }
+    
     document.getElementById("profile-form").addEventListener("submit", function (e) {
       e.preventDefault();
 
@@ -160,8 +179,10 @@
 
       fetch(`${apiUrl}/users/${currentUserId}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedUser)
+        headers: { 
+            "Authorization": getAuthorization()
+},
+        body: createFormData()
       })
         .then(res => res.json())
         .then(() => {

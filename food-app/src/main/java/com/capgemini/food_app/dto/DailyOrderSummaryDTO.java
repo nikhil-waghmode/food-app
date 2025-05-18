@@ -7,5 +7,6 @@ public interface DailyOrderSummaryDTO {
     LocalDate getDate();
     Long getTotalOrders();
     Double getTotalRevenue();
+    
 }
 

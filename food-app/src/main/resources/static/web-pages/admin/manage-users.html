@@ -97,7 +97,13 @@ userPhoneInput = document.getElementById("userPhone");
 
 //fetch and render users(calling different function)
 function fetchAndRenderusers() {
-    fetch(`${apiUrl}/users`) 
+    fetch(`${apiUrl}/users`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": getAuthorization()
+        },
+    }) 
     .then(response => response.json())
     .then(data =>{
         users = data;
@@ -149,14 +155,20 @@ function renderusers(users) {
     document.querySelectorAll(".delete-btn").forEach((btn) => {
       btn.addEventListener("click", (e) => {
         e.preventDefault(); // Prevent form submit or default action
-        const id = btn.getAttribute("data-id");
+        id = btn.getAttribute("data-id");
         deleteuser(id);
       });
     });
 }
 
 function loaduserForEdit(id) {
-    fetch(`${apiUrl}/users/${id}`)
+    fetch(`${apiUrl}/users/${id}`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": getAuthorization()
+        },
+    })
         .then(response => response.json())
         .then(data => {
             userNameInput.value = data.name;
@@ -188,6 +200,21 @@ userPhoneInput.addEventListener("input",()=>{
 
 form.addEventListener("submit", adduser);
 
+function createFormDataAdmin() {
+	  userType = document.querySelector('input[name="usertype"]:checked').value;
+
+    formData = new FormData();
+    formData.append('name', userNameInput.value.trim());
+    formData.append('email', userEmailInput.value.trim());
+    formData.append('phone', userPhoneInput.value.trim());
+    formData.append('location', userLocationInput.value.trim());
+
+    // Use existing userType and password from loaded user data
+    formData.append('userType', userType);
+    formData.append('password', userPasswordInput.value.trim());
+    return formData;
+}
+
 //function that will store values of all Input fields and add them to the db
 function adduser(event){
   isValid = true;
@@ -206,13 +233,14 @@ function adduser(event){
         userType: userType,
         phone: userPhoneInput.value.trim()
     };
-    console.log(editId);
 
     if(editId) {
         fetch(`${apiUrl}/users/${editId}`,{
             method:"PUT",
-            headers:{"Content-Type": "application/json"},
-            body: JSON.stringify(newuser)
+            headers:{
+                "Authorization": getAuthorization()
+},
+            body: createFormDataAdmin()
         }).then(()=>{
             fetchAndRenderusers();
             form.reset();
@@ -223,8 +251,10 @@ function adduser(event){
     } else {
         fetch(`${apiUrl}/users`, {
             method:"POST", 
-            headers: {"Content-Type": "application/json"}, 
-            body: JSON.stringify(newuser)
+            headers: {
+                "Authorization": getAuthorization()
+}, 
+            body:  createFormDataAdmin()
             }).then(()=> {
                 fetchAndRenderusers();
                 form.reset();
@@ -252,8 +282,12 @@ document.querySelector("th:nth-child(2)").addEventListener("click", () => {
 function deleteuser(id) {
     if (confirm("Are you sure you want to delete this user?")) {
         fetch(`${apiUrl}/users/${id}`, {
-            method: "DELETE"
-        }).then(() => fetchAndRenderusers());
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": getAuthorization()
+            }
+        }).then(() => fetchAndbRenderusers());
     }
 }
 

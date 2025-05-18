@@ -237,19 +237,16 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public List<Object[]> dataForOrdersPerWeekChart(Long restaurantID) {
-		// TODO Auto-generated method stub
 		return orderRepository.dataForOrdersPerWeekChart(restaurantID);
 	}
 
 	@Override
 	public List<Object[]> dataForRevenuePerWeekChart(Long restaurantID) {
-		// TODO Auto-generated method stub
 		return orderRepository.dataForRevenuePerWeekChart(restaurantID);
 	}
 
 	@Override
 	public List<Object[]> dataForRevenuePerMonthChart(Long restaurantID) {
-		// TODO Auto-generated method stub
 		return orderRepository.dataForRevenuePerMonthChart(restaurantID);
 	}
 

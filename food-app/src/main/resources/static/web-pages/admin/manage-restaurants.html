@@ -82,11 +82,17 @@
     restcontactInput = document.getElementById("restaurantcontact");
     resImageInput = document.getElementById("restImage");
 
-currentOwnerId = localStorage.getItem("currentOwnerId");
+currentOwnerId =getUserId();
     //fetch and render restaurants(calling different function)
     async function fetchAndRenderRestaurants() {
 
-    restaurantsRes = await fetch(`${apiUrl}/restaurants`);
+    restaurantsRes = await fetch(`${apiUrl}/restaurants`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": getAuthorization()
+        },
+    });
     // console.log(restaurantsRes)
     restaurantsData = await restaurantsRes.json();
 
@@ -186,15 +192,26 @@ async function renderRestaurants(restaurantsData) {
     //     });
     //   });
     // }
+    
+    
 	function deleteRestaurant(id) {
       if (confirm("Are you sure you want to delete this restaurant?")) {
         fetch(`${apiUrl}/restaurants/${id}`, {
+        	headers: {
+                "Authorization": getAuthorization()
+            },
           method: "DELETE"
         }).then(() => fetchAndRenderRestaurants());
       }
     }
 	function loadRestaurantForEdit(id) {
-      fetch(`${apiUrl}/restaurants/${id}`)
+      fetch(`${apiUrl}/restaurants/${id}`, {
+          method: "GET",
+          headers: {
+              "Content-Type": "application/json",
+              "Authorization": getAuthorization()
+          },
+      })
         .then(response => response.json())
         .then(data => {
           restNameInput.value = data.name;
@@ -206,14 +223,9 @@ async function renderRestaurants(restaurantsData) {
           location.hash = "#top";
         });
     }
-<<<<<<< HEAD
 
     // Add validation functions here
     restcontactInput.addEventListener("input", () => {
-=======
-	// Add validation functions here
-    restPhoneInput.addEventListener("input", () => {
->>>>>>> origin/rahul_backup1
       isValid = true;
       contactRegex = /^[789]\d{9}$/;
       if (contactRegex.test(restcontactInput.value.trim())) {
@@ -263,10 +275,11 @@ function createFormData() {
       // };
       // console.log(editId);
 
+
       if (editId) {
         fetch(`${apiUrl}/restaurants/${editId}`, {
           method: "PUT",
-          // headers: { "Content-Type": "application/json" },
+           headers: {"Authorization": getAuthorization()},
           // body: JSON.stringify(newRestaurant)
           body: createFormData()
 
@@ -280,7 +293,7 @@ function createFormData() {
       } else {
         fetch(`${apiUrl}/restaurants`, {
           method: "POST",
-          // headers: { "Content-Type": "application/json" },
+          headers: {"Authorization": getAuthorization()},
           // body: JSON.stringify(newRestaurant)
           body: createFormData()
         }).then(() => {

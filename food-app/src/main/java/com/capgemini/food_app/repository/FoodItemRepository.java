@@ -31,7 +31,6 @@ public interface FoodItemRepository extends JpaRepository<FoodItem, Long> {
     FoodItem findLeastOrderedFoodItem();
 
 
-
 	List<FoodItem> findByNameContainingIgnoreCase(String name);
 
 	List<FoodItem> findByCuisineIgnoreCase(String cuisine);

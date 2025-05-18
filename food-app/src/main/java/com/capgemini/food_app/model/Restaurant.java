@@ -28,11 +28,11 @@ public class Restaurant {
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private List<FoodItem> foodItem = new ArrayList<FoodItem>();
+    private List<FoodItem> foodItem = new ArrayList<>();
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private List<Review> review = new ArrayList<Review>();
+    private List<Review> review = new ArrayList<>();
 
     public Restaurant() {
         super();

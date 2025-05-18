@@ -3,6 +3,7 @@ package com.capgemini.food_app.rest;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import com.capgemini.food_app.model.Review;
 import com.capgemini.food_app.service.ReviewService;
@@ -11,6 +12,8 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api")
+@PreAuthorize("hasRole('CUSTOMER') or hasRole('ADMIN') or hasRole('OWNER')")
+
 public class ReviewController {
 
 	private ReviewService reviewService;

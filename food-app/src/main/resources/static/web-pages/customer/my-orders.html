@@ -48,9 +48,15 @@
     <script>
 
         async function fetchMyOrders() {
-            currentUserId = localStorage.getItem("currentUserId")
+            currentUserId = getUserId();
             
-            myOrdersRes = await fetch(`${apiUrl}/orders/detail/customer/${currentUserId}`);
+            myOrdersRes = await fetch(`${apiUrl}/orders/detail/customer/${currentUserId}`, {
+                method: "GET",
+                headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": getAuthorization()
+                },
+              });
             myOrdersData = await myOrdersRes.json();
             console.log("myOrdersData", myOrdersData)
             container = document.getElementById("orders-container");

@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -19,6 +20,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/orders")
+@PreAuthorize("hasRole('CUSTOMER') or hasRole('ADMIN') or hasRole('OWNER')")
+
 public class OrderController {
 
     private OrderService orderService;
@@ -30,11 +33,6 @@ public class OrderController {
     	this.orderService = orderService;
     	this.orderRepository=orderRepository;
     }
-
-//    @Autowired
-//    public OrderController(OrderService orderService) {
-//        this.orderService = orderService;
-//    }
 
     @PostMapping
     public ResponseEntity<Order> createOrder(@Valid @RequestBody Order order) {
@@ -54,9 +52,6 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getAllOrders());
     }
     
-    
-    
-
     @PutMapping("/{id}")
     public ResponseEntity<Order> updateOrder(@PathVariable Long id, @Valid @RequestBody Order order) {
         try {
@@ -77,13 +72,6 @@ public class OrderController {
         orderService.deleteOrder(id);
         return ResponseEntity.noContent().build();
     }
-
-
-//    @GetMapping("/recents")
-//    public ResponseEntity<List<Order>> getRecentOrders() {
-//        List<Order> orders = orderService.getTop3OrdersByDateDesc();
-//        return ResponseEntity.ok(orders);
-//    }
     
     @GetMapping("/restaurant/charts/orders-per-week")
     public List<Object[]> getOrdersPerWeek() {
@@ -167,37 +155,20 @@ public class OrderController {
         }
     }
 
-    // ✅ New chart-related endpoints from the second file
-
     @GetMapping("/restaurant/charts/orders-per-week/{restaurantId}")
     public ResponseEntity<List<Object[]>> dataForOrdersPerWeekChart(@PathVariable Long restaurantId) {
         return ResponseEntity.ok(orderService.dataForOrdersPerWeekChart(restaurantId));
     }
-
-//    @GetMapping("/restaurant/charts/orders-per-week")
-//    public ResponseEntity<List<Object[]>> dataForOrdersPerWeekChartForAdmin() {
-//        return ResponseEntity.ok(orderService.dataForOrdersPerWeekChartForAdmin());
-//    }
 
     @GetMapping("/restaurant/charts/revenue-per-week/{restaurantId}")
     public ResponseEntity<List<Object[]>> dataForRevenuePerWeekChart(@PathVariable Long restaurantId) {
         return ResponseEntity.ok(orderService.dataForRevenuePerWeekChart(restaurantId));
     }
 
-//    @GetMapping("/restaurant/charts/revenue-per-week")
-//    public ResponseEntity<List<Object[]>> dataForRevenuePerWeekChartForAdmin() {
-//        return ResponseEntity.ok(orderService.dataForRevenuePerWeekChartForAdmin());
-//    }
-
     @GetMapping("/restaurant/charts/revenue-per-month/{restaurantId}")
     public ResponseEntity<List<Object[]>> dataForRevenuePerMonthChart(@PathVariable Long restaurantId) {
         return ResponseEntity.ok(orderService.dataForRevenuePerMonthChart(restaurantId));
     }
-
-//    @GetMapping("/restaurant/charts/revenue-per-month")
-//    public ResponseEntity<List<Object[]>> dataForRevenuePerMonthChartForAdmin() {
-//        return ResponseEntity.ok(orderService.dataForRevenuePerMonthChartForAdmin());
-//    }
 
     @GetMapping("/restaurant/charts/revenue-by-category/{restaurantId}")
     public ResponseEntity<List<Object[]>> getRevenueByCategory(@PathVariable Long restaurantId) {

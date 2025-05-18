@@ -19,8 +19,7 @@ public interface RestaurantService {
     Restaurant patchRestaurant(Long id, String name, String location, String contact,
                               Long ownerId, MultipartFile resImage) throws IOException;
     void deleteRestaurant(Long id);
-//    List<Object[]> getCustomerDetailsByRestaurantID(Long restaurantID);
-
+    
     List<Object[]> getCustomerDetailsByRestaurantID(Long restaurantID);
 
 

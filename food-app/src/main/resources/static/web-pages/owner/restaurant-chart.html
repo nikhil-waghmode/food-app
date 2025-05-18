@@ -207,7 +207,7 @@
     </div>
 
     <!-- Orders Table -->
-    <h4 class="mb-3">Orders</h4>
+    <h4 class="mb-3">Orders Today</h4>
     <table class="table table-bordered table-hover mb-5">
       <thead class="table-light">
         <tr>
@@ -357,20 +357,44 @@
       renderRevenuePerWeekChart();
       renderRevenuePerMonthChart();
       renderBestAndLeastSellingItem();
+      
     async function loadReportRestaurantData() {
       try {
-        currentOwnerId = localStorage.getItem("currentOwnerId");
-        console.log("first")
-console.log(currentOwnerId)
-        res = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
+        currentOwnerId = getUserId()
+
+        res = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": getAuthorization()
+            },
+        });
+        
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         restaurant = await res.json();
+        try{
+        	imageRes = await fetch(`${apiUrl}/restaurants/image/${restaurant.restaurantImg}`, {
+          	  method: "GET",
+          	  headers: {
+          	    "Authorization": getAuthorization()
+          	  }
+          });
+        }
+        catch (error) {
+            if (!imageRes.ok) throw new Error("Failed to fetch image: ", error);
+
+        }
+        
+        imageBlob = await imageRes.blob();
+        imageUrl = URL.createObjectURL(imageBlob);
+        
+        document.getElementById('restaurantImage').src = imageUrl;
         console.log(restaurant)
+        console.log("name: ", restaurant.name)
 
         document.getElementById("reportRestaurantName").textContent = restaurant.name;
         document.getElementById("reportRestaurantPhone").textContent = restaurant.contact;
         document.getElementById("reportRestaurantLocation").textContent = restaurant.location;
-        document.getElementById('restaurantImage').src = `${apiUrl}/restaurants/image/${restaurant.resImage}`;
         document.getElementById('restaurantImage').alt = restaurant.name;
         console.log("restaurant", restaurant)
       } catch (err) {
@@ -382,23 +406,51 @@ console.log(currentOwnerId)
       date = document.getElementById('reportDate').value;
       document.getElementById("demographicDate").innerText = date;
 
-      res = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
-      restaurant = await res.json();
-      restaurantId = restaurant.id;
+      restaurantId = getCurrentRestaurantId();
 
       document.getElementById('totalOrders').innerText =
-        await (await fetch(`${apiUrl}/orders/restaurant/count/${restaurantId}`)).text();
+        await (await fetch(`${apiUrl}/orders/restaurant/count/${restaurantId}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": getAuthorization()
+            }
+          })).text();
 
       document.getElementById('ordersOnDate').innerText =
-        await (await fetch(`${apiUrl}/orders/restaurant/count/${restaurantId}?date=${date}`)).text();
+        await (await fetch(`${apiUrl}/orders/restaurant/count/${restaurantId}?date=${date}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": getAuthorization()
+            }
+          })).text();
 
       document.getElementById('totalRevenue').innerText = "₹" +
-        await (await fetch(`${apiUrl}/orders/restaurant/revenue/${restaurantId}`)).text();
+        await (await fetch(`${apiUrl}/orders/restaurant/revenue/${restaurantId}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": getAuthorization()
+            }
+          })).text();
 
       document.getElementById('revenueOnDate').innerText = "₹" +
-        await (await fetch(`${apiUrl}/orders/restaurant/revenue/${restaurantId}?date=${date}`)).text();
+        await (await fetch(`${apiUrl}/orders/restaurant/revenue/${restaurantId}?date=${date}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": getAuthorization()
+            }
+          })).text();
 
-      orders = await (await fetch(`${apiUrl}/orders/detail/restaurant/${restaurantId}?date=${date}`)).json();
+      orders = await (await fetch(`${apiUrl}/orders/detail/restaurant/${restaurantId}?date=${date}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": getAuthorization()
+          }
+        })).json();
       tbody = document.getElementById("ordersTable");
       tbody.innerHTML = "";
       orders.forEach(o => {
@@ -411,8 +463,15 @@ console.log(currentOwnerId)
           <td>₹${o.totalAmount}</td>
         </tr>`;
       });
-
-      itemsRes = await fetch(`${apiUrl}/fooditems/sold/${restaurantId}?date=${date}`);
+      
+      itemsRes = await fetch(`${apiUrl}/fooditems/sold/${restaurantId}?date=${date}`, {
+          method: "GET",
+          headers: {
+              "Content-Type": "application/json",
+              "Authorization": getAuthorization()
+          },
+      });
+     
       items = await itemsRes.json();
       itemNames = items.map(item => item[0]);
       itemQuantities = items.map(item => item[1]);
@@ -434,17 +493,19 @@ console.log(currentOwnerId)
     }
 
     async function renderRecentOrders() {
-      currentRestaurantRes = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
-      currentRestaurant = await currentRestaurantRes.json();
 
-      currentRestaurantId = currentRestaurant.id;
+      currentRestaurantId = getCurrentRestaurantId();
 
-      //  recentOrdersRes = await fetch(`${apiUrl}/orders/recents/${currentRestaurantId}`);
-      recentOrdersRes = await fetch(`${apiUrl}/orders/detail/restaurant/${currentRestaurantId}`);
+      recentOrdersRes = await fetch(`${apiUrl}/orders/detail/restaurant/${currentRestaurantId}`, {
+          method: "GET",
+          headers: {
+              "Content-Type": "application/json",
+              "Authorization": getAuthorization()
+          },
+      })
 
       recentOrdersData = await recentOrdersRes.json();
       limitedOrders = recentOrdersData.slice(0, 3);
-      // console.log(recentOrdersData)
       tableBody = document.getElementById("recentOrdersTable");
       tableBody.innerHTML = "";
       limitedOrders.forEach(order => {
@@ -460,11 +521,16 @@ console.log(currentOwnerId)
     }
 
     async function renderRecentFoodItems() {
-      currentRestaurantRes = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
-      currentRestaurant = await currentRestaurantRes.json();
-      currentRestaurantId = currentRestaurant.id;
 
-      res = await fetch(`${apiUrl}/fooditems/recent/${currentRestaurantId}`);
+      currentRestaurantId = getCurrentRestaurantId();
+
+      res = await fetch(`${apiUrl}/fooditems/recent/${currentRestaurantId}`, {
+          method: "GET",
+          headers: {
+              "Content-Type": "application/json",
+              "Authorization": getAuthorization()
+          },
+      });
       fooditems = await res.json();
       tbody = document.getElementById("recentAddedItemTable");
       tbody.innerHTML = "";
@@ -481,11 +547,17 @@ console.log(currentOwnerId)
     }
 
     async function renderTopCustomers() {
-      currentRestaurantRes = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
-      currentRestaurant = await currentRestaurantRes.json();
-      currentRestaurantId = currentRestaurant.id;
+/*       currentRestaurantRes = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
+      currentRestaurant = await currentRestaurantRes.json(); */
+      currentRestaurantId = getCurrentRestaurantId();
 
-      res = await fetch(`${apiUrl}/restaurants/customers/details/${currentRestaurantId}`);
+      res = await fetch(`${apiUrl}/restaurants/customers/details/${currentRestaurantId}`, {
+          method: "GET",
+          headers: {
+              "Content-Type": "application/json",
+              "Authorization": getAuthorization()
+          },
+      });
       customers = await res.json();
 
       tbody = document.getElementById("topCustomersTable");
@@ -504,11 +576,17 @@ console.log(currentOwnerId)
     }
 
     async function renderOrdersPerWeekChart() {
-      currentRestaurantRes = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
-      currentRestaurant = await currentRestaurantRes.json();
-      currentRestaurantId = currentRestaurant.id;
+      currentRestaurantId = getCurrentRestaurantId();
 
-      ordersPerWeekRes = await fetch(`${apiUrl}/orders/restaurant/charts/orders-per-week/${currentRestaurantId}`);
+
+      ordersPerWeekRes = await fetch(`${apiUrl}/orders/restaurant/charts/orders-per-week/${currentRestaurantId}`, {
+          method: "GET",
+          headers: {
+              "Content-Type": "application/json",
+              "Authorization": getAuthorization()
+          },
+      });
+      
       ordersPerWeekData = await ordersPerWeekRes.json();
 
       weeks = ordersPerWeekData.map(item => item[0]);
@@ -538,11 +616,16 @@ console.log(currentOwnerId)
     }
 
     async function renderRevenueByCategoryChart() {
-      currentRestaurantRes = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
-      currentRestaurant = await currentRestaurantRes.json();
-      currentRestaurantId = currentRestaurant.id;
+      currentRestaurantId = getCurrentRestaurantId();
 
-      revenueCategoryRes = await fetch(`${apiUrl}/orders/restaurant/charts/revenue-by-category/${currentRestaurantId}`);
+
+      revenueCategoryRes = await fetch(`${apiUrl}/orders/restaurant/charts/revenue-by-category/${currentRestaurantId}`, {
+          method: "GET",
+          headers: {
+              "Content-Type": "application/json",
+              "Authorization": getAuthorization()
+          },
+      });
       revenueCategoryData = await revenueCategoryRes.json();
 
       categories = revenueCategoryData.map(item => item[0]);
@@ -568,11 +651,16 @@ console.log(currentOwnerId)
     }
 
     async function renderRevenuePerWeekChart() {
-      currentRestaurantRes = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
-      currentRestaurant = await currentRestaurantRes.json();
-      currentRestaurantId = currentRestaurant.id;
+      currentRestaurantId = getCurrentRestaurantId();
 
-      revenuePerWeekRes = await fetch(`${apiUrl}/orders/restaurant/charts/revenue-per-week/${currentRestaurantId}`);
+
+      revenuePerWeekRes = await fetch(`${apiUrl}/orders/restaurant/charts/revenue-per-week/${currentRestaurantId}`, {
+          method: "GET",
+          headers: {
+              "Content-Type": "application/json",
+              "Authorization": getAuthorization()
+          },
+      });
       revenuePerWeekData = await revenuePerWeekRes.json();
 
       weeks = revenuePerWeekData.map(item => item[0]);
@@ -603,11 +691,16 @@ console.log(currentOwnerId)
 
     async function renderRevenuePerMonthChart() {
 
-      currentRestaurantRes = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
-      currentRestaurant = await currentRestaurantRes.json();
-      currentRestaurantId = currentRestaurant.id;
+      currentRestaurantId = getCurrentRestaurantId();
 
-      revenuePerMonthRes = await fetch(`${apiUrl}/orders/restaurant/charts/revenue-per-month/${currentRestaurantId}`);
+
+      revenuePerMonthRes = await fetch(`${apiUrl}/orders/restaurant/charts/revenue-per-month/${currentRestaurantId}`, {
+          method: "GET",
+          headers: {
+              "Content-Type": "application/json",
+              "Authorization": getAuthorization()
+          },
+      });
       revenuePerMonthData = await revenuePerMonthRes.json();
 
       months = revenuePerMonthData.map(item => item[0]);
@@ -638,14 +731,25 @@ console.log(currentOwnerId)
 
     async function renderBestAndLeastSellingItem() {
 
-      currentRestaurantRes = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
-      currentRestaurant = await currentRestaurantRes.json();
-      currentRestaurantId = currentRestaurant.id;
+      currentRestaurantId = getCurrentRestaurantId();
 
 
-      bestItemRes = await fetch(`${apiUrl}/fooditems/best/${currentRestaurantId}`);
+
+      bestItemRes = await fetch(`${apiUrl}/fooditems/best/${currentRestaurantId}`, {
+          method: "GET",
+          headers: {
+              "Content-Type": "application/json",
+              "Authorization": getAuthorization()
+          },
+      });
       bestItem = await bestItemRes.json();
-      leastItemRes = await fetch(`${apiUrl}/fooditems/least/${currentRestaurantId}`);
+      leastItemRes = await fetch(`${apiUrl}/fooditems/least/${currentRestaurantId}`, {
+          method: "GET",
+          headers: {
+              "Content-Type": "application/json",
+              "Authorization": getAuthorization()
+          },
+      });
       leastItem = await leastItemRes.json();
       document.getElementById("bestSellingItem").innerHTML = `${bestItem[0][1]}`;
       document.getElementById("leastSellingItem").innerHTML = `${leastItem[0][1]}`;
@@ -653,15 +757,32 @@ console.log(currentOwnerId)
     }
 
     function exportToPDF() {
-      element = document.getElementById("reportContent");
-      date = document.getElementById('reportDate').value
-      html2pdf().set({
-        margin: 0.5,
-        filename: `Report_${date}.pdf`,
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-      }).from(element).save();
-    }
+    	  try {
+    	    const element = document.getElementById("reportContent");
+    	    const date = document.getElementById('reportDate').value;
+
+    	    if (!element) throw new Error("Report content not found.");
+    	    if (!date) throw new Error("No report date selected.");
+
+    	    html2pdf().set({
+    	      margin: 0.5,
+    	      filename: `Report_${date}.pdf`,
+    	      html2canvas: { scale: 2 },
+    	      jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+    	    }).from(element).save()
+    	      .then(() => {
+    	        alert("Report downloaded successfully.");
+    	      })
+    	      .catch((error) => {
+    	        console.error("PDF generation failed:", error);
+    	        alert("Failed to generate the PDF.");
+    	      });
+
+    	  } catch (err) {
+    	    console.error("Export to PDF error:", err);
+    	    alert("Error occurred: " + err.message);
+    	  }
+    	}
 
 
   </script>

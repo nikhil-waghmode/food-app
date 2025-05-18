@@ -139,11 +139,16 @@
     <script>
 
         welcomeMessage = document.getElementById("welcomeMessage");
-        currentAdminId = localStorage.getItem("currentAdminId");
+        currentAdminId = getUserId();
 
         async function fetchAllData() {
-            const response = await fetch("http://localhost:8080/api/dashboard")
-            
+            const response = await fetch(`${apiUrl}/dashboard`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": getAuthorization()
+                },
+            })
              if (!response.ok) {
             throw new Error("Network response was not ok");
           }
@@ -164,7 +169,13 @@
         async function renderQuickStats(recentOrders, totalRestaurants, totalFoodItems, totalOrders, totalCustomers, totalOwners,totalUsers,bestSelling,leastSelling) {
         // console.log(users);
             try {
-                currentAdminRes = await fetch(`${apiUrl}/users/${currentAdminId}`);
+                currentAdminRes = await fetch(`${apiUrl}/users/${currentAdminId}`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": getAuthorization()
+                    },
+                });
                 currentAdminData = await currentAdminRes.json();
                 console.log("total food items "+totalFoodItems)
                 welcomeMessage.innerHTML = `Welcome, ${currentAdminData.name} 👩🏻‍💼`;
@@ -203,7 +214,13 @@
 
 async function renderTopRestaurants() {
   try {
-    const topRestaurantsRes = await fetch(`http://localhost:8080/api/restaurants/top-rated`);
+    const topRestaurantsRes = await fetch(`${apiUrl}/restaurants/top-rated`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": getAuthorization()
+        },
+    });
     const topRestaurantsData = await topRestaurantsRes.json();
 
     console.log(topRestaurantsData);

@@ -10,10 +10,13 @@ import com.capgemini.food_app.dto.DashboardDTO;
 import com.capgemini.food_app.service.DashboardDTOService;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping("/api/dashboard")
+@PreAuthorize("hasRole('CUSTOMER') or hasRole('ADMIN') or hasRole('OWNER')")
+
 public class DashboardDTOController {
 
     private final DashboardDTOService dashboardService;

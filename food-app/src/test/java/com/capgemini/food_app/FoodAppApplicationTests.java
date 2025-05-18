@@ -8,6 +8,7 @@ class FoodAppApplicationTests {
 
 	@Test
 	void contextLoads() {
+		throw new UnsupportedOperationException("Not yet implemented");
 	}
 
 }

@@ -10,7 +10,6 @@ public class TopRestaurantDTO {
 
     public TopRestaurantDTO() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	public TopRestaurantDTO(Restaurant restaurant, Double averageRating) {

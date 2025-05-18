@@ -19,7 +19,6 @@ public class DashboardDTO {
 
 	public DashboardDTO() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	public DashboardDTO(List<Order> recentOrders, int totalRestaurants, int totalFoodItems, int totalOrders,

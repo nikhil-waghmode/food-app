@@ -85,15 +85,15 @@
         <label class="form-label">User Type</label><br />
         <div class="form-check form-check-inline">
           <input class="form-check-input" type="radio" name="usertype" id="customer" value="CUSTOMER" checked />
-          <label class="form-check-label" for="customer">Customer</label>
+          <label class="form-check-label" for="customer">CUSTOMER</label>
         </div>
         <div class="form-check form-check-inline">
           <input class="form-check-input" type="radio" name="usertype" id="owner" value="OWNER" />
-          <label class="form-check-label" for="owner">Restaurant Owner</label>
+          <label class="form-check-label" for="owner">OWNER</label>
         </div>
         <div class="form-check form-check-inline">
           <input class="form-check-input" type="radio" name="usertype" id="admin" value="ADMIN" />
-          <label class="form-check-label" for="admin">Admin</label>
+          <label class="form-check-label" for="admin">ADMIN</label>
         </div>
         <div class="form-text text-danger d-none" id="userTypeError">Please select a user type.</div>
       </div>
@@ -123,7 +123,7 @@
   </div>
 
   <script>
-    apiUrl = "http://localhost:8080/api";
+    //apiUrl = "http://localhost:8080/api";
 
     nameInput = document.getElementById("nameInput");
     passwordInput = document.getElementById("passwordInput");
@@ -151,21 +151,22 @@
 
 
 
-    async function addUser() {
-      const newUser = {
-        name: nameInput.value.trim(),
-        email: emailInput.value.trim(),
-        password: passwordInput.value.trim(),
-        phone: phoneInput.value.trim(),
-        userType: document.querySelector('input[name="usertype"]:checked').value,
-        location: locationInput.value.trim(),
-      };
+   /*  async function addUser() {
 
+      const formData = new FormData();
+      formData.append("name", nameInput.value.trim());
+      formData.append("email", emailInput.value.trim());
+      formData.append("password", passwordInput.value.trim());
+      formData.append("phone", phoneInput.value.trim());
+      formData.append("location", locationInput.value.trim());
+      formData.append("userType", document.querySelector('input[name="usertype"]:checked').value);
+      formData.append("userImg", selectedImageFile); // optional
+      
       try {
-        const response = await fetch(`${apiUrl}/users`, {
+        const response = await fetch(`http://localhost:8080/auth`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(newUser),
+          //headers: { "Content-Type": "application/json" },
+          body: formData,
         });
 
         if (!response.ok) throw new Error("User creation failed.");
@@ -173,20 +174,21 @@
         const createdUser = await response.json();
         const userId = createdUser.id;
 
-        // If Restaurant Owner, create associated restaurant
-        if (newUser.userType === "Restaurant Owner") {
-
-          const newRestaurant = {
-            name: restaurantNameInput.value.trim(),
-            location: restaurantLocationInput.value.trim(),
-            phone: restaurantPhoneInput.value.trim(),
-            ownerID: userId
-          };
+        // If OWNER, create associated restaurant
+        if (newUser.userType === "OWNER") {
+        	
+        	const restaurantData = new FormData();
+            restaurantData.append("name", restaurantNameInput.value.trim());
+            restaurantData.append("location", restaurantLocationInput.value.trim());
+            restaurantData.append("contact", restaurantPhoneInput.value.trim());
+            restaurantData.append("ownerId", userId);
+            
 
           const restRes = await fetch(`${apiUrl}/restaurants`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(newRestaurant),
+            //headers: { "Content-Type": "application/json" },
+            //body: JSON.stringify(newRestaurant),
+           	body: restaurantData
           });
 
           if (!restRes.ok) throw new Error("Restaurant creation failed.");
@@ -199,7 +201,52 @@
         console.error("Error:", err);
         alert("Something went wrong during registration.");
       }
-    }
+    } */
+    async function addUser() {
+    	  const formData = new FormData();
+
+    	  const userType = document.querySelector('input[name="usertype"]:checked').value;
+
+    	  formData.append("name", nameInput.value.trim());
+    	  formData.append("email", emailInput.value.trim());
+    	  formData.append("password", passwordInput.value.trim());
+    	  formData.append("phone", phoneInput.value.trim());
+    	  formData.append("location", locationInput.value.trim());
+    	  formData.append("userType", userType);
+
+    	  // If user image is selected
+    	  if (typeof selectedImageFile !== "undefined" && selectedImageFile) {
+    	    formData.append("userImg", selectedImageFile);
+    	  }
+
+    	  // If OWNER, also include restaurant fields in same form
+    	  if (userType === "OWNER") {
+    	    formData.append("restaurantName", restaurantNameInput.value.trim());
+    	    formData.append("restaurantLocation", restaurantLocationInput.value.trim());
+    	    formData.append("restaurantPhone", restaurantPhoneInput.value.trim());
+
+    	    if (typeof selectedRestaurantImageFile !== "undefined" && selectedRestaurantImageFile) {
+    	      formData.append("resImage", selectedRestaurantImageFile);
+    	    }
+    	  }
+
+    	  try {
+    	    const response = await fetch(`http://localhost:8080/auth/register`, {
+    	      method: "POST",
+    	      body: formData,
+    	    });
+
+    	    if (!response.ok) throw new Error("User creation failed");
+
+    	    const createdUser = await response.json();
+
+    	    alert("User Registration Successful! 🎉");
+    	    window.location.href = "./login.html";
+    	  } catch (err) {
+    	    console.error("Error:", err);
+    	    alert("Something went wrong during registration.");
+    	  }
+    	}
 
 
     function validatePhone() {
@@ -250,13 +297,14 @@
     }
 
 
-    async function checkEmailExits() {
+    async function checkEmailExists() {
       const email = emailInput.value.trim();
       if (validateEmail()) {
         try {
-          const existsRes = await fetch(`${apiUrl}/users/exists/${email}`);
-          const existsText = await existsRes.text();
-          if (existsText === "true") {
+          const existsRes = await fetch(`http://localhost:8080/auth/exists?email=${encodeURIComponent(email)}`);
+          const existsJson = await existsRes.json();
+   
+          if (existsJson.exists === "true") {
             emailInput.classList.add("is-invalid");
             emailInput.classList.remove("is-valid");
             document.getElementById("emailError").style.display = "block";
@@ -292,14 +340,14 @@
 
       const nameValid = nameInput.value.trim() !== "";
       const locationValid = locationInput.value.trim() !== "";
-      const emailValid = await checkEmailExits();
+      const emailValid = await checkEmailExists();
       const phoneValid = validatePhone();
       const passwordValid = validatePassword();
 
       restaurantValid = true;
       const userType = document.querySelector('input[name="usertype"]:checked').value;
 
-      if (userType === "Restaurant Owner") {
+      if (userType === "OWNER") {
         const nameCheck = restaurantNameInput.value.trim() !== "";
         const locationCheck = restaurantLocationInput.value.trim() !== "";
         const phoneCheck = validateRestaurantPhone();
@@ -317,7 +365,7 @@
     restaurantPhoneInput.addEventListener("blur", validateRestaurantPhone);
     phoneInput.addEventListener("blur", validatePhone);
     passwordInput.addEventListener("blur", validatePassword);
-    emailInput.addEventListener("blur", checkEmailExits);
+    emailInput.addEventListener("blur", checkEmailExists);
   </script>
 </body>
 

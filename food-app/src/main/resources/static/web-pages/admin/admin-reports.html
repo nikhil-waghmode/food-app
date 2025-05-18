@@ -155,16 +155,34 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
 
-        currentAdminId = localStorage.getItem("currentAdminId");
+        currentAdminId = getUserId();
 
 
         async function renderSalesPerRestaurantChart() {
             try {
-                currentAdminRes = await fetch(`${apiUrl}/users/${currentAdminId}`);
+                currentAdminRes = await fetch(`${apiUrl}/users/${currentAdminId}`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": getAuthorization()
+                    },
+                })
                 currentAdminData = await currentAdminRes.json();
 
-                const restaurantsRes = await fetch(`${apiUrl}/restaurants`);
-                const ordersRes = await fetch(`${apiUrl}/orders`);
+                const restaurantsRes = await fetch(`${apiUrl}/restaurants` , {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": getAuthorization()
+                    },
+                })
+                const ordersRes = await fetch(`${apiUrl}/orders`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": getAuthorization()
+                    },
+                })
 
                 const restaurants = await restaurantsRes.json();
                 const orders = await ordersRes.json();
@@ -211,7 +229,13 @@
         }
 
         async function renderOwnerLocationChart() {
-            restaurantsRes = await fetch(`${apiUrl}/restaurants`);
+            restaurantsRes = await fetch(`${apiUrl}/restaurants`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": getAuthorization()
+                },
+            })
             restaurants = await restaurantsRes.json();
 
             locationMap = {};
@@ -245,7 +269,13 @@
 
         async function renderOrdersPerWeekChart() {
 
-        ordersPerWeekRes = await fetch(`${apiUrl}/orders/restaurant/charts/orders-per-week`);
+        ordersPerWeekRes = await fetch(`${apiUrl}/orders/restaurant/charts/orders-per-week`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": getAuthorization()
+            },
+        });
         ordersPerWeekData = await ordersPerWeekRes.json();
 
         weeks = ordersPerWeekData.map(item => item[0]);
@@ -279,7 +309,13 @@
     async function renderRevenueByCategoryChart() {
 
 
-        revenueCategoryRes = await fetch(`${apiUrl}/orders/restaurant/charts/revenue-by-category`);
+        revenueCategoryRes = await fetch(`${apiUrl}/orders/restaurant/charts/revenue-by-category`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": getAuthorization()
+            },
+        });
         revenueCategoryData = await revenueCategoryRes.json();
 
         categories = revenueCategoryData.map(item => item[0]);
@@ -308,7 +344,13 @@
     async function renderRevenuePerWeekChart() {
 
 
-        revenuePerWeekRes = await fetch(`${apiUrl}/orders/restaurant/charts/revenue-per-week`);
+        revenuePerWeekRes = await fetch(`${apiUrl}/orders/restaurant/charts/revenue-per-week`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": getAuthorization()
+            },
+        })
         revenuePerWeekData = await revenuePerWeekRes.json();
 
         weeks = revenuePerWeekData.map(item => item[0]);
@@ -342,7 +384,13 @@
 
 
 
-        revenuePerMonthRes = await fetch(`${apiUrl}/orders/restaurant/charts/revenue-per-month`);
+        revenuePerMonthRes = await fetch(`${apiUrl}/orders/restaurant/charts/revenue-per-month`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": getAuthorization()
+            },
+        });
         revenuePerMonthData = await revenuePerMonthRes.json();
 
         months = revenuePerMonthData.map(item => item[0]);

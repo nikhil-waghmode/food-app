@@ -107,15 +107,20 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="../js/script.js"></script>
 <script>
-    currentOwnerId = localStorage.getItem("currentOwnerId");
+    currentOwnerId = getUserId();
 
 
     async function renderOrdersPerWeekChart() {
-        currentRestaurantRes = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
-      currentRestaurant = await currentRestaurantRes.json();
-      currentRestaurantId = currentRestaurant.id;
 
-        ordersPerWeekRes = await fetch(`${apiUrl}/orders/restaurant/charts/orders-per-week/${currentRestaurantId}`);
+
+      currentRestaurantId = getCurrentRestaurantId();
+        ordersPerWeekRes = await fetch(`${apiUrl}/orders/restaurant/charts/orders-per-week/${currentRestaurantId}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": getAuthorization()
+            },
+        });
         ordersPerWeekData = await ordersPerWeekRes.json();
 
         weeks = ordersPerWeekData.map(item => item[0]);
@@ -147,11 +152,16 @@
 
 
     async function renderRevenueByCategoryChart() {
-        currentRestaurantRes = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
-      currentRestaurant = await currentRestaurantRes.json();
-      currentRestaurantId = currentRestaurant.id;
+      currentRestaurantId = getCurrentRestaurantId();
 
-        revenueCategoryRes = await fetch(`${apiUrl}/orders/restaurant/charts/revenue-by-category/${currentRestaurantId}`);
+
+        revenueCategoryRes = await fetch(`${apiUrl}/orders/restaurant/charts/revenue-by-category/${currentRestaurantId}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": getAuthorization()
+            },
+        });
         revenueCategoryData = await revenueCategoryRes.json();
 
         categories = revenueCategoryData.map(item => item[0]);
@@ -178,11 +188,16 @@
     renderRevenueByCategoryChart();
 
     async function renderRevenuePerWeekChart() {
-        currentRestaurantRes = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
-      currentRestaurant = await currentRestaurantRes.json();
-      currentRestaurantId = currentRestaurant.id;
+      currentRestaurantId = getCurrentRestaurantId();
 
-        revenuePerWeekRes = await fetch(`${apiUrl}/orders/restaurant/charts/revenue-per-week/${currentRestaurantId}`);
+
+        revenuePerWeekRes = await fetch(`${apiUrl}/orders/restaurant/charts/revenue-per-week/${currentRestaurantId}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": getAuthorization()
+            },
+        });
         revenuePerWeekData = await revenuePerWeekRes.json();
 
         weeks = revenuePerWeekData.map(item => item[0]);
@@ -214,11 +229,16 @@
 
     async function renderRevenuePerMonthChart() {
 
-        currentRestaurantRes = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
-      currentRestaurant = await currentRestaurantRes.json();
-      currentRestaurantId = currentRestaurant.id;
+      currentRestaurantId = getCurrentRestaurantId();
 
-        revenuePerMonthRes = await fetch(`${apiUrl}/orders/restaurant/charts/revenue-per-month/${currentRestaurantId}`);
+
+        revenuePerMonthRes = await fetch(`${apiUrl}/orders/restaurant/charts/revenue-per-month/${currentRestaurantId}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": getAuthorization()
+            },
+        });
         revenuePerMonthData = await revenuePerMonthRes.json();
 
         months = revenuePerMonthData.map(item => item[0]);
@@ -250,14 +270,25 @@
 
     async function renderBestAndLeastSellingItem(){
 
-        currentRestaurantRes = await fetch(`${apiUrl}/restaurants/owner/${currentOwnerId}`);
-      currentRestaurant = await currentRestaurantRes.json();
-      currentRestaurantId = currentRestaurant.id;
+      currentRestaurantId = getCurrentRestaurantId();
 
 
-        bestItemRes = await fetch(`${apiUrl}/fooditems/best/${currentRestaurantId}`);
+
+        bestItemRes = await fetch(`${apiUrl}/fooditems/best/${currentRestaurantId}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": getAuthorization()
+            },
+        });
         bestItem = await bestItemRes.json();
-        leastItemRes= await fetch(`${apiUrl}/fooditems/least/${currentRestaurantId}`);
+        leastItemRes= await fetch(`${apiUrl}/fooditems/least/${currentRestaurantId}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": getAuthorization()
+            },
+        });
         leastItem = await leastItemRes.json();
         document.getElementById("bestSellingItem").innerHTML=`${bestItem[0][1]}`;
         document.getElementById("leastSellingItem").innerHTML=`${leastItem[0][1]}`;

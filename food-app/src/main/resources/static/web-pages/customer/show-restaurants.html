@@ -61,7 +61,13 @@
             container = document.getElementById("restaurant-list");
             container.innerHTML = "";
 
-            fetch(`${apiUrl}/restaurants`)
+            fetch(`${apiUrl}/restaurants`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": getAuthorization()
+                },
+            })
                 .then(response => response.json())
                 .then(restaurants => {
                     restaurants.forEach(restaurant => {
@@ -95,7 +101,13 @@
             restaurantSection.classList.add("hidden");
             menuSection.classList.remove("hidden");
 
-            restaurantRes = await fetch(`${apiUrl}/restaurants/${restaurantId}`);
+            restaurantRes = await fetch(`${apiUrl}/restaurants/${restaurantId}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": getAuthorization()
+                },
+            });
             restaurant = await restaurantRes.json();
             document.getElementById("menu-restaurant-name").textContent = restaurant.name;
             document.getElementById("menu-restaurant-location").textContent = restaurant.location;
@@ -104,7 +116,13 @@
             const container = document.getElementById("menu-items");
             container.innerHTML = "";
 
-            menuItemsRes = await fetch(`${apiUrl}/fooditems/restaurant/${restaurantId}`);
+            menuItemsRes = await fetch(`${apiUrl}/fooditems/restaurant/${restaurantId}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": getAuthorization()
+                },
+            });
             menuItems = await menuItemsRes.json();
 
             if (menuItems.length === 0) {
@@ -153,7 +171,7 @@
         cartItems = [];
 
         function addToCart(item,restaurantId) {
-            currentUserId = localStorage.getItem("currentUserId");
+            currentUserId = getUserId();
 
             if (!currentUserId) {
                 alert("Please log in first.");

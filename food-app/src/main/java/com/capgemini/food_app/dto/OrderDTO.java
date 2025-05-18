@@ -15,24 +15,22 @@ import java.util.List;
  */
 public class OrderDTO {
 
-	Long orderID;
-	String customerName;
-	String customerLocation;
-	LocalDate orderDate;
+	private Long orderID;
+	private String customerName;
+	private String customerLocation;
+	private LocalDate orderDate;
 
-	Double totalAmount;
-	List<String> items = new ArrayList<>(); // item names + quantities
-	String restaurantID;
-	Integer itemPrice;
+	private Double totalAmount;
+	private List<String> items = new ArrayList<>(); 
+	private String restaurantID;
+	private Integer itemPrice;
 
 	public OrderDTO() {
 		super();
 	}
-
-
+	
 	public OrderDTO(Long orderID, String customerName, String customerLocation, LocalDate orderDate, Double totalAmount,
 			List<String> items, String restaurantID, Integer itemPrice) {
-		super();
 		this.orderID = orderID;
 		this.customerName = customerName;
 		this.customerLocation = customerLocation;
