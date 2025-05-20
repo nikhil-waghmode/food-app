@@ -38,10 +38,9 @@ public class Restaurant {
         super();
     }
 
-    public Restaurant(Long id, String name, String location, String contact, Long ownerId, String restaurantImg,
+    public Restaurant(String name, String location, String contact, Long ownerId, String restaurantImg,
                       List<FoodItem> foodItem) {
         super();
-        this.id = id;
         this.name = name;
         this.location = location;
         this.contact = contact;
@@ -50,10 +49,9 @@ public class Restaurant {
         this.foodItem = foodItem;
     }
 
-    public Restaurant(Long id, String name, String location, String contact, Long ownerId, String restaurantImg,
+    public Restaurant(String name, String location, String contact, Long ownerId, String restaurantImg,
                       List<FoodItem> foodItem, List<Review> review) {
         super();
-        this.id = id;
         this.name = name;
         this.location = location;
         this.contact = contact;

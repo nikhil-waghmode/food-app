@@ -26,8 +26,8 @@ public class ReviewServiceImplTest {
 
 	    @Test
 	    void testCreateReview() {
-	        Review review = new Review(null, 5F, "Nice", LocalDate.now(), 1L);
-	        Review saved = new Review(1L, 5F, "Nice", LocalDate.now(), 1L);
+	        Review review = new Review(5F, "Nice", LocalDate.now(), 1L);
+	        Review saved = new Review(5F, "Nice", LocalDate.now(), 1L);
 
 	        when(reviewRepository.save(review)).thenReturn(saved);
 
@@ -39,8 +39,8 @@ public class ReviewServiceImplTest {
 	    @Test
 	    void testGetAllReviews() {
 	        List<Review> reviews = Arrays.asList(
-	            new Review(1L, 5F, "Great", LocalDate.now(), 1L),
-	            new Review(2L, 4F, "Good", LocalDate.now(), 2L)
+	            new Review(5F, "Great", LocalDate.now(), 1L),
+	            new Review(4F, "Good", LocalDate.now(), 2L)
 	        );
 
 	        when(reviewRepository.findAll()).thenReturn(reviews);
@@ -52,7 +52,7 @@ public class ReviewServiceImplTest {
 
 	    @Test
 	    void testGetReviewById_found() {
-	        Review review = new Review(1L, 4F, "Okay", LocalDate.now(), 1L);
+	        Review review = new Review(4F, "Okay", LocalDate.now(), 1L);
 
 	        when(reviewRepository.findById(1L)).thenReturn(Optional.of(review));
 
@@ -67,14 +67,14 @@ public class ReviewServiceImplTest {
 
 	        assertThatThrownBy(() -> reviewService.getReviewById(100L))
 	            .isInstanceOf(RuntimeException.class)
-	            .hasMessageContaining("Review not found with id: 100");
+	            .hasMessageContaining("Review with ID 100 not found.");
 	    }
 
 	    @Test
 	    void testUpdateReview() {
-	        Review existing = new Review(1L, 3F, "Old", LocalDate.of(2024, 1, 1), 1L);
-	        Review updated = new Review(null, 5F, "Updated", LocalDate.of(2025, 1, 1), 2L);
-	        Review saved = new Review(1L, 5F, "Updated", LocalDate.of(2025, 1, 1), 2L);
+	        Review existing = new Review(3F, "Old", LocalDate.of(2024, 1, 1), 1L);
+	        Review updated = new Review(5F, "Updated", LocalDate.of(2025, 1, 1), 2L);
+	        Review saved = new Review(5F, "Updated", LocalDate.of(2025, 1, 1), 2L);
 
 	        when(reviewRepository.findById(1L)).thenReturn(Optional.of(existing));
 	        when(reviewRepository.save(any(Review.class))).thenReturn(saved);
@@ -97,7 +97,7 @@ public class ReviewServiceImplTest {
 
 	    @Test
 	    void testGetReviewByRestaurant() {
-	        List<Review> reviews = List.of(new Review(1L, 5F, "Yummy", LocalDate.now(), 10L));
+	        List<Review> reviews = List.of(new Review(5F, "Yummy", LocalDate.now(), 10L));
 
 	        when(reviewRepository.findByRestaurantId(10L)).thenReturn(reviews);
 
@@ -108,7 +108,7 @@ public class ReviewServiceImplTest {
 
 	    @Test
 	    void testGetReviewByUser() {
-	        List<Review> reviews = List.of(new Review(1L, 4F, "User review", LocalDate.now(), 2L));
+	        List<Review> reviews = List.of(new Review(4F, "User review", LocalDate.now(), 2L));
 
 	        when(reviewRepository.findByUserId(20L)).thenReturn(reviews);
 

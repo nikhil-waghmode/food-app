@@ -27,17 +27,15 @@ public class OrderItem {
 	public OrderItem() {
 	}
 
-	public OrderItem(Long id, Long orderId, Long itemId, Integer quantity) {
+	public OrderItem(Long orderId, Long itemId, Integer quantity) {
 		super();
-		this.id = id;
 		this.orderId = orderId;
 		this.itemId = itemId;
 		this.quantity = quantity;
 	}
 
-	public OrderItem(Long id, Integer quantity) {
+	public OrderItem(Integer quantity) {
 		super();
-		this.id = id;
 		this.quantity = quantity;
 	}
 

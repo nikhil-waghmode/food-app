@@ -51,9 +51,8 @@ public class Review {
         super();
     }
 
-    public Review(Long id, Float rating, String feedback, LocalDate date, Long userId) {
+    public Review(Float rating, String feedback, LocalDate date, Long userId) {
         super();
-        this.id = id;
         this.rating = rating;
         this.feedback = feedback;
         this.date = date;

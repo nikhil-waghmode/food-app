@@ -36,7 +36,7 @@ public class RestaurantServiceImpl implements RestaurantService {
 
     @Override
     public Restaurant getRestaurantByOwner(Long ownerId) {
-        return restaurantRepository.findByOwnerId(ownerId);
+    	return restaurantRepository.findByOwnerId(ownerId).orElse(null);
     }
 
     @Override

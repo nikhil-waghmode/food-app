@@ -62,9 +62,15 @@ public class AuthController {
 			claims.put("usertype", user.getUserType());
 			
 			if (user.getUserType().equals("OWNER")) {
-				Restaurant restaurant = restaurantService.getRestaurantByOwner(user.getId());
-				claims.put("currentRestaurantId", restaurant.getId());
+			    Restaurant restaurant = restaurantService.getRestaurantByOwner(user.getId());
+			    if (restaurant != null) {
+			        claims.put("currentRestaurantId", restaurant.getId());
+			    } else {
+			        System.out.println("No restaurant found for OWNER with id: " + user.getId());
+			        // Optionally set: claims.put("currentRestaurantId", null);
+			    }
 			}
+
 			String token = jwtService.generateToken(loginDto.getEmail(), claims);
 
 			Map<String, String> response = new HashMap<>();

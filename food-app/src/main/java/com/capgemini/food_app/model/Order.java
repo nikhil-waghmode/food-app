@@ -37,16 +37,14 @@ public class Order {
 
 	}
 
-	public Order(Long id, LocalDate date, Double totalAmount) {
+	public Order(LocalDate date, Double totalAmount) {
 		super();
-		this.id = id;
 		this.date = date;
 		this.totalAmount = totalAmount;
 	}
 
-	public Order(Long id, Long userId, Long restaurantId, LocalDate date, Double totalAmount) {
+	public Order(Long userId, Long restaurantId, LocalDate date, Double totalAmount) {
 		super();
-		this.id = id;
 		this.userId = userId;
 		this.restaurantId = restaurantId;
 		this.date = date;

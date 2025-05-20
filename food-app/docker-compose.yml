@@ -7,7 +7,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8081:8081"
+      - "8080:8080"
     depends_on:
       db:
         condition: service_healthy
@@ -33,12 +33,13 @@ services:
       - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+      - /Users/nikhilwaghmode/Documents/test-food/food-app/food-app/db-init:/docker-entrypoint-initdb.d:rw
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-pTejas@24l"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p6969"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 40s 
+      start_period: 40s
 
 volumes:
   mysql_data:

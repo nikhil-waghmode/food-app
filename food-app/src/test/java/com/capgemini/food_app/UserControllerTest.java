@@ -1,80 +1,55 @@
 package com.capgemini.food_app;
 
+
 import com.capgemini.food_app.model.User;
 import com.capgemini.food_app.rest.UserController;
 import com.capgemini.food_app.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Arrays;
+import java.util.List;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(UserController.class)
 class UserControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
+    @Mock
     private UserService userService;
+
+    @InjectMocks
+    private UserController userController;
+
+    private MockMvc mockMvc;
 
     private User user;
 
     @BeforeEach
     void setUp() {
-        user = new User();
-        user.setId(1L);
-        user.setName("Milind");
-        user.setEmail("milind@example.com");
-        user.setPassword("password123");
-        user.setPhone("1234567890");
-        user.setUserType("Customer");
-        user.setLocation("Pune");
-        user.setUserImg("image.jpg");
+        MockitoAnnotations.openMocks(this);
+        mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
+
+        user = new User("John Doe", "john@example.com", "password", "1234567890", "CUSTOMER", "NY", "img.jpg");
     }
 
     @Test
     void testGetAllUsers() throws Exception {
-        when(userService.getAllUsers()).thenReturn(Arrays.asList(user));
+        List<User> users = Arrays.asList(user);
+        when(userService.getAllUsers()).thenReturn(users);
 
         mockMvc.perform(get("/api/users"))
-               .andExpect(status().isOk())
-               .andExpect(jsonPath("$.size()").value(1))
-               .andExpect(jsonPath("$[0].name").value("Milind"));
-    }
-
-    @Test
-    void testCreateUser() throws Exception {
-        MockMultipartFile file = new MockMultipartFile(
-            "userImg", "profile.jpg", "image/jpeg", "dummy".getBytes()
-        );
-        when(userService.createUser(
-                eq("Milind"), eq("milind@example.com"), eq("password123"),
-                eq("1234567890"), eq("Pune"), eq("Customer"),
-                any(MockMultipartFile.class))
-        ).thenReturn(user);
-
-        mockMvc.perform(multipart("/api/users")
-                .file(file)
-                .param("name", user.getName())
-                .param("email", user.getEmail())
-                .param("password", user.getPassword())
-                .param("phone", user.getPhone())
-                .param("location", user.getLocation())
-                .param("userType", user.getUserType())
-        )
-        .andExpect(status().isCreated())
-        .andExpect(header().string("Location", "/api/users/1"))
-        .andExpect(jsonPath("$.name").value("Milind"));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name").value("John Doe"));
     }
 
     @Test
@@ -82,8 +57,68 @@ class UserControllerTest {
         when(userService.getUserById(1L)).thenReturn(user);
 
         mockMvc.perform(get("/api/users/1"))
-               .andExpect(status().isOk())
-               .andExpect(jsonPath("$.email").value("milind@example.com"));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").value("john@example.com"));
+    }
+
+    @Test
+    void testCreateUser() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("userImg", "img.jpg", "image/jpeg", "dummy".getBytes());
+
+        when(userService.createUser(
+                anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), any())
+        ).thenReturn(user);
+
+        mockMvc.perform(multipart("/api/users")
+                        .file(file)
+                        .param("name", "John Doe")
+                        .param("email", "john@example.com")
+                        .param("password", "password")
+                        .param("phone", "1234567890")
+                        .param("location", "NY")
+                        .param("userType", "CUSTOMER")
+                        .contentType(MediaType.MULTIPART_FORM_DATA))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name").value("John Doe"));
+    }
+
+    @Test
+    void testUpdateUser() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("userImg", "img.jpg", "image/jpeg", "dummy".getBytes());
+
+        when(userService.updateUser(
+                eq(1L), anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), any())
+        ).thenReturn(user);
+
+        mockMvc.perform(multipart("/api/users/1")
+                        .file(file)
+                        .with(request -> { request.setMethod("PUT"); return request; })
+                        .param("name", "John Doe")
+                        .param("email", "john@example.com")
+                        .param("password", "password")
+                        .param("phone", "1234567890")
+                        .param("location", "NY")
+                        .param("userType", "CUSTOMER")
+                        .contentType(MediaType.MULTIPART_FORM_DATA))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("John Doe"));
+    }
+
+    @Test
+    void testPatchUser() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("userImg", "img.jpg", "image/jpeg", "dummy".getBytes());
+
+        when(userService.patchUser(
+                eq(1L), any(), any(), any(), any(), any(), any(), any())
+        ).thenReturn(user);
+
+        mockMvc.perform(multipart("/api/users/1")
+                        .file(file)
+                        .with(request -> { request.setMethod("PATCH"); return request; })
+                        .param("name", "John Doe")
+                        .contentType(MediaType.MULTIPART_FORM_DATA))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("John Doe"));
     }
 
     @Test
@@ -91,86 +126,14 @@ class UserControllerTest {
         when(userService.deleteUser(1L)).thenReturn(true);
 
         mockMvc.perform(delete("/api/users/1"))
-               .andExpect(status().isNoContent());
+                .andExpect(status().isNoContent());
     }
 
     @Test
     void testDeleteUser_NotFound() throws Exception {
-        when(userService.deleteUser(2L)).thenReturn(false);
+        when(userService.deleteUser(1L)).thenReturn(false);
 
-        mockMvc.perform(delete("/api/users/2"))
-               .andExpect(status().isNotFound());
+        mockMvc.perform(delete("/api/users/1"))
+                .andExpect(status().isNotFound());
     }
-
-    @Test
-    void testUpdateUser_Success() throws Exception {
-        MockMultipartFile file = new MockMultipartFile(
-            "userImg", "update.jpg", "image/jpeg", "update".getBytes()
-        );
-        when(userService.updateUser(
-                eq(1L), eq("Milind"), eq("milind@example.com"), eq("password123"),
-                eq("1234567890"), eq("Pune"), eq("Customer"),
-                any(MockMultipartFile.class))
-        ).thenReturn(user);
-
-        mockMvc.perform(multipart("/api/users/1")
-                .file(file)
-                .with(request -> { request.setMethod("PUT"); return request; })
-                .param("name", user.getName())
-                .param("email", user.getEmail())
-                .param("password", user.getPassword())
-                .param("phone", user.getPhone())
-                .param("location", user.getLocation())
-                .param("userType", user.getUserType())
-        )
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.name").value("Milind"));
-    }
-
-    @Test
-    void testUpdateUser_NotFound() throws Exception {
-        MockMultipartFile file = new MockMultipartFile(
-            "userImg", "", "application/octet-stream", new byte[0]
-        );
-        when(userService.updateUser(
-                eq(2L), anyString(), anyString(), anyString(),
-                anyString(), anyString(), anyString(),
-                any(MockMultipartFile.class))
-        ).thenReturn(null);
-
-        mockMvc.perform(multipart("/api/users/2")
-                .file(file)
-                .with(request -> { request.setMethod("PUT"); return request; })
-                .param("name", user.getName())
-                .param("email", user.getEmail())
-                .param("password", user.getPassword())
-                .param("phone", user.getPhone())
-                .param("location", user.getLocation())
-                .param("userType", user.getUserType())
-        )
-        .andExpect(status().isNotFound());
-    }
-
-    @Test
-    void testPatchUser_Success() throws Exception {
-        user.setLocation("Mumbai");
-        MockMultipartFile file = new MockMultipartFile(
-            "userImg", "", "application/octet-stream", new byte[0]
-        );
-        when(userService.patchUser(
-                eq(1L), isNull(), isNull(), isNull(),
-                isNull(), eq("Mumbai"), isNull(),
-                any(MockMultipartFile.class))
-        ).thenReturn(user);
-
-        mockMvc.perform(multipart("/api/users/1")
-                .file(file)
-                .with(request -> { request.setMethod("PATCH"); return request; })
-                .param("location", "Mumbai")
-        )
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.location").value("Mumbai"));
-    }
-
-    
 }

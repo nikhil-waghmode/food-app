@@ -57,18 +57,16 @@ public class FoodItem {
 		
 	}
 
-	public FoodItem(Long id, String name, String category, Integer price, String itemImg) {
+	public FoodItem(String name, String category, Integer price, String itemImg) {
 		super();
-		this.id = id;
 		this.name = name;
 		this.category = category;
 		this.price = price;
 		this.itemImg = itemImg;
 	}
 
-	public FoodItem(Long id, String name, String category, Integer price, String itemImg, String cuisine) {
+	public FoodItem(String name, String category, Integer price, String itemImg, String cuisine) {
 		super();
-		this.id = id;
 		this.name = name;
 		this.category = category;
 		this.price = price;
@@ -76,9 +74,8 @@ public class FoodItem {
 		this.cuisine = cuisine;
 	}
 
-	public FoodItem(Long id, String name, String category, Integer price, String itemImg, Restaurant restaurant) {
+	public FoodItem(String name, String category, Integer price, String itemImg, Restaurant restaurant) {
 		super();
-		this.id = id;
 		this.name = name;
 		this.category = category;
 		this.price = price;

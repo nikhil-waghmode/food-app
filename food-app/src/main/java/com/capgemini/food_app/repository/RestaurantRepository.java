@@ -9,10 +9,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
-    Restaurant findByOwnerId(Long ownerId);
+	Optional<Restaurant> findByOwnerId(Long ownerId);
 
     @Query("SELECT new com.capgemini.food_app.dto.TopRestaurantDTO(r, AVG(rev.rating)) " +
             "FROM Restaurant r JOIN r.review rev " +

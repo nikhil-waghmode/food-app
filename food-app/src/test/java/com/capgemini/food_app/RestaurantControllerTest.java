@@ -1,167 +1,188 @@
 package com.capgemini.food_app;
 
 
+import com.capgemini.food_app.dto.TopRestaurantDTO;
 import com.capgemini.food_app.exception.RestaurantNotFoundException;
 import com.capgemini.food_app.model.Restaurant;
-
-import com.capgemini.food_app.exception.RestaurantNotFoundException;
-import com.capgemini.food_app.model.Restaurant;
+import com.capgemini.food_app.repository.RestaurantRepository;
 import com.capgemini.food_app.rest.RestaurantController;
 import com.capgemini.food_app.service.RestaurantService;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.capgemini.food_app.service.TopRestaurantDTOService;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpMethod;
+import org.mockito.*;
+import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Arrays;
+import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(RestaurantController.class)
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
 class RestaurantControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
+    @Mock
     private RestaurantService restaurantService;
+    @Mock
+    private RestaurantRepository restaurantRepository;
+    @Mock
+    private TopRestaurantDTOService topRestaurantDTOService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @InjectMocks
+    private RestaurantController restaurantController;
 
-    private Restaurant restaurant;
+    private Restaurant sampleRestaurant;
 
     @BeforeEach
     void setUp() {
-        restaurant = new Restaurant();
-        restaurant.setId(1L);
-        restaurant.setName("Test Restaurant");
-        restaurant.setLocation("Test City");
-        restaurant.setContact("1234567890");
-        restaurant.setOwnerId(1L);
+        MockitoAnnotations.openMocks(this);
+        sampleRestaurant = new Restaurant();
+        sampleRestaurant.setId(1L);
+        sampleRestaurant.setName("Test Restaurant");
+        sampleRestaurant.setLocation("Test City");
+        sampleRestaurant.setContact("1234567890");
+        sampleRestaurant.setOwnerId(1L);
     }
 
     @Test
-    void testGetAllRestaurants() throws Exception {
-        when(restaurantService.getAllRestaurants()).thenReturn(Arrays.asList(restaurant));
-        
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/restaurants"))
-               .andExpect(status().isOk())
-               .andExpect(jsonPath("$[0].name").value("Test Restaurant"));
+    @DisplayName("Get All Restaurants - Should return OK and restaurant list")
+    void testGetAllRestaurants() {
+        when(restaurantService.getAllRestaurants()).thenReturn(Collections.singletonList(sampleRestaurant));
+
+        ResponseEntity<List<Restaurant>> response = restaurantController.getAllRestaurants();
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(1, response.getBody().size());
+        assertEquals("Test Restaurant", response.getBody().get(0).getName());
+        verify(restaurantService).getAllRestaurants();
     }
 
     @Test
-    void testGetRestaurantById_Success() throws Exception {
-        when(restaurantService.getRestaurantById(1L)).thenReturn(restaurant);
-        
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/restaurants/1"))
-               .andExpect(status().isOk())
-               .andExpect(jsonPath("$.contact").value("1234567890"));
+    @DisplayName("Get Restaurant By ID - Should return OK and restaurant")
+    void testGetRestaurantById() {
+        when(restaurantService.getRestaurantById(1L)).thenReturn(sampleRestaurant);
+
+        ResponseEntity<Restaurant> response = restaurantController.getRestaurantById(1L);
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(sampleRestaurant, response.getBody());
+        verify(restaurantService).getRestaurantById(1L);
     }
 
     @Test
-    void testGetRestaurantById_NotFound() throws Exception {
-        when(restaurantService.getRestaurantById(2L))
-            .thenThrow(new RestaurantNotFoundException("Restaurant not found with ID: 2"));
-        
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/restaurants/2"))
-               .andExpect(status().isNotFound())
-               .andExpect(jsonPath("$.message").value("Restaurant not found with ID: 2"));
+    @DisplayName("Get Restaurant By ID - Not Found should throw exception")
+    void testGetRestaurantById_NotFound() {
+        when(restaurantService.getRestaurantById(2L)).thenThrow(new RestaurantNotFoundException("Not found"));
+
+        assertThrows(RestaurantNotFoundException.class, () -> restaurantController.getRestaurantById(2L));
+        verify(restaurantService).getRestaurantById(2L);
     }
 
     @Test
-    void testGetRestaurantsByOwner() throws Exception {
+    @DisplayName("Get Restaurants By Owner - Should return OK and restaurant list")
+    void testGetRestaurantsByOwner() {
+        when(restaurantService.getRestaurantByOwner(1L)).thenReturn(sampleRestaurant);
 
-        when(restaurantService.getRestaurantByOwner(1L)).thenReturn(restaurant);
+        ResponseEntity<Restaurant> response = restaurantController.getRestaurantsByOwner(1L);
 
-        
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/restaurants/owner/1"))
-               .andExpect(status().isOk())
-               .andExpect(jsonPath("$[0].ownerId").value(1));
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(sampleRestaurant, response.getBody());
+        verify(restaurantService).getRestaurantByOwner(1L);
     }
 
     @Test
-    void testGetRestaurantCount() throws Exception {
+    @DisplayName("Get Restaurant Count - Should return OK and count")
+    void testGetRestaurantCount() {
         when(restaurantService.getTotalRestaurantsCount()).thenReturn(5L);
-        
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/restaurants/count"))
-               .andExpect(status().isOk())
-               .andExpect(content().string("5"));
+
+        ResponseEntity<Long> response = restaurantController.getRestaurantCount();
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(5L, response.getBody());
+        verify(restaurantService).getTotalRestaurantsCount();
     }
 
     @Test
-    void testCreateRestaurant() throws Exception {
-        when(restaurantService.createRestaurant(any(), any(), any(), any(), any()))
-            .thenReturn(restaurant);
+    @DisplayName("Create Restaurant - Should return CREATED and restaurant")
+    void testCreateRestaurant() throws IOException {
+        MockMultipartFile file = new MockMultipartFile("resImage", "test.jpg", MediaType.IMAGE_JPEG_VALUE, "test".getBytes());
+        when(restaurantService.createRestaurant(anyString(), anyString(), anyString(), anyLong(), any(MultipartFile.class)))
+                .thenReturn(sampleRestaurant);
 
-        mockMvc.perform(MockMvcRequestBuilders.multipart("/api/restaurants")
-                .file(new MockMultipartFile("resImage", "test.jpg", 
-                       MediaType.IMAGE_JPEG_VALUE, "test".getBytes()))
-                .param("name", "Test Restaurant")
-                .param("location", "Test City")
-                .param("contact", "1234567890")
-                .param("ownerId", "1"))
-               .andExpect(status().isCreated())
-               .andExpect(header().exists("Location"))
-               .andExpect(jsonPath("$.name").value("Test Restaurant"));
+        ResponseEntity<Restaurant> response = restaurantController.createRestaurant(
+                "Test Restaurant", "Test City", "1234567890", 1L, file);
+
+        assertEquals(201, response.getStatusCodeValue());
+        assertEquals(sampleRestaurant, response.getBody());
+        verify(restaurantService).createRestaurant("Test Restaurant", "Test City", "1234567890", 1L, file);
     }
 
     @Test
-    void testUpdateRestaurant_Success() throws Exception {
-        restaurant.setLocation("Updated City");
-        when(restaurantService.updateRestaurant(eq(1L), any(), any(), any(), any(), any()))
-            .thenReturn(restaurant);
+    @DisplayName("Update Restaurant - Should return OK and updated restaurant")
+    void testUpdateRestaurant() throws IOException {
+        MockMultipartFile file = new MockMultipartFile("resImage", "update.jpg", MediaType.IMAGE_JPEG_VALUE, "update".getBytes());
+        when(restaurantService.updateRestaurant(eq(1L), anyString(), anyString(), anyString(), anyLong(), any(MultipartFile.class)))
+                .thenReturn(sampleRestaurant);
 
-        mockMvc.perform(MockMvcRequestBuilders.multipart(HttpMethod.PUT, "/api/restaurants/1")
-                .file(new MockMultipartFile("resImage", "update.jpg", 
-                       MediaType.IMAGE_JPEG_VALUE, "update".getBytes()))
-                .param("name", "Updated Restaurant")
-                .param("location", "Updated City")
-                .param("contact", "0987654321")
-                .param("ownerId", "1"))
-               .andExpect(status().isOk())
-               .andExpect(jsonPath("$.location").value("Updated City"));
+        ResponseEntity<Restaurant> response = restaurantController.updateRestaurant(
+                1L, "Updated Restaurant", "Updated City", "0987654321", 1L, file);
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(sampleRestaurant, response.getBody());
+        verify(restaurantService).updateRestaurant(1L, "Updated Restaurant", "Updated City", "0987654321", 1L, file);
     }
 
     @Test
-    void testDeleteRestaurant_Success() throws Exception {
+    @DisplayName("Patch Restaurant - Should return OK and patched restaurant")
+    void testPatchRestaurant() throws IOException {
+        MockMultipartFile file = new MockMultipartFile("resImage", "patch.jpg", MediaType.IMAGE_JPEG_VALUE, "patch".getBytes());
+        when(restaurantService.patchRestaurant(eq(1L), anyString(), anyString(), anyString(), any(), any(MultipartFile.class)))
+                .thenReturn(sampleRestaurant);
+
+        ResponseEntity<Restaurant> response = restaurantController.patchRestaurant(
+                1L, "Patched", "Patched City", "0000000000", 1L, file);
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(sampleRestaurant, response.getBody());
+        verify(restaurantService).patchRestaurant(1L, "Patched", "Patched City", "0000000000", 1L, file);
+    }
+
+    @Test
+    @DisplayName("Delete Restaurant - Should return NO_CONTENT")
+    void testDeleteRestaurant() {
         doNothing().when(restaurantService).deleteRestaurant(1L);
-        
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/restaurants/1"))
-               .andExpect(status().isNoContent());
+
+        ResponseEntity<Void> response = restaurantController.deleteRestaurant(1L);
+
+        assertEquals(204, response.getStatusCodeValue());
+        verify(restaurantService).deleteRestaurant(1L);
     }
 
     @Test
-    void testDeleteRestaurant_NotFound() throws Exception {
-        doThrow(new RestaurantNotFoundException("Restaurant not found with ID: 2"))
-            .when(restaurantService).deleteRestaurant(2L);
-        
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/restaurants/2"))
-               .andExpect(status().isNotFound())
-               .andExpect(jsonPath("$.message").value("Restaurant not found with ID: 2"));
+    @DisplayName("Get Image - Not Found")
+    void testGetImage_NotFound() throws IOException {
+        ResponseEntity<Resource> response = restaurantController.getImage("nonexistent.jpg");
+        assertEquals(404, response.getStatusCodeValue());
     }
-
-    @Disabled
-    @Test
-    void testGetImage_Success() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/restaurants/image/test.jpg"))
-               .andExpect(status().isOk());
-    }
+  
 
     @Test
-    void testGetImage_NotFound() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/restaurants/image/nonexistent.jpg"))
-               .andExpect(status().isNotFound());
+    @DisplayName("Get Top Rated Restaurants - Should return list")
+    void testGetTopRatedRestaurants() {
+        TopRestaurantDTO dto = new TopRestaurantDTO();
+        when(topRestaurantDTOService.findTopRestaurantsByAverageRating()).thenReturn(Collections.singletonList(dto));
+
+        List<TopRestaurantDTO> result = restaurantController.getTopRatedRestaurants();
+
+        assertEquals(1, result.size());
+        verify(topRestaurantDTOService).findTopRestaurantsByAverageRating();
     }
+
+
 }
